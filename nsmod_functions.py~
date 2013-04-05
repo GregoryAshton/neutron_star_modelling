@@ -26,6 +26,7 @@ py.rcParams['axes.color_cycle'] = ['k', 'r', 'cyan']
 py.rcParams['font.size'] = 16
 py.rcParams['lines.linewidth'] = 2
 py.rcParams['axes.grid']=True
+py.rcParams['figure.figsize']= (10.0, 8.0)
 py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12,hspace=0.0)
 
 
@@ -137,14 +138,18 @@ def Simple_Plot_Transform(options):
 	py.show()
 
 
-def Spherical_Plot(options):
-	""" Plot the input data after transforming to spherical polar coordinates """
+def Spherical_Plot(file_name,opts):
+	""" Plot the input data after transforming to spherical polar coordinates 
+	The opts dictionary may contain """
 	# Default settings 
 	labelx = -0.1  # x position of the yaxis labels
 
 	# Import the data in components x,y,z
-	file_name = options.splot
-	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name) 
+	max_n = -1
+	if opts.has_key('max_n'):
+		max_n = opts['max_n']	
+
+	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name,max_n) 
 
 	# Transform to spherical polar coordinates
 	(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z)
@@ -185,7 +190,7 @@ def Spherical_Plot(options):
 	ax3.yaxis.set_label_coords(labelx, 0.5)
 	py.xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]",fontsize=16)
 
-	if options.end_val :
+	if opts.has_key('end_val') :
 		print " Data on the end value of the spherical components of omega"
 		omega_end = omega[-100:-1]
 		print " Average of |omega| :  %s s^-1  \n Range of omega : %s"	% (py.average(omega_end),max(omega_end)-min(omega_end))
@@ -195,20 +200,25 @@ def Spherical_Plot(options):
 		print " Average of phi :  %s s^-1 \n Range of phi : %s"	% (py.average(phi_end),max(phi_end)-min(phi_end))
 
 
-	if options.save_fig:
+	if opts.has_key('save_fig'):
 		Save_Figure(file_name,"Spherical_Plot")
 	else:
 		py.show()
 
-def Spherical_Plot_Transform(options):
-	""" Plot the input data after transforming to spherical polar coordinates in the primed coordinates"""
+def Spherical_Plot_Transform(file_name,options):
+	""" Plot the input data after transforming to spherical polar coordinates in the primed coordinates 
+	options should be passed as a dictionary with the following arguments:
+	opts : max_len ~ A maximum number of points to include
+	end_val : True ~ Prints an average of the last 100 points in the plot
+	save_fig : True ~ Save the figure in an appropriate way """
+
+
 	# Default settings 
 	labelx = -0.1  # x position of the yaxis labels
 
 	# Import the data in components x,y,z
-	file_name = options.Csplot
 	data=open(file_name,"r")	
-	if options.opts: 
+	if options['opts']: 
 		max_len = int(options.opts)
 	else : max_len=-1
 
@@ -290,7 +300,7 @@ def Spherical_Plot_Transform(options):
 		ax3.yaxis.set_label_coords(labelx, 0.5)
 		ax3.set_yticks(ax3.get_yticks()[0:-2])
 
-		py.show()
+	
 	else : 
 			# Function to help scale the x-axis
 		(t_scaled,scale_val) = Plotting_Functions.Sort_Out_Some_Axis(time)	
@@ -337,7 +347,7 @@ def Spherical_Plot_Transform(options):
 		py.xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]",fontsize=16)
 	
 		
-	if options.end_val :
+	if options['end_val'] :
 		print " Data on the end value of the spherical components of omega"
 		omega_end = omegaprime[-100:-1]
 		print " Average of |omega| :  %s s^-1  \n Range of omega : %s"	% (py.average(omega_end),max(omega_end)-min(omega_end))
@@ -346,8 +356,12 @@ def Spherical_Plot_Transform(options):
 		phi_end = omegaprime[-100:-1]
 		print " Average of phi :  %s s^-1 \n Range of phi : %s"	% (py.average(phi_end),max(phi_end)-min(phi_end))
 
+	if options['save_fig']:
+		Save_Figure(file_name,"Spherical_Plot_Transform")
+	
 	py.show()
 
+	
 def ThreeD_Plot_Cartesian(options):
 	d = 1000 ; po = 0.5 # default values 
 
@@ -420,7 +434,10 @@ def ThreeD_Plot_Cartesian(options):
 	ax.set_zticklabels([])
 
 
-	py.show()
+	if options.save_fig:
+		Save_Figure(file_name,"ThreeD_Plot_Cartesian")
+	else:
+		py.show()
 
 	if options.save_data:
 		file_name=options.save_data
@@ -463,9 +480,8 @@ def Alpha_Plot(options):
 	ax1.set_xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]",fontsize=16)
 
 	if options.save_fig:
-		print "saving file"
-		py.savefig(options.save_fig)
-	else: 	
+		Save_Figure(file_name,"Alpha")
+	else:
 		py.show()
 
 	if options.end_val: 
@@ -565,14 +581,14 @@ def Plot_Angular_Momentum_and_Energy(options):
 
 	py.legend()
 	if options.save_fig:
-		print "saving file"
-		py.savefig(options.save_fig)
-	else :
+		Save_Figure(file_name,"Angular_Momentum_and_Energy")
+	else:
 		py.show()
 
-def Run(options):
-	""" Takes as input the parameters chi,epsI,epsA,omega_0,eta,err=1.0e-12,*args separated by commas"""
-	parameters = options.run.split(",")
+def Run(run_options,opts_options=None):
+	""" Takes as input the parameters chi,epsI,epsA,omega_0,eta,err=1.0e-12,*args separated by commas..."""
+	parameters = run_options.split(",")
+
 	# Minimum number of input parameters
 	chi = parameters[0] # Input should be in degrees perhaps this should be checked?
 	epsI = parameters[1]
@@ -584,7 +600,7 @@ def Run(options):
 	if len(parameters) > 5 : err = parameters[5]
 	else : err = 1e-12 # Default parameter
 
-	if options.opts:
+	if opts_options != None:
 		args = options.opts
 	else : args = None
 
@@ -602,6 +618,8 @@ def Run(options):
 	os.system("gcc -static generic_script.o -lgsl -lgslcblas -lm")
 	os.system("./a.out >  %s" % file_name)
 	os.system("rm generic_script.* *~ a.out")
+	print " Run is complete for this data, the output is saved in the file "+file_name
+	return file_name
 
 
 def Beta_func(epsI,epsA,chi):

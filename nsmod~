@@ -1,0 +1,81 @@
+#!/usr/bin/python 
+
+# This file allows users to call the functions from the command line. It should not contain any functions required in other parts of the code
+
+import optparse, sys, os
+
+import nsmod_functions
+
+
+
+def parse_command_line(argvs):
+
+	parser = optparse.OptionParser()
+	
+	parser.add_option("--b_2_e", help="Return the epsilon_A value given a surface magnetic field (canonical value of R=1e6 cm is assumed)",metavar="Bs" )
+
+	parser.add_option("--e_2_b", help="Return the Bs value given a value of Epsilon_A (canonical value of R=1e6 cm is assumed)",metavar="Epsilon_A" )
+
+	parser.add_option("-p","--plot",help="Plot the last three colums in FILE against the first column it is assumed this refer to wx,wy and wz", metavar="FILE")
+
+	parser.add_option("-s","--splot",help="Plot the last three colums in FILE against the first column converting to spherical polars", metavar="FILE")
+
+	parser.add_option("-B", "--Beta" ,help="Takes as input =sign,epsI,epsA,chi and returns the angle Beta through which the xz coordinates rotate", metavar="FILE")
+
+	parser.add_option("-c", "--Cplot", help ="Same as plot but transforming coordinates to principle axis of the effective moment of inertia tensor ", metavar="FILE")
+
+	parser.add_option("-d", "--Csplot", help ="Same as splot but transforming coordinates to principle axis of the effective moment of inertia tensor", metavar="FILE")
+
+	parser.add_option("-3", "--ThreeD", help ="Plot the input in 3d of input file ", metavar="FILE")
+
+	parser.add_option("-a", "--alpha",help = "Plot the allignment of omega with the magnetic dipole axis ", metavar="FILE")
+	
+	parser.add_option("-x", "--param_space_plot", help = "Plot omega_dot, a_dot, phi_dot ", metavar="FILE")
+
+	parser.add_option("-z", "--correlation_sum" , help ="Compute the correlated sum of input file", metavar="dotted_variables_XXX")
+
+	parser.add_option("-r", "--run" , help = "Create the generic write file that can be compiled and run in C. The input should be of the form  chi,epsI,epsA,omega_0,eta,err=1.0e-12,*args  where \n chi = angle between magnetic dipole and z axis \n epsI = elastic deformation \n epsA magnetic deformation \n omega_0 = initial spin period \n eta = Simultion will stop when omega**2.0 < eta*omega_0**2.0 ")
+
+	parser.add_option("-i", "--plot_angular_momentum_and_energy" ) 
+
+
+	# Options to be called with above
+
+	parser.add_option("-e", "--end_val", help = "Print the average end value from the given input data ", action='store_true')
+
+	parser.add_option("-o", "--opts", help = "Options argument used in some particular tasks " ,metavar="o_1,o_2,..")
+
+	parser.add_option("--save_data", help = "Save the data from the task in an appropriate way", action='store_true', metavar="FILE")
+
+	parser.add_option("--save_fig" , help = "Save the figure in an appropriate way" ,metavar="FILE")
+
+	(options,arguments) = parser.parse_args(argvs)
+	return options, arguments
+
+options, arguments = parse_command_line(sys.argv)
+
+if options.b_2_e: nsmod_functions.Magnetic_Field_to_Epsilon_A()
+
+if options.e_2_b: nsmod_functions.Epsilon_A_to_Magnetic_Field()
+
+if options.plot: Simple_Plot()
+
+if options.splot: Spherical_Plot()
+
+if options.Beta: Print_Beta()
+
+if options.Cplot: Simple_Plot_Transform()
+
+if options.Csplot: Spherical_Plot_Transform()
+
+if options.ThreeD : ThreeD_Plot_Cartesian()
+
+if options.alpha : Alpha_Plot()
+
+if options.param_space_plot : NLD_Functions.Param_Space_Plot()
+
+if options.correlation_sum : NLD_Functions.Correlation_Sum()
+
+if options.run : Run()
+
+if options.plot_angular_momentum_and_energy: Plot_Angular_Momentum_and_Energy()

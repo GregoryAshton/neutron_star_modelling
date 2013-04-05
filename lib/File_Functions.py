@@ -45,13 +45,14 @@ def Params_From_File_Name(file_name):
 
 	return (chi,epsI,epsA,omega0,eta)
 
-def Import_Data(file_name,max_int=-1):
+def Import_Data(file_name,max_int=-1,d_int=1):
 	data = np.fromfile(file_name,dtype=float,count=max_int,sep=" ") 
 	n = len(data)
 	time = data[0:n:4]
 	x = data[1:n+1:4]
 	y = data[2:n+2:4]
 	z = data[3:n+3:4]
+	print len(time),len(x)
 
 	return (time,x,y,z)
 
@@ -465,7 +466,7 @@ main (void)
 	double y[3] = { omega_0*sin(a_int), 0.0 , omega_0*cos(a_int) };
 
 	// Start and stop times for integration in the automated version we choose a maximum value of t1:
-	double t = 0.0, t1 = 1e8; 
+	double t = 0.0, t1 = 1e15; 
 
 	double params[4];	
 	params[0] = lambda;

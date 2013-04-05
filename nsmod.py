@@ -63,10 +63,10 @@ def Run(run_options,Option_Dictionary):
 
 	if Option_Dictionary.has_key('no_anom'):
 		print " Running code WITHOUT the anomalous torque"
-		file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) ; args="no_anom"
+		file_name = "no_anom_chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) ; args="no_anom"
 	else :
 		print " Running code WITH the anomalous torque"
-		file_name = "no_anom_chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) ; args = None
+		file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) ; args = None
 
 	File_Functions.Write_File_Automatic(chi,epsI,epsA,omega0,eta_relative,err,args)
 	os.system("gcc -Wall -I/usr/local/include -c generic_script.c")

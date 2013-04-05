@@ -7,7 +7,6 @@ import optparse, sys, os
 import nsmod_functions
 
 
-
 def parse_command_line(argvs):
 
 	parser = optparse.OptionParser()
@@ -47,35 +46,37 @@ def parse_command_line(argvs):
 
 	parser.add_option("--save_data", help = "Save the data from the task in an appropriate way", action='store_true', metavar="FILE")
 
-	parser.add_option("--save_fig" , help = "Save the figure in an appropriate way" ,metavar="FILE")
+	parser.add_option("--save_fig" , help = "Save the figure in an appropriate way", action='store_true' ,metavar="FILE")
 
 	(options,arguments) = parser.parse_args(argvs)
 	return options, arguments
 
 options, arguments = parse_command_line(sys.argv)
 
-if options.b_2_e: nsmod_functions.Magnetic_Field_to_Epsilon_A(options.b_2_e)
+print options
 
-if options.e_2_b: nsmod_functions.Epsilon_A_to_Magnetic_Field(options.e_2_b)
+if options.b_2_e: nsmod_functions.Magnetic_Field_to_Epsilon_A(options)
 
-if options.plot: Simple_Plot()
+if options.e_2_b: nsmod_functions.Epsilon_A_to_Magnetic_Field(options)
 
-if options.splot: Spherical_Plot()
+if options.plot: nsmod_functions.Simple_Plot(options)
 
-if options.Beta: Print_Beta()
+if options.splot: nsmod_functions.Spherical_Plot(options)
 
-if options.Cplot: Simple_Plot_Transform()
+if options.Beta: nsmod_functions.Print_Beta(options)
 
-if options.Csplot: Spherical_Plot_Transform()
+if options.Cplot: nsmod_functions.Simple_Plot_Transform(options)
 
-if options.ThreeD : ThreeD_Plot_Cartesian()
+if options.Csplot: nsmod_functions.Spherical_Plot_Transform(options)
 
-if options.alpha : Alpha_Plot()
+if options.ThreeD : nsmod_functions.ThreeD_Plot_Cartesian(options)
 
-if options.param_space_plot : NLD_Functions.Param_Space_Plot()
+if options.alpha : nsmod_functions.Alpha_Plot(options)
 
-if options.correlation_sum : NLD_Functions.Correlation_Sum()
+#if options.param_space_plot : NLD_Functions.Param_Space_Plot()
 
-if options.run : Run()
+#if options.correlation_sum : NLD_Functions.Correlation_Sum()
 
-if options.plot_angular_momentum_and_energy: Plot_Angular_Momentum_and_Energy()
+if options.run : nsmod_functions.Run(options)
+
+if options.plot_angular_momentum_and_energy: nsmod_functions.Plot_Angular_Momentum_and_Energy(options)

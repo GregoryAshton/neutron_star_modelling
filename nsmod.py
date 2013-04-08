@@ -42,20 +42,35 @@ def Epsilon_A_to_Magnetic_Field(Epsilon_A):
 	print "Bs="+str(Bs)+" Epsilon_A="+str(Epsilon_A)
 
 
-def Run(run_options,Option_Dictionary):
-	""" Takes as input the parameters chi,epsI,epsA,omega_0,eta,err=1.0e-12,*args separated by commas..."""
-	parameters = run_options.split(",")
+def Run(Option_Dictionary):
+	""" Takes as input a dictionary of parameters chi,epsI,epsA,omega_0,eta,err=1.0e-12,*args from the input"""
 
 	# Minimum number of input parameters
-	chi = parameters[0] # Input should be in degrees perhaps this should be checked?
-	epsI = parameters[1]
-	epsA = parameters[2]
-	omega0 = parameters[3] 
-	eta = parameters[4]
+	if Option_Dictionary.has_key('chi') : chi = str(Option_Dictionary['chi'])
+	else : print "ERROR you have not specified chi"
+	# Input should be in degrees perhaps this should be checked?
+
+	if Option_Dictionary.has_key('epsI') : epsI = str(Option_Dictionary['epsI'])
+	else : print "ERROR you have not specified epsI"
+
+	if Option_Dictionary.has_key('epsA') : epsA = str(Option_Dictionary['epsA'])
+	else : print "ERROR you have not specified epsA"
+
+	if Option_Dictionary.has_key('omega0') : epsI = str(Option_Dictionary['omega0'])
+	else : print "ERROR you have not specified omega0"
+
+	if Option_Dictionary.has_key('eta') : eta = str(Option_Dictionary['eta'])
+	else : print "ERROR you have not specified eta"
+
+	if Option_Dictionary.has_key('omega0') : omega0 = str(Option_Dictionary['omega0'])
+	else : print "ERROR you have not specified eta"
+
+	print eta 
+
 	eta_relative = str(float(eta)*pow(float(omega0),2))
 
-	if len(parameters) > 5 : err = parameters[5]
-	else : err = 1e-12 # Default parameter
+	#if len(parameters) > 5 : err = parameters[5]
+	err = 1e-12 # Default parameter need to add options to change this
 
 	# Needs to implement check that the valuables are correct
 	#print "Writing file with chi = %s , epsI=%s, epsA=%s , omega_0=%s , t1 =%s,err=%s 
@@ -97,7 +112,7 @@ def main():
 
 		parser.add_option("-r", "--run" , help = 
 									"""Create the generic write file that can be compiled
-									 and run in C. The input should be of the form  
+									 and run in C. The input should be of the form of a dictionary including 
 
 									chi,epsI,epsA,omega_0,eta,err=1.0e-12,*args 
 
@@ -127,7 +142,8 @@ def main():
 
 	if options.beta : Print_Beta(options.beta)
 
-	if options.run : Run(options.run,Option_Dictionary)
+	# For the fun command the argument should be a dictionary of values. No Option_Dictionary exists
+	if options.run : Run(options.run)
 
 
 if __name__ == "__main__":

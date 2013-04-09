@@ -3,37 +3,92 @@
 from datetime import datetime
 import numpy as np
 
-def Import_Data(file_name,max_int=None,*args):
-	""" Return the contents of 'file_name' as 4 lists + a list of params"""
-	t1 = datetime.now() # Used in testing time
-	data=open(file_name,"r")	
-	time=[] ; x=[] ; y=[] ; z=[] ; params=[]
-	if max_int == None : 
-		for line in data:
-			line=line.split()
-			if len(params)==0:
-				params=(line)
-			else:
-				time.append(float(line[0]))
-				x.append(float(line[1]))
-				y.append(float(line[2]))
-				z.append(float(line[3]))
-	else :
-		for line in data:
-			line=line.split()
-			if len(params)==0:
-				params=(line)
-			else:
-				time.append(float(line[0]))
-				x.append(float(line[1]))
-				y.append(float(line[2]))
-				z.append(float(line[3]))
-			if len(x) > max_int : break
+def Params_From_File_Name(file_name):
+	# Could we improve this to give units?
+	"""Function to disect the standard filename a dictionary with all the values, this reduces the amount of code required on the other end"""
+	# Initiate dictionary 
+	p_d={}
 
-	t2 = datetime.now()
-	if "timing" in args:
-		print "Time for operations = ",t2-t1	
-	return (time,x,y,z,params)
+	# Remove the file descriptor and the path directory
+	f = file_name.rstrip(".txt")
+	f = f.split("/")[-1]	
+
+	# Check if the anomalous torque was used or not
+	if "no_anom" in f: 
+		f = f.lstrip("no_anom_")
+		p_d["no_anom"] = True
+	else : p_d["no_anom"] = False
+	
+	# Import the rest of the parameters
+	f = f.split("_")
+	for i in range(0,len(f),2):
+		p_d[f[i]]=float(f[i+1])	
+
+	# Standard values for c , R in cgs
+	c = 3e10 
+	R = 1e6
+	# Compute a couple of often used variabes	
+	p_d["tauP"] = pow(p_d["omega0"]*p_d["epsI"],-1)
+	p_d["tauA"] = pow(p_d["omega0"]*p_d["epsA"],-1)
+	p_d["tauS"] = pow(p_d["omega0"]**2.0 *p_d["epsA"],-1)*3*c/(2*R)
+
+	return p_d
+
+
+	# Standard values for c , R in cgs
+	c = 3e10 
+	R = 1e6
+	# Compute a couple of often used variabes	
+	tau_P = pow(omega0*epsI,-1)
+	tau_A = pow(omega0*epsA,-1)
+	tau_S = pow(omega0*omega0*epsA)*3*c/(2*R)
+
+	return (chi,epsI,epsA,omega0,eta)
+
+def Import_Data(file_name,max_int=-1,d_int=1):
+	data = np.fromfile(file_name,dtype=float,count=max_int,sep=" ") 
+	n = len(data)
+	time = data[0:n:4]
+	x = data[1:n+1:4]
+	y = data[2:n+2:4]
+	z = data[3:n+3:4]
+	print len(time),len(x)
+
+	return (time,x,y,z)
+
+
+# Old code which used the params header
+#def Import_Data(file_name,max_int=None,*args):
+#	""" Return the contents of 'file_name' as 4 lists + a list of params"""
+#	t1 = datetime.now() # Used in testing time
+#	data=open(file_name,"r")	
+#	time=[] ; x=[] ; y=[] ; z=[] ; params=[]
+#	if max_int == None : 
+#		for line in data:
+#			line=line.split()
+#			if len(params)==0:
+#				params=(line)
+#			else:
+#				time.append(float(line[0]))
+#				x.append(float(line[1]))
+#				y.append(float(line[2]))
+#				z.append(float(line[3]))
+#	else :
+#		for line in data:
+#			line=line.split()
+#			if len(params)==0:
+#				params=(line)
+#			else:
+#				time.append(float(line[0]))
+#				x.append(float(line[1]))
+#				y.append(float(line[2]))
+#				z.append(float(line[3]))
+#			if len(x) > max_int : break
+#
+#	t2 = datetime.now()
+#	if "timing" in args:
+#		print "Time for operations = ",t2-t1	
+#	return (time,x,y,z,params)
 
 def Import_Data_Array_Method(file_name,max_int=None,*args):
 	t1 = datetime.now() # Used for testing time 
@@ -131,11 +186,6 @@ main (void)
 	double a_int=M_PI*50.0/180; 
 	double y[3] = { omega_0*sin(a_int), 0.0 , omega_0*cos(a_int) };
 
-	/* Some computed time scales */
-	double ts = pow(lambda*eps_A*omega_0*omega_0,-1);
-	double ta = pow(eps_A*omega_0,-1);
-	double tp = pow(eps_I*omega_0,-1);
-
 	// Start and stop times for integration:
 	double t = 0.0, t1 = KEY_t1;
 
@@ -170,8 +220,6 @@ main (void)
 
 	/*************************************************************/
 
-	/* Print some computed initial data to file */
-	printf("chi=%.5e eps_A=%.5e eps_I=%.5e  t_end=%.2e ts=%.2e ta=%.2e tp=%.2e\n", chi , eps_A, eps_I, t1 ,ts,ta,tp);
 
 	while (t < t1)
 	{
@@ -270,11 +318,6 @@ main (void)
 	double a_int=M_PI*50.0/180; 
 	double y[3] = { omega_0*sin(a_int), 0.0 , omega_0*cos(a_int) };
 
-	/* Some computed time scales */
-	double ts = pow(lambda*eps_A*omega_0*omega_0,-1);
-	double ta = pow(eps_A*omega_0,-1);
-	double tp = pow(eps_I*omega_0,-1);
-
 	// Start and stop times for integration:
 	double t = 0.0, t1 = KEY_t1;
 
@@ -308,9 +351,6 @@ main (void)
 	double h = 1e-10;
 
 	/*************************************************************/
-
-	/* Print some computed initial data to file */
-	printf("chi=%.5e eps_A=%.5e eps_I=%.5e  t_end=%.2e ts=%.2e ta=%.2e tp=%.2e\n", chi , eps_A, eps_I, t1 ,ts,ta,tp);
 
 	while (t < t1)
 	{
@@ -425,13 +465,8 @@ main (void)
 	double a_int=M_PI*50.0/180; 
 	double y[3] = { omega_0*sin(a_int), 0.0 , omega_0*cos(a_int) };
 
-	/* Some computed time scales */
-	double ts = pow(lambda*eps_A*omega_0*omega_0,-1);
-	double ta = pow(eps_A*omega_0,-1);
-	double tp = pow(eps_I*omega_0,-1);
-
 	// Start and stop times for integration in the automated version we choose a maximum value of t1:
-	double t = 0.0, t1 = 1e10; 
+	double t = 0.0, t1 = 1e15; 
 
 	double params[4];	
 	params[0] = lambda;
@@ -466,9 +501,6 @@ main (void)
 	
 	/* square value of spin magnitude to cut of simulation */
 	double eta = KEY_ETA_REL ;
-
-	/* Print some computed initial data to file */
-	printf("chi=%.5e eps_A=%.5e eps_I=%.5e  eta_rel=%.2e ts=%.2e ta=%.2e tp=%.2e\n", chi , eps_A, eps_I, eta ,ts,ta,tp);
 
 	while (pow(y[0],2)+pow(y[1],2)+pow(y[2],2) > eta && t < t1)
 	{
@@ -567,11 +599,6 @@ main (void)
 	double a_int=M_PI*50.0/180; 
 	double y[3] = { omega_0*sin(a_int), 0.0 , omega_0*cos(a_int) };
 
-	/* Some computed time scales */
-	double ts = pow(lambda*eps_A*omega_0*omega_0,-1);
-	double ta = pow(eps_A*omega_0,-1);
-	double tp = pow(eps_I*omega_0,-1);
-
 	// Start and stop times for integration in the automated version we choose a maximum value of t1:
 	double t = 0.0, t1 = 1e15;
 
@@ -608,9 +635,6 @@ main (void)
 
 	/* square value of spin magnitude to cut of simulation */
 	double eta = KEY_ETA_REL ;
-
-	/* Print some computed initial data to file */
-	printf("chi=%.5e eps_A=%.5e eps_I=%.5e  eta_rel=%.2e ts=%.2e ta=%.2e tp=%.2e\n", chi , eps_A, eps_I, eta ,ts,ta,tp);
 
 	while (pow(y[0],2)+pow(y[1],2)+pow(y[2],2) > eta && t < t1) 
 	{

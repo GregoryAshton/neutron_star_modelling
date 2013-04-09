@@ -42,13 +42,14 @@ def Epsilon_A_to_Magnetic_Field(Epsilon_A):
 	print "Bs="+str(Bs)+" Epsilon_A="+str(Epsilon_A)
 
 
+# Top level function to sort the dictionary of parameters write a .c script compile and output to a suitable .txt file
+# may be able to use http://docs.python.org/2/tutorial/controlflow.html instead eg **dictionary
 def Run(Option_Dictionary):
-	""" Takes as input a dictionary of parameters chi,epsI,epsA,omega_0,eta,err=1.0e-12,*args from the input"""
+	""" Takes as input a dictionary of parameters chi,epsI,epsA,omega_0,eta,err=1.0e-12,*args from the input. chi must be unit degrees and not radians"""
 
 	# Minimum number of input parameters
 	if Option_Dictionary.has_key('chi') : chi = str(Option_Dictionary['chi'])
-	else : print "ERROR you have not specified chi"
-	# Input should be in degrees perhaps this should be checked?
+	else : print "ERROR you have not specified chi" 
 
 	if Option_Dictionary.has_key('epsI') : epsI = str(Option_Dictionary['epsI'])
 	else : print "ERROR you have not specified epsI"
@@ -56,39 +57,37 @@ def Run(Option_Dictionary):
 	if Option_Dictionary.has_key('epsA') : epsA = str(Option_Dictionary['epsA'])
 	else : print "ERROR you have not specified epsA"
 
-	if Option_Dictionary.has_key('omega0') : epsI = str(Option_Dictionary['omega0'])
+	if Option_Dictionary.has_key('omega0') : omega0 = str(Option_Dictionary['omega0'])
 	else : print "ERROR you have not specified omega0"
 
 	if Option_Dictionary.has_key('eta') : eta = str(Option_Dictionary['eta'])
 	else : print "ERROR you have not specified eta"
 
-	if Option_Dictionary.has_key('omega0') : omega0 = str(Option_Dictionary['omega0'])
-	else : print "ERROR you have not specified eta"
+	if Option_Dictionary.has_key('err') : err = str(Option_Dictionary['err'])
+	else : 
+		#print " Using default error value of 1e-12" 
+		err = 1e-12
 
-	print eta 
-
+	# Caluclate the relative eta 
 	eta_relative = str(float(eta)*pow(float(omega0),2))
 
-	#if len(parameters) > 5 : err = parameters[5]
-	err = 1e-12 # Default parameter need to add options to change this
-
-	# Needs to implement check that the valuables are correct
-	#print "Writing file with chi = %s , epsI=%s, epsA=%s , omega_0=%s , t1 =%s,err=%s 
-	#File_Functions.Write_File(chi,epsI,epsA,omega_0,t1,err,args)
-
-	if Option_Dictionary.has_key('no_anom'):
+	# Create file name 
+	if Option_Dictionary.has_key('no_anom') and Option_Dictionary['no_anom']==True:
 		print " Running code WITHOUT the anomalous torque"
-		file_name = "no_anom_chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) ; args="no_anom"
+		file_name = "no_anom_chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) 
+		args="no_anom"
 	else :
 		print " Running code WITH the anomalous torque"
-		file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) ; args = None
+		file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) 
+		args = None
 
 	File_Functions.Write_File_Automatic(chi,epsI,epsA,omega0,eta_relative,err,args)
 	os.system("gcc -Wall -I/usr/local/include -c generic_script.c")
 	os.system("gcc -static generic_script.o -lgsl -lgslcblas -lm")
-	os.system("./a.out >  %s" % file_name)
-	os.system("rm generic_script.* *~ a.out")
+	os.system("./a.out >  %s" % (file_name) )
+	os.system("rm generic_script.*  a.out")
 	print " Run is complete for this data, the output is saved in the file "+file_name
+	print 
 	return file_name
 
 def Create_Option_Dictionary(opts):

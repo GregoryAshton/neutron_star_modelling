@@ -128,7 +128,7 @@ def Write_File(chi,eps_I,eps_A,omega_0,t1,err=1.0e-12,*args):
 
 /* Function containing the ODEs*/
 
-
+int
 func (double t, const double y[], double f[] , void *params)
 {
 	/* Import the three time dependant variables from y[]*/
@@ -260,7 +260,7 @@ main (void)
 
 /* Function containing the ODEs*/
 
-
+int
 func (double t, const double y[], double f[] , void *params)
 {
 	/* Import the three time dependant variables from y[]*/
@@ -407,7 +407,7 @@ def Write_File_Automatic(chi,eps_I,eps_A,omega_0,eta_relative,err=1.0e-12,*args)
 
 /* Function containing the ODEs*/
 
-
+int
 func (double t, const double y[], double f[] , void *params)
 {
 	/* Import the three time dependant variables from y[]*/
@@ -541,7 +541,7 @@ main (void)
 
 /* Function containing the ODEs*/
 
-
+int
 func (double t, const double y[], double f[] , void *params)
 {
 	/* Import the three time dependant variables from y[]*/

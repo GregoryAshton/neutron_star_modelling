@@ -15,18 +15,19 @@ import lib.File_Functions as File_Functions
 import lib.Physics_Functions as Physics_Functions 
 import lib.Plotting_Functions as Plotting_Functions
 
-# Set the default font for all plots 
-from matplotlib import rc
-rc('font',**{'family':'serif','serif':['Computer Modern Roman']})
-rc('text', usetex=True)
+def Defaults():
+	# Set the default font for all plots 
+	from matplotlib import rc
+	rc('font',**{'family':'serif','serif':['Computer Modern Roman']})
+	rc('text', usetex=True)
 
-# Set the defaults for axis
-py.rcParams['axes.color_cycle'] = ['k', 'r', 'cyan']
-py.rcParams['font.size'] = 16
-py.rcParams['lines.linewidth'] = 2
-py.rcParams['axes.grid']=True
-py.rcParams['figure.figsize']= (10.0, 8.0)
-py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12,hspace=0.0)
+	# Set the defaults for axis
+	py.rcParams['axes.color_cycle'] = ['k', 'r', 'cyan']
+	py.rcParams['font.size'] = 16
+	py.rcParams['lines.linewidth'] = 2
+	py.rcParams['axes.grid']=True
+	py.rcParams['figure.figsize']= (10.0, 8.0)
+	py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12,hspace=0.0)
 
 # Plotting functions
 
@@ -190,4 +191,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+	Defaults()
+	main()

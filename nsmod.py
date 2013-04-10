@@ -47,6 +47,7 @@ def Epsilon_A_to_Magnetic_Field(Epsilon_A):
 def Run(Option_Dictionary):
 	""" Takes as input a dictionary of parameters chi,epsI,epsA,omega_0,eta,err=1.0e-12,*args from the input. chi must be unit degrees and not radians"""
 
+	# Currently this will take either eta, or t but it's starting to get messy. Consider simplfying.
 	# Minimum number of input parameters
 	if Option_Dictionary.has_key('chi') : chi = str(Option_Dictionary['chi'])
 	else : print "ERROR you have not specified chi" 
@@ -60,28 +61,45 @@ def Run(Option_Dictionary):
 	if Option_Dictionary.has_key('omega0') : omega0 = str(Option_Dictionary['omega0'])
 	else : print "ERROR you have not specified omega0"
 
-	if Option_Dictionary.has_key('eta') : eta = str(Option_Dictionary['eta'])
-	else : print "ERROR you have not specified eta"
-
 	if Option_Dictionary.has_key('err') : err = str(Option_Dictionary['err'])
 	else : 
 		#print " Using default error value of 1e-12" 
 		err = 1e-12
 
-	# Caluclate the relative eta 
-	eta_relative = str(float(eta)*pow(float(omega0),2))
 
 	# Create file name 
-	if Option_Dictionary.has_key('no_anom') and Option_Dictionary['no_anom']==True:
-		print " Running code WITHOUT the anomalous torque"
-		file_name = "no_anom_chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) 
-		args="no_anom"
-	else :
-		print " Running code WITH the anomalous torque"
-		file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) 
-		args = None
+	if Option_Dictionary.has_key('eta'):
+		eta = str(Option_Dictionary['eta'])
+		# Caluclate the relative eta 
+		eta_relative = str(float(eta)*pow(float(omega0),2))
 
-	File_Functions.Write_File_Automatic(chi,epsI,epsA,omega0,eta_relative,err,args)
+		if Option_Dictionary.has_key('no_anom') and Option_Dictionary['no_anom']==True:
+			print " Running code WITHOUT the anomalous torque"
+			file_name = "no_anom_chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) 
+			args="no_anom"
+		else :
+			print " Running code WITH the anomalous torque"
+			file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) 
+			args = None
+
+		File_Functions.Write_File_Automatic(chi,epsI,epsA,omega0,eta_relative,err,args)
+
+	elif Option_Dictionary.has_key('t1'):
+		t1 = str(Option_Dictionary['t1'])
+
+		if Option_Dictionary.has_key('no_anom') and Option_Dictionary['no_anom']==True:
+			print " Running code WITHOUT the anomalous torque"
+			file_name = "no_anom_chi_%s_epsI_%s_epsA_%s_omega0_%s_t1_%s.txt" % (chi,epsI,epsA,omega0,t1) 
+			args="no_anom"
+		else :
+			print " Running code WITH the anomalous torque"
+			file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_t1_%s.txt" % (chi,epsI,epsA,omega0t1) 
+			args = None
+
+		File_Functions.Write_File(chi,epsI,epsA,omega0,t1,err,args) # Note this is not the automatic writer..consider relabelling
+
+	else : print " You have not specified either eta or t1"
+
 	os.system("gcc -Wall -I/usr/local/include -c generic_script.c")
 	os.system("gcc -static generic_script.o -lgsl -lgslcblas -lm")
 	os.system("./a.out >  %s" % (file_name) )

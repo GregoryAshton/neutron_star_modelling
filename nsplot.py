@@ -171,7 +171,7 @@ def Alpha_Plot(file_name,Option_Dictionary):
 	# Extract some parameters from the first line in the file 
 	epsI=Parameter_Dictionary["epsI"]
 	epsA=Parameter_Dictionary["epsA"]
-	chi=Parameter_Dictionary["chi"]
+	chi=Parameter_Dictionary["chi"] # This will be returned in radians
 	
 	# Transform to spherical polar coordinates specifying that we wish the angles to be in Radians rather than degrees
 	(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z,"Radians")
@@ -180,10 +180,12 @@ def Alpha_Plot(file_name,Option_Dictionary):
 	(t_scaled,scale_val) = Plotting_Functions.Sort_Out_Some_Axis(time)	
 
 	# Calculate the angle made with the magnetic dipole assumed to lie at chi to the z axis in the x-z plane
-	Sx=py.sin(chi) ; Cx=py.cos(chi)
+	chi_radians = chi * pi/180
+	Sx=py.sin(chi_radians) ; Cx=py.cos(chi_radians)
 	alpha = [py.arccos(Sx*py.sin(a[i])*py.cos(phi[i]) + Cx*py.cos(a[i]))*180/pi for i in range(len(a))]
 
-	ax1=py.subplot(111)
+	fig = py.figure()
+	ax1=fig.add_subplot(111)
 	ax1.plot(t_scaled,alpha,lw=2)
 	ax1.set_ylabel(r"$\alpha$ [deg]",fontsize=20,rotation="horizontal")
 	ax1.set_xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]",fontsize=16)
@@ -194,9 +196,7 @@ def Alpha_Plot(file_name,Option_Dictionary):
 		py.show()
 
 	if Option_Dictionary.has_key('end_val') :
-		frac = float(options.end_val)
-		n = int(len(alpha)*frac)	
-		print " Average of the last "+str(frac*100.0)+"% is "+str(py.average(alpha[-1-n:-1]))+" degrees"
+		print " Average of the last "+str(5)+" points is "+str(py.average(alpha[-6:-1]))+" degrees"
 
 
 def main():

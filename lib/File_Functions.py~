@@ -46,6 +46,7 @@ def Params_From_File_Name(file_name):
 	return (chi,epsI,epsA,omega0,eta)
 
 def Import_Data(file_name,max_int=-1,d_int=1):
+	if max_int != -1 : max_int = 4 *max_int
 	data = np.fromfile(file_name,dtype=float,count=max_int,sep=" ") 
 	n = len(data)
 	time = data[0:n:4]
@@ -128,7 +129,7 @@ def Write_File(chi,eps_I,eps_A,omega_0,t1,err=1.0e-12,*args):
 
 /* Function containing the ODEs*/
 
-
+int
 func (double t, const double y[], double f[] , void *params)
 {
 	/* Import the three time dependant variables from y[]*/
@@ -260,7 +261,7 @@ main (void)
 
 /* Function containing the ODEs*/
 
-
+int
 func (double t, const double y[], double f[] , void *params)
 {
 	/* Import the three time dependant variables from y[]*/
@@ -407,7 +408,7 @@ def Write_File_Automatic(chi,eps_I,eps_A,omega_0,eta_relative,err=1.0e-12,*args)
 
 /* Function containing the ODEs*/
 
-
+int
 func (double t, const double y[], double f[] , void *params)
 {
 	/* Import the three time dependant variables from y[]*/
@@ -541,7 +542,7 @@ main (void)
 
 /* Function containing the ODEs*/
 
-
+int
 func (double t, const double y[], double f[] , void *params)
 {
 	/* Import the three time dependant variables from y[]*/

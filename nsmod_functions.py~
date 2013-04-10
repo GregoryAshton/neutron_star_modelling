@@ -585,41 +585,6 @@ def Plot_Angular_Momentum_and_Energy(options):
 	else:
 		py.show()
 
-def Run(run_options,opts_options=None):
-	""" Takes as input the parameters chi,epsI,epsA,omega_0,eta,err=1.0e-12,*args separated by commas..."""
-	parameters = run_options.split(",")
-
-	# Minimum number of input parameters
-	chi = parameters[0] # Input should be in degrees perhaps this should be checked?
-	epsI = parameters[1]
-	epsA = parameters[2]
-	omega0 = parameters[3] 
-	eta = parameters[4]
-	eta_relative = str(float(eta)*pow(float(omega0),2))
-
-	if len(parameters) > 5 : err = parameters[5]
-	else : err = 1e-12 # Default parameter
-
-	if opts_options != None:
-		args = options.opts
-	else : args = None
-
-	# Needs to implement check that the valuables are correct
-	#print
-	#print "Writing file with chi = %s , epsI=%s, epsA=%s , omega_0=%s , t1 =%s,err=%s 
-	#File_Functions.Write_File(chi,epsI,epsA,omega_0,t1,err,args)
-
-	if args==None:
-		file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta)
-	elif "no_anom" in args:
-		file_name = "no_anom_chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta)
-	File_Functions.Write_File_Automatic(chi,epsI,epsA,omega0,eta_relative,err,args)
-	os.system("gcc -Wall -I/usr/local/include -c generic_script.c")
-	os.system("gcc -static generic_script.o -lgsl -lgslcblas -lm")
-	os.system("./a.out >  %s" % file_name)
-	os.system("rm generic_script.* *~ a.out")
-	print " Run is complete for this data, the output is saved in the file "+file_name
-	return file_name
 
 
 def Beta_func(epsI,epsA,chi):

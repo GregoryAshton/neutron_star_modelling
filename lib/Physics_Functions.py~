@@ -7,6 +7,7 @@ from math import pi
 
 def Transform_Cartesian_2_Spherical(x,y,z,Angle_Type="Degrees"):
 
+	print "Transform using angle type ",Angle_Type
 	if "Degrees" in Angle_Type:
 		""" Transform x,y,z to spherical coordinates returning omega,a,phi in degrees. This is the default"""
 		N=len(x)
@@ -15,7 +16,7 @@ def Transform_Cartesian_2_Spherical(x,y,z,Angle_Type="Degrees"):
 		azimuth=[py.arctan(y[i]/x[i])*180/pi for i in range(N)]
 		return (radial,polar,azimuth)
 
-	if "Radian" in Angle_Type:
+	elif Angle_Type in ["Radians","Radian","Rads"]:
 		""" Transform x,y,z to spherical coordinates returning omega,a,phi in radians"""
 		N=len(x)
 		radial=[(x[i]*x[i]+y[i]*y[i]+z[i]*z[i])**0.5 for i in range(N)]
@@ -34,7 +35,7 @@ def Transform_Cartesian_Body_Frame_2_Effective_Body_Frame(x,y,z,Beta):
 def Rotational_Kinetic_Energy(Ix,Iy,Iz,omega_x,omega_y,omega_z):
 	return 0.5*(Ix*pow(omega_x,2)+Iy*pow(omega_y,2)+Iz*pow(omega_z,2))
 
-def Fix_Phi(phi,epsilon=160.0,Angle_Type="degrees"):
+def Fix_Phi(phi,epsilon=160.0,Angle_Type="Degrees"):
 	""" Takes a list of phi values and looks for jumps greater than epsilon, assuming these reflect a full rotation (2pi-0) it adds a correction factor to the subsequent data"""
 	
 	if Angle_Type == "Degrees" :
@@ -46,7 +47,7 @@ def Fix_Phi(phi,epsilon=160.0,Angle_Type="degrees"):
 		phi=phi_fix
 		return phi
 
-	elif Angle_Type in ["Radians","Rads"] :
+	elif Angle_Type in ["Radians","Radian","Rads"] :
 		# Change the default value of epsilon
 		if epsilon==160.0 : epsilon = 1.0 
 

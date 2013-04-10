@@ -9,8 +9,8 @@ from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 
 # Import functions external files
-import lib.NLD_Functions as NLD_Functions
-import lib.GSL_ODE_Functions as GSL_ODE_Functions
+#import lib.NLD_Functions as NLD_Functions
+#import lib.GSL_ODE_Functions as ODE_Functions
 import lib.File_Functions as File_Functions
 import lib.Physics_Functions as Physics_Functions 
 import lib.Plotting_Functions as Plotting_Functions
@@ -23,29 +23,29 @@ def Save_Figure(file_name,type_of_plot,format_type=".png"):
 def Defaults():
 	# Set the default font for all plots 
 	from matplotlib import rc
-	rc('font',**{'family':'serif','serif':['Computer Modern Roman']})
+	rc('font',**{'family':'serif','serif':['Computer MOption_Dictionaryern Roman']})
 	rc('text', usetex=True)
 
 	# Set the defaults for axis
 	py.rcParams['axes.color_cycle'] = ['k', 'r', 'cyan']
-	py.rcParams['font.size'] = 16
+	py.rcParams['font.size'] = 18
 	py.rcParams['lines.linewidth'] = 2
 	py.rcParams['axes.grid']=True
 	py.rcParams['figure.figsize']= (10.0, 8.0)
-	py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12,hspace=0.0)
+	#py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12,hspace=0.0)
 
 # Plotting functions
 
-def Simple_Plot(file_name,OD):
+def Simple_Plot(file_name,Option_Dictionary):
 	""" Plots the given in as a function of time, it is assumed the columns of data are given by time , omega_x , omega_y and omega_z"""
 		
 	# Import the data 
 	(time,x,y,z) = File_Functions.Import_Data(file_name)
 
 	# Handle any additional options which are in the dictionary
-	if OD.has_key('tmax') : tmax = OD['tmax'] 
+	if Option_Dictionary.has_key('tmax') : tmax = Option_Dictionary['tmax'] 
 	else : tmax = max(time)
-	if OD.has_key('tmin') : tmin  = OD['tmin']
+	if Option_Dictionary.has_key('tmin') : tmin  = Option_Dictionary['tmin']
 	else : tmin = min(time)
 
 	fig1=py.subplot(3,1,1) ; fig1.set_xticklabels([])
@@ -71,7 +71,7 @@ def Simple_Plot(file_name,OD):
 	py.show()
 
 
-def Spherical_Plot(file_name,OD):
+def Spherical_Plot(file_name,Option_Dictionary):
 	""" Plot the input data after transforming to spherical polar coordinates 
 	The opts dictionary may contain 
 	nmax ~ limit the data from 0:nmax
@@ -83,16 +83,15 @@ def Spherical_Plot(file_name,OD):
 	labelx = -0.1  # x position of the yaxis labels
 
 	# Handle any additional options which are in the dictionary
-	if OD.has_key("nmax"):
-		max_n = int(OD['nmax']) 
+	if Option_Dictionary.has_key("nmax"):
+		max_n = int(Option_Dictionary['nmax']) 
 	else : max_n = -1
-	print max_n
 
 	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name,max_n) 
 
-	if OD.has_key('tmax') : tmax = OD['tmax'] 
+	if Option_Dictionary.has_key('tmax') : tmax = Option_Dictionary['tmax'] 
 	else : tmax = max(time)
-	if OD.has_key('tmin') : tmin  = OD['tmin']
+	if Option_Dictionary.has_key('tmin') : tmin  = Option_Dictionary['tmin']
 	else : tmin = 0.0
 
 
@@ -139,7 +138,7 @@ def Spherical_Plot(file_name,OD):
 	ax3.yaxis.set_label_coords(labelx, 0.5)
 	ax3.set_xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]",fontsize=16)
 	ax3.set_xlim(tmin*pow(10,-scale_val),tmax*pow(10,-scale_val))
-	if OD.has_key('end_val') :
+	if Option_Dictionary.has_key('end_val') :
 		print " Data on the end value of the spherical components of omega"
 		omega_end = omega[-100:-1]
 		print " Average of |omega| :  %s s^-1  \n Range of omega : %s"	% (py.average(omega_end),max(omega_end)-min(omega_end))
@@ -148,12 +147,56 @@ def Spherical_Plot(file_name,OD):
 		phi_end = omega[-100:-1]
 		print " Average of phi :  %s s^-1 \n Range of phi : %s"	% (py.average(phi_end),max(phi_end)-min(phi_end))
 
-
-	if OD.has_key('save_fig') and OD['save_fig'] == True :
+	py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12,hspace=0.0)
+	if Option_Dictionary.has_key('save_fig') and Option_Dictionary['save_fig'] == True :
 		Save_Figure(file_name,"Spherical_Plot")
 	else:
 		py.show()
 
+def Alpha_Plot(file_name,Option_Dictionary):
+	""" Plots the alignment of the input file [t,omega_x , omega_y and omega_z] against the magnetic dipole"""
+
+	# Handle any additional options which are in the dictionary
+	if Option_Dictionary.has_key("nmax"):
+		max_n = int(Option_Dictionary['nmax']) 
+	else : max_n = -1
+
+	# Import the data in components x,y,z
+	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name,max_n) 
+
+	# Get the paramters of the run
+	Parameter_Dictionary = File_Functions.Params_From_File_Name(file_name)
+
+
+	# Extract some parameters from the first line in the file 
+	epsI=Parameter_Dictionary["epsI"]
+	epsA=Parameter_Dictionary["epsA"]
+	chi=Parameter_Dictionary["chi"]
+	
+	# Transform to spherical polar coordinates specifying that we wish the angles to be in Radians rather than degrees
+	(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z,"Radians")
+	
+	# Function to help scale the t-axis
+	(t_scaled,scale_val) = Plotting_Functions.Sort_Out_Some_Axis(time)	
+
+	# Calculate the angle made with the magnetic dipole assumed to lie at chi to the z axis in the x-z plane
+	Sx=py.sin(chi) ; Cx=py.cos(chi)
+	alpha = [py.arccos(Sx*py.sin(a[i])*py.cos(phi[i]) + Cx*py.cos(a[i]))*180/pi for i in range(len(a))]
+
+	ax1=py.subplot(111)
+	ax1.plot(t_scaled,alpha,lw=2)
+	ax1.set_ylabel(r"$\alpha$ [deg]",fontsize=20,rotation="horizontal")
+	ax1.set_xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]",fontsize=16)
+
+	if Option_Dictionary.has_key('save_fig') and Option_Dictionary['save_fig'] == True :
+		Save_Figure(file_name,"Alpha")
+	else:
+		py.show()
+
+	if Option_Dictionary.has_key('end_val') :
+		frac = float(options.end_val)
+		n = int(len(alpha)*frac)	
+		print " Average of the last "+str(frac*100.0)+"% is "+str(py.average(alpha[-1-n:-1]))+" degrees"
 
 
 def main():
@@ -184,7 +227,6 @@ def main():
 		parser.add_option("-a", "--alpha",help = "Plot the allignment of omega with the magnetic dipole axis ", metavar="FILE")
 
 
-
 		# Options to be called with above
 
 
@@ -203,11 +245,13 @@ def main():
 
 	if options.splot: Spherical_Plot(options.splot,Option_Dictionary)
 
+	if options.alpha : Alpha_Plot(options.alpha,Option_Dictionary)
+
 	if options.Cplot: Simple_Plot_Transform(options.Cplot,options)
 
 	if options.Csplot: Spherical_Plot_Transform(options.Csplot,options)
 
-	if options.alpha : Alpha_Plot(options)
+
 
 
 if __name__ == "__main__":

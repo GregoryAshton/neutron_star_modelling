@@ -35,15 +35,15 @@ def Params_From_File_Name(file_name):
 	return p_d
 
 
-	# Standard values for c , R in cgs
-	c = 3e10 
-	R = 1e6
-	# Compute a couple of often used variabes	
-	tau_P = pow(omega0*epsI,-1)
-	tau_A = pow(omega0*epsA,-1)
-	tau_S = pow(omega0*omega0*epsA)*3*c/(2*R)
+#	# Standard values for c , R in cgs
+#	c = 3e10 
+#	R = 1e6
+#	# Compute a couple of often used variabes	
+#	tau_P = pow(omega0*epsI,-1)
+#	tau_A = pow(omega0*epsA,-1)
+#	tau_S = pow(omega0*omega0*epsA)*3*c/(2*R)
 
-	return (chi,epsI,epsA,omega0,eta)
+#	return (chi,epsI,epsA,omega0,eta)
 
 def Import_Data(file_name,max_int=-1,d_int=1):
 	if max_int != -1 : max_int = 4 *max_int # Note it is 4 since each line contains 4 columns so the total data set is 4*nmax

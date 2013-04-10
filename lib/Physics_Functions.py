@@ -9,14 +9,16 @@ def Transform_Cartesian_2_Spherical(x,y,z,Angle_Type="Degrees"):
 
 	if "Degrees" in Angle_Type:
 		""" Transform x,y,z to spherical coordinates returning omega,a,phi in degrees. This is the default"""
+		print "Transform using angle type Degrees"
 		N=len(x)
 		radial=[(x[i]*x[i]+y[i]*y[i]+z[i]*z[i])**0.5 for i in range(N)]
 		polar=[py.arccos(z[i]/radial[i])*180/pi for i in range(N)]
 		azimuth=[py.arctan(y[i]/x[i])*180/pi for i in range(N)]
 		return (radial,polar,azimuth)
 
-	if "Radian" in Angle_Type:
+	elif Angle_Type in ["Radians","Radian","Rads"]:
 		""" Transform x,y,z to spherical coordinates returning omega,a,phi in radians"""
+		print "Transform using angle type Radians"
 		N=len(x)
 		radial=[(x[i]*x[i]+y[i]*y[i]+z[i]*z[i])**0.5 for i in range(N)]
 		polar=[py.arccos(z[i]/radial[i]) for i in range(N)]
@@ -46,7 +48,7 @@ def Fix_Phi(phi,epsilon=160.0,Angle_Type="Degrees"):
 		phi=phi_fix
 		return phi
 
-	elif Angle_Type in ["Radians","Rads"] :
+	elif Angle_Type in ["Radians","Radian","Rads"] :
 		# Change the default value of epsilon
 		if epsilon==160.0 : epsilon = 1.0 
 

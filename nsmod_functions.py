@@ -465,7 +465,7 @@ def Alpha_Plot(options):
 	chi=p_d["chi"]
 	
 	# Transform to spherical polar coordinates specifying that we wish the angles to be in Radians rather than degrees
-	(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z,"Radians")
+	(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z,"Radian")
 	
 	# Function to help scale the t-axis
 	(t_scaled,scale_val) = Plotting_Functions.Sort_Out_Some_Axis(time)	

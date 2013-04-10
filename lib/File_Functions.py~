@@ -46,7 +46,7 @@ def Params_From_File_Name(file_name):
 	return (chi,epsI,epsA,omega0,eta)
 
 def Import_Data(file_name,max_int=-1,d_int=1):
-	if max_int != -1 : max_int = 4 *max_int
+	if max_int != -1 : max_int = 4 *max_int # Note it is 4 since each line contains 4 columns so the total data set is 4*nmax
 	data = np.fromfile(file_name,dtype=float,count=max_int,sep=" ") 
 	n = len(data)
 	time = data[0:n:4]

@@ -29,15 +29,30 @@ def Defaults():
 	# Set the defaults for axis
 	py.rcParams['axes.color_cycle'] = ['k', 'r', 'cyan']
 	py.rcParams['font.size'] = 18
+	py.rcParams[ 'axes.labelsize'] = 30	
 	py.rcParams['lines.linewidth'] = 2
 	py.rcParams['axes.grid']=True
 	py.rcParams['figure.figsize']= (10.0, 8.0)
 	#py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12,hspace=0.0)
 
+
+
+
+def Beta_Function(epsI,epsA,chi):
+	if abs(chi) < 2*pi : print "Please check that the chi used in Beta_Function is in degrees and not radians"
+ 
+	if epsI>=0:
+		sign=-1.0
+	else: sign=1.0
+
+	b=py.sqrt(epsA*epsA+epsI*epsI-2*epsA*epsI*py.cos(2*chi))
+	return py.arctan((epsI+epsA*(1-2*pow(py.cos(chi),2.0))+sign*b)/(2*epsA*py.sin(chi)*py.cos(chi)))
+
+
 # Plotting functions
 
 def Simple_Plot(file_name,Option_Dictionary):
-	""" Plots the given in as a function of time, it is assumed the columns of data are given by time , omega_x , omega_y and omega_z"""
+	""" Plots the given file as a function of time, it is assumed the columns of data are given by time , omega_x , omega_y and omega_z"""
 		
 	# Import the data 
 	(time,x,y,z) = File_Functions.Import_Data(file_name)
@@ -50,23 +65,23 @@ def Simple_Plot(file_name,Option_Dictionary):
 
 	fig1=py.subplot(3,1,1) ; fig1.set_xticklabels([])
 	fig1.plot(time,x)
-	py.ylabel(r"$\omega_{x}$",fontsize=20,rotation="horizontal")
+	py.ylabel(r"$\omega_{x}$",rotation="horizontal")
 	py.yticks(fig1.get_yticks()[1:-1])
 	py.xlim(tmin,tmax)
 
 	fig2=py.subplot(3,1,2) ; fig2.set_xticklabels([])
 	fig2.plot(time,y)
 	py.yticks() 
-	py.ylabel("$\omega_{y}$",fontsize=20,rotation="horizontal")
+	py.ylabel("$\omega_{y}$",rotation="horizontal")
 	py.yticks(fig2.get_yticks()[1:-1])
 	py.xlim(tmin,tmax)
 
 	fig2=py.subplot(3,1,3)
 	fig2.plot(time,z)
-	py.ylabel("$\omega_{z} $",fontsize=20,rotation="horizontal")
+	py.ylabel("$\omega_{z} $",rotation="horizontal")
 	py.xlim(tmin,tmax)
 
-	py.xlabel(r"$t$",fontsize=20)
+	py.xlabel(r"$t$")
 
 	py.show()
 
@@ -136,7 +151,7 @@ def Spherical_Plot(file_name,Option_Dictionary):
 	ax3.set_yticks(ax3.get_yticks()[0:-1])
 	ax3.set_ylabel("$\phi$ [deg]",rotation="vertical")
 	ax3.yaxis.set_label_coords(labelx, 0.5)
-	ax3.set_xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]",fontsize=16)
+	ax3.set_xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]")
 	ax3.set_xlim(tmin*pow(10,-scale_val),tmax*pow(10,-scale_val))
 	if Option_Dictionary.has_key('end_val') :
 		print " Data on the end value of the spherical components of omega"
@@ -184,10 +199,11 @@ def Alpha_Plot(file_name,Option_Dictionary):
 	Sx=py.sin(chi_radians) ; Cx=py.cos(chi_radians)
 	alpha = [py.arccos(Sx*py.sin(a[i])*py.cos(phi[i]) + Cx*py.cos(a[i]))*180/pi for i in range(len(a))]
 
-	ax1=py.subplot(111)
+	fig = py.figure()
+	ax1=fig.add_subplot(111)
 	ax1.plot(t_scaled,alpha,lw=2)
-	ax1.set_ylabel(r"$\alpha$ [deg]",fontsize=20,rotation="horizontal")
-	ax1.set_xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]",fontsize=16)
+	ax1.set_ylabel(r"$\alpha$ [deg]",rotation="horizontal")
+	ax1.set_xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]")
 
 	if Option_Dictionary.has_key('save_fig') and Option_Dictionary['save_fig'] == True :
 		Save_Figure(file_name,"Alpha")
@@ -196,6 +212,103 @@ def Alpha_Plot(file_name,Option_Dictionary):
 
 	if Option_Dictionary.has_key('end_val') :
 		print " Average of the last "+str(5)+" points is "+str(py.average(alpha[-6:-1]))+" degrees"
+
+def ThreeD_Plot_Cartesian(file_name,Option_Dictionary):
+	""" 
+
+	Plots the components of input file in 3D Option_Dictionary take the following 
+	# Integers to retrict the number of plotted points
+	start = int  
+	stop = int 
+
+	# Colouring commands
+	power = float 
+	"""
+
+	# Import the data in components x,y,z
+	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name) 
+
+	# Get the paramters of the run
+	Parameter_Dictionary = File_Functions.Params_From_File_Name(file_name)
+
+	# Set the defaults and then overide if they exist in Option_Dictionary
+	start = 0 
+	stop = -1
+
+	if Option_Dictionary.has_key("start") : start =  int(Option_Dictionary["start"])
+	if Option_Dictionary.has_key("stop") : stop =  int(Option_Dictionary["stop"])
+
+	if Option_Dictionary['verbose'] ==True :
+		print 
+		print " Reducing plotted data size from %s to %s" % (len(time) , stop-start)
+		print " The observation time  is from t=%s to %s seconds" % ( time[start] , time[stop])
+		print 
+	
+	# Reduce the number of points
+	time = time[start:stop] ; omega_x = omega_x[start:stop] ; omega_y = omega_y[start:stop] ; omega_z = omega_z[start:stop]
+
+	# Extract some parameters from the dictionary
+	epsI=Parameter_Dictionary["epsI"]
+	epsA=Parameter_Dictionary["epsA"]
+	chi =Parameter_Dictionary["chi"]
+
+	# Compute the rotation angle of primed axis and transform the solution omega_{xyz} into these coordinates
+#	beta=Beta_Function(epsI,epsA,chi)
+
+#	Cb=py.cos(beta) ; Sb=py.sin(beta)
+
+#	xprime=[x[i]*Cb - z[i]*Sb for i in range(len(x))]
+#	zprime=[z[i]*Cb + x[i]*Sb for i in range(len(x))]
+#	yprime = y
+
+	#fig = py.figure()
+	x = omega_x ; y = omega_y ; z = omega_z
+
+	ax = py.subplot(111, projection='3d')
+
+
+	# Compute same variables used for colouring and plot the x',y' and z' transforming the colour as time changes
+	if Option_Dictionary.has_key('power') : 
+		power = float(Option_Dictionary['power'])
+#		n=len(x)
+#		d = int(Plotting_Functions.Round_To_n(n,0))/100
+#		s=n/d 	
+#		for i in range(1,d-1):
+#			ax.plot(x[s*i:s*i+s],y[s*i:s*i+s],z[s*i:s*i+s],color=(0.0,1-float(pow(i,power)*1.0/pow(d,power)),0.8),alpha=0.5)
+
+		n = len(time)
+		for i in range(0,n-10,10):
+			ax.plot(x[i:i+11],y[i:i+11],z[i:i+11],color=(0.0,1-float(pow(i,power)*1.0/pow(n,power)),0.8),alpha=0.5)		
+	else :
+		ax.plot(x,y,z)
+
+	# Create and label the primed axis
+	ax.plot(py.zeros(100),py.zeros(100),py.linspace(-max(z),max(z),100),color="k")
+	ax.text(0,0,max(z)*1.1,"$z'$")
+	ax.plot(py.zeros(100),py.linspace(max(y),min(y),100),py.zeros(100),color="k")
+	ax.text(0,max(y)*1.1,0,"$y'$")
+	ax.plot(py.linspace(max(x),min(x),100),py.zeros(100),py.zeros(100),color="k")
+	ax.text(max(x)*1.1,0,0,"$x'$")
+
+	#py.ylabel(r"$\omega_{y}'$")
+	#py.zlabel(r"$\omega_{z}'$")
+
+	ax.set_xticklabels([])
+	ax.set_yticklabels([])
+	ax.set_zticklabels([])
+
+
+	#if options.save_fig:
+	#	Save_Figure(file_name,"ThreeD_Plot_Cartesian")
+	#else:
+	py.show()
+
+#	if options.save_data:
+#		file_name=options.save_data
+#		write_file=open(file_name,"w+")
+#		for i in range (len(xprime)):
+#			write_file.write(str(time[i])+" "+str(xprime[i])+" "+str(yprime[i])+" "+str(zprime[i])+"\n")
+#		write_file.close()
 
 
 def main():
@@ -214,22 +327,24 @@ def main():
 		parser = optparse.OptionParser()
 	
 
-		parser.add_option("-p","--plot",help="Plot the last three colums in FILE against the first column it is assumed this refer to wx,wy and wz", metavar="FILE")
+		parser.add_option("-p","--plot",help=Simple_Plot.__doc__, metavar="FILE")
 
-		parser.add_option("-s","--splot",help="Plot the last three colums in FILE against the first column converting to spherical polars", metavar="FILE")
-
-
-		parser.add_option("-c", "--Cplot", help ="Same as plot but transforming coordinates to principle axis of the effective moment of inertia tensor ", metavar="FILE")
-
-		parser.add_option("-d", "--Csplot", help ="Same as splot but transforming coordinates to principle axis of the effective moment of inertia tensor", metavar="FILE")
-
-		parser.add_option("-a", "--alpha",help = "Plot the allignment of omega with the magnetic dipole axis ", metavar="FILE")
+		parser.add_option("-s","--splot",help= Spherical_Plot.__doc__, metavar="FILE")
 
 
-		# Options to be called with above
+#		parser.add_option("-c", "--Cplot", help ="Same as plot but transforming coordinates to principle axis of the effective moment of inertia tensor ", metavar="FILE")
 
+#		parser.add_option("-d", "--Csplot", help = , metavar="FILE")
+
+		parser.add_option("-a", "--alpha",help = Alpha_Plot.__doc__, metavar="FILE")
+
+		parser.add_option("-3", "--threeDplot", help = ThreeD_Plot_Cartesian.__doc__ ) 
 
 		parser.add_option("-o", "--opts")
+
+		# Set the verbose/quite options, this will be passed to the option dictionary
+		parser.add_option("-v", action="store_true", dest="verbose", default=True)
+		parser.add_option("-q", action="store_false", dest="verbose")
 
 
 		(options,arguments) = parser.parse_args(argvs)
@@ -240,15 +355,20 @@ def main():
 	if options.opts : Option_Dictionary = Create_Option_Dictionary(options.opts)
 	else : Option_Dictionary = {}
 
+	# Add the verbosity to the Option Dictionary
+	Option_Dictionary['verbose'] = options.verbose
+
 	if options.plot: Simple_Plot(options.plot,Option_Dictionary)
 
 	if options.splot: Spherical_Plot(options.splot,Option_Dictionary)
 
 	if options.alpha : Alpha_Plot(options.alpha,Option_Dictionary)
 
-	if options.Cplot: Simple_Plot_Transform(options.Cplot,options)
+	if options.threeDplot :  ThreeD_Plot_Cartesian(options.threeDplot,Option_Dictionary)
 
-	if options.Csplot: Spherical_Plot_Transform(options.Csplot,options)
+#	if options.Cplot: Simple_Plot_Transform(options.Cplot,options)
+
+#	if options.Csplot: Spherical_Plot_Transform(options.Csplot,options)
 
 
 

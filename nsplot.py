@@ -311,6 +311,23 @@ def ThreeD_Plot_Cartesian(file_name,Option_Dictionary):
 #		write_file.close()
 
 
+def Angle_Space_Plot(file_name,Option_Dictionary):
+	"""Experimental! USed to plot the angular components against each other of the spin vector"""
+	# Import the data in components x,y,z
+	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name) 
+
+	# Transform to spherical coordinates
+	(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z)
+
+	phi=Physics_Functions.Fix_Phi(phi) # By default we assume the phi is broken so fix it
+
+	fig = py.figure()
+	ax1 = fig.add_subplot(111)
+	ax1.plot(phi,a)
+	ax1.set_xlabel("$\phi$ [deg]")
+	ax1.set_ylabel("$a$ [deg]")
+	py.show()	
+
 def main():
 
 	# A function which translates the options.opts input into a dictionary of parameters
@@ -340,6 +357,8 @@ def main():
 
 		parser.add_option("-3", "--threeDplot", help = ThreeD_Plot_Cartesian.__doc__ ) 
 
+		parser.add_option("-g", "--angle_space", help = Angle_Space_Plot.__doc__)
+
 		parser.add_option("-o", "--opts")
 
 		# Set the verbose/quite options, this will be passed to the option dictionary
@@ -365,6 +384,8 @@ def main():
 	if options.alpha : Alpha_Plot(options.alpha,Option_Dictionary)
 
 	if options.threeDplot :  ThreeD_Plot_Cartesian(options.threeDplot,Option_Dictionary)
+	
+	if options.angle_space : Angle_Space_Plot(options.angle_space,Option_Dictionary)
 
 #	if options.Cplot: Simple_Plot_Transform(options.Cplot,options)
 

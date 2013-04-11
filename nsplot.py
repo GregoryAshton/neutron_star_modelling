@@ -29,6 +29,7 @@ def Defaults():
 	# Set the defaults for axis
 	py.rcParams['axes.color_cycle'] = ['k', 'r', 'cyan']
 	py.rcParams['font.size'] = 18
+	py.rcParams[ 'axes.labelsize'] = 30	
 	py.rcParams['lines.linewidth'] = 2
 	py.rcParams['axes.grid']=True
 	py.rcParams['figure.figsize']= (10.0, 8.0)
@@ -50,23 +51,23 @@ def Simple_Plot(file_name,Option_Dictionary):
 
 	fig1=py.subplot(3,1,1) ; fig1.set_xticklabels([])
 	fig1.plot(time,x)
-	py.ylabel(r"$\omega_{x}$",fontsize=20,rotation="horizontal")
+	py.ylabel(r"$\omega_{x}$",rotation="horizontal")
 	py.yticks(fig1.get_yticks()[1:-1])
 	py.xlim(tmin,tmax)
 
 	fig2=py.subplot(3,1,2) ; fig2.set_xticklabels([])
 	fig2.plot(time,y)
 	py.yticks() 
-	py.ylabel("$\omega_{y}$",fontsize=20,rotation="horizontal")
+	py.ylabel("$\omega_{y}$",rotation="horizontal")
 	py.yticks(fig2.get_yticks()[1:-1])
 	py.xlim(tmin,tmax)
 
 	fig2=py.subplot(3,1,3)
 	fig2.plot(time,z)
-	py.ylabel("$\omega_{z} $",fontsize=20,rotation="horizontal")
+	py.ylabel("$\omega_{z} $",rotation="horizontal")
 	py.xlim(tmin,tmax)
 
-	py.xlabel(r"$t$",fontsize=20)
+	py.xlabel(r"$t$")
 
 	py.show()
 
@@ -136,7 +137,7 @@ def Spherical_Plot(file_name,Option_Dictionary):
 	ax3.set_yticks(ax3.get_yticks()[0:-1])
 	ax3.set_ylabel("$\phi$ [deg]",rotation="vertical")
 	ax3.yaxis.set_label_coords(labelx, 0.5)
-	ax3.set_xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]",fontsize=16)
+	ax3.set_xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]")
 	ax3.set_xlim(tmin*pow(10,-scale_val),tmax*pow(10,-scale_val))
 	if Option_Dictionary.has_key('end_val') :
 		print " Data on the end value of the spherical components of omega"
@@ -187,8 +188,8 @@ def Alpha_Plot(file_name,Option_Dictionary):
 	fig = py.figure()
 	ax1=fig.add_subplot(111)
 	ax1.plot(t_scaled,alpha,lw=2)
-	ax1.set_ylabel(r"$\alpha$ [deg]",fontsize=20,rotation="horizontal")
-	ax1.set_xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]",fontsize=16)
+	ax1.set_ylabel(r"$\alpha$ [deg]",rotation="horizontal")
+	ax1.set_xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]")
 
 	if Option_Dictionary.has_key('save_fig') and Option_Dictionary['save_fig'] == True :
 		Save_Figure(file_name,"Alpha")
@@ -227,10 +228,11 @@ def main():
 		parser.add_option("-a", "--alpha",help = "Plot the allignment of omega with the magnetic dipole axis ", metavar="FILE")
 
 
-		# Options to be called with above
-
-
 		parser.add_option("-o", "--opts")
+
+		# Set the verbose/quite options, this will be passed to the option dictionary
+		parser.add_option("-v", action="store_true", dest="verbose", default=True)
+		parser.add_option("-q", action="store_false", dest="verbose")
 
 
 		(options,arguments) = parser.parse_args(argvs)
@@ -240,6 +242,9 @@ def main():
 
 	if options.opts : Option_Dictionary = Create_Option_Dictionary(options.opts)
 	else : Option_Dictionary = {}
+
+	# Add the verbosity to the Option Dictionary
+	Option_Dictionary['verbose'] = option.verbose
 
 	if options.plot: Simple_Plot(options.plot,Option_Dictionary)
 

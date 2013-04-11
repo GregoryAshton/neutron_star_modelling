@@ -140,18 +140,24 @@ def main():
 									omega_0 = initial spin period 
 									eta = Simultion will stop when omega**2.0 < eta*omega_0**2.0 """)
 
+		# Additional arguments are passed to opts 
 		parser.add_option("-o","--opts")
-
-
-		# Options to be called with above
+	
+		# Set the verbose/quite options, this will be passed to the option dictionary
+		parser.add_option("-v", action="store_true", dest="verbose", default=True)
+		parser.add_option("-q", action="store_false", dest="verbose")
 
 		(options,arguments) = parser.parse_args(argvs)
 		return options, arguments
 
 	options, arguments = parse_command_line(sys.argv)
 
+	# Create the options dictionary 
 	if options.opts : Option_Dictionary = Create_Option_Dictionary(options.opts)
 	else : Option_Dictionary = {}
+
+	# Add the verbosity to the Option Dictionary
+	Option_Dictionary['verbose'] = option.verbose
 
 	if options.b_2_e : Magnetic_Field_to_Epsilon_A(options.b_2_e)
 

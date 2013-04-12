@@ -278,7 +278,7 @@ def ThreeD_Plot_Cartesian(file_name,Option_Dictionary):
 
 		n = len(time)
 		for i in range(0,n-10,10):
-			ax.plot(x[i:i+11],y[i:i+11],z[i:i+11],color=(0.0,1-float(pow(i,power)*1.0/pow(n,power)),float(pow(i,power)*1.0/pow(n,power))),alpha=0.5)		
+			ax.plot(x[i:i+11],y[i:i+11],z[i:i+11],color=(0.0,1-float(pow(i,power)*1.0/pow(n,power)),float(pow(i,power)*1.0/pow(n,power))),alpha=1.0)		
 	else :
 		ax.plot(x,y,z)
 
@@ -312,22 +312,48 @@ def ThreeD_Plot_Cartesian(file_name,Option_Dictionary):
 
 
 def Angle_Space_Plot(file_name,Option_Dictionary):
-	"""Experimental! USed to plot the angular components against each other of the spin vector"""
+	"""Experimental! USed to plot the angular components against each other of the spin vector"""	
+	
+	# Handle any additional options which are in the dictionary
+	if Option_Dictionary.has_key("nmax"):
+		max_n = int(Option_Dictionary['nmax']) 
+	else : max_n = -1
 	# Import the data in components x,y,z
-	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name) 
+	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name,max_n) 
 
 	# Transform to spherical coordinates
 	(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z)
 
-	#phi=Physics_Functions.Fix_Phi(phi) # By default we assume the phi is broken so fix it
+	phi=Physics_Functions.Fix_Phi(phi) # By default we assume the phi is broken so fix it
 
 	fig = py.figure()
 	ax1 = fig.add_subplot(111)
+	n = len(time)
+	list_vals = py.linspace(0,1,n)
+	#for i in range(0,n-12,10):
+	#	ax1.plot(phi[i:i+11],a[i:i+11],color=(list_vals[i],0.0,list_vals[i]))
 	ax1.plot(phi,a)
 	ax1.set_xlabel("$\phi$ [deg]")
-	ax1.set_ylabel("$a$ [deg]")
-	py.show()	
+	ax1.set_ylabel("$a$ [deg]")	
+	#ax1.set_xlim(0,180)
+	#ax1.set_ylim(0,180)
 
+	if Option_Dictionary.has_key('arrow'):	
+		if Option_Dictionary['arrow'] == True :
+			for i in range(0,n,int(n/20.0)):
+				py.arrow(phi[i],a[i],0.1*(phi[i+1]-phi[i]),0.1*(a[i+1]-a[i]),color="k",fill=True, head_width=1.0,head_starts_at_zero=True,alpha=0.8)
+
+		else :
+			try :			
+				i = int(Option_Dictionary['arrow'])
+				py.arrow(phi[i],a[i],0.1*(phi[i+1]-phi[i]),0.1*(a[i+1]-a[i]),color="k",fill=True, head_width=1.5,head_starts_at_zero=True,alpha=0.8)
+			except ValueError :
+				pass
+	
+	if Option_Dictionary.has_key('save_fig') and Option_Dictionary['save_fig'] == True :
+		Save_Figure(file_name,"Angle_Space_Plot")
+	else:
+		py.show()
 def main():
 
 	# A function which translates the options.opts input into a dictionary of parameters

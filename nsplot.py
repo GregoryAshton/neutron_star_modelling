@@ -267,12 +267,12 @@ def ThreeD_Plot_Cartesian(file_name,Option_Dictionary):
 	ax = py.subplot(111, projection='3d')
 
 	# Create and label the primed axis
-	ax.plot(py.zeros(100),py.zeros(100),py.linspace(-max(z),max(z),100),color="k")
-	ax.text(0,0,max(z)*1.1,"$z'$")
-	ax.plot(py.zeros(100),py.linspace(max(y),min(y),100),py.zeros(100),color="k")
-	ax.text(0,max(y)*1.1,0,"$y'$")
-	ax.plot(py.linspace(max(x),min(x),100),py.zeros(100),py.zeros(100),color="k")
-	ax.text(max(x)*1.1,0,0,"$x'$")
+#	ax.plot(py.zeros(100),py.zeros(100),py.linspace(-max(z),max(z),100),color="k")
+#	ax.text(0,0,max(z)*1.1,"$z'$")
+#	ax.plot(py.zeros(100),py.linspace(max(y),min(y),100),py.zeros(100),color="k")
+#	ax.text(0,max(y)*1.1,0,"$y'$")
+#	ax.plot(py.linspace(max(x),min(x),100),py.zeros(100),py.zeros(100),color="k")
+#	ax.text(max(x)*1.1,0,0,"$x'$")
 
 	# Compute same variables used for colouring and plot the x',y' and z' transforming the colour as time changes
 	if Option_Dictionary.has_key('power') : 
@@ -298,11 +298,13 @@ def ThreeD_Plot_Cartesian(file_name,Option_Dictionary):
 	ax.set_yticklabels([])
 	ax.set_zticklabels([])
 
+	ax.set_zlabel(r"$\hat{z}$",rotation='horizontal')
+	ax.grid(False)
 
-	#if options.save_fig:
-	#	Save_Figure(file_name,"ThreeD_Plot_Cartesian")
-	#else:
-	py.show()
+	if Option_Dictionary.has_key('save_fig') and Option_Dictionary['save_fig'] == True :
+		Save_Figure(file_name,"Spherical_Plot")
+	else:
+		py.show()
 
 #	if options.save_data:
 #		file_name=options.save_data

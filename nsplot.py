@@ -89,10 +89,10 @@ def Simple_Plot(file_name,Option_Dictionary):
 def Spherical_Plot(file_name,Option_Dictionary):
 	""" Plot the input data after transforming to spherical polar coordinates 
 	The opts dictionary may contain 
-	nmax ~ limit the data from 0:nmax
-	tmax , tmin ~ limit the xaxis
-	end_val ~ print the average of the last 100 points
-	save_fig ~ 
+	nmax=int limit the data from 0:nmax
+	tmax=float, tmin=float ~ limit the xaxis
+	end_val=True ~ print the average of the last 100 points
+	save_fig=True ~ saves the figure
 """
 	# Default settings 
 	labelx = -0.1  # x position of the yaxis labels

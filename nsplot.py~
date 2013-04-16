@@ -317,7 +317,8 @@ def ThreeD_Plot_Cartesian(file_name,Option_Dictionary):
 
 
 def Angle_Space_Plot(file_name,Option_Dictionary):
-	"""Experimental! USed to plot the angular components against each other of the spin vector"""	
+	"""Experimental! USed to plot the angular components against each other of the spin vector. Option_Dictionary takes the following as arguments 
+	"""	
 	
 	# Handle any additional options which are in the dictionary
 	if Option_Dictionary.has_key("nmax"):
@@ -356,20 +357,15 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 					py.arrow(phi[i],a[i],0.1*(phi[i+1]-phi[i]),0.1*(a[i+1]-a[i]),color="k",fill=True, head_width=1.5,head_starts_at_zero=True,alpha=0.8)
 				except ValueError :
 					pass
+
+		if Option_Dictionary.has_key('save_fig') and Option_Dictionary['save_fig'] == True :
+			Save_Figure(file_name,"Angle_Space_Plot_2D")
+		else:
+			py.show()
+
 	if Option_Dictionary.has_key('3D'):
 		ax = py.subplot(111, projection='3d')
-#		omega_x_normalised=[] 
-#		omega_y_normalised=[] 
-#		omega_z_normalised=[] 
-#		for i in range(len(time)):
-#			w2 = pow(omega_x[i],2)+pow(omega_y[i],2)+pow(omega_z[i],2)
-#			omega_x_normalised.append(omega_x[i]/w2)
-#			omega_y_normalised.append(omega_y[i]/w2)
-#			omega_z_normalised.append(omega_z[i]/w2)
-#		
-#		ax.plot(omega_x_normalised, omega_y_normalised, omega_z_normalised, color="r")
 	
-
 		# Transform to spherical coordinates
 		(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z,Angle_Type="Radians")
 
@@ -402,12 +398,200 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 
 		ax.grid(False)
 
-	if Option_Dictionary.has_key('save_fig') and Option_Dictionary['save_fig'] == True :
-		Save_Figure(file_name,"Angle_Space_Plot")
-	else:
-		py.show()
+		if Option_Dictionary.has_key('save_fig') and Option_Dictionary['save_fig'] == True :
+			Save_Figure(file_name,"Angle_Space_Plot_3D")
+		else:
+			py.show()
+
+def Simple_Plot_Transform(file_name,Option_Dictionary):
+	""" Same as Simple_Plot() except transform to the effective MOI tensor principle axis, this has limited functionality as it is generally used for checking data is correct and not final plots """
+
+	
+	# Handle any additional options which are in the dictionary
+	if Option_Dictionary.has_key("nmax"):
+		max_n = int(Option_Dictionary['nmax']) 
+	else : max_n = -1
+	# Import the data in components x,y,z
+	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name,max_n) 
+
+	# Get the paramters of the run
+	Parameter_Dictionary = File_Functions.Params_From_File_Name(file_name)
+
+	epsI=Parameter_Dictionary['epsI']
+	epsA=Parameter_Dictionary['epsA']
+	chi=Parameter_Dictionary['chi']
+	beta=Beta_Function(epsI,epsA,chi)
+
+	(omega_x_prime,omega_y_prime,omega_z_prime) = Physics_Functions.Transform_Cartesian_Body_Frame_2_Effective_Body_Frame(omega_x,omega_y,omega_z,beta)
 
 
+	fig1=py.subplot(3,1,1)
+	fig1.plot(time,omega_x_prime)
+	py.ylabel(r"$\omega_{x}' $",fontsize=20,rotation="horizontal")
+
+	fig2=py.subplot(3,1,2)
+	fig2.plot(time,omega_y_prime)
+	py.yticks() 
+	py.ylabel("$\omega_{y}' $",fontsize=20,rotation="horizontal")
+
+
+	fig2=py.subplot(3,1,3)
+	fig2.plot(time,omega_z_prime)
+	py.xlabel(r"$t$",fontsize=20)
+	py.ylabel("$\omega_{z}' $",fontsize=20,rotation="horizontal")
+
+	py.show()
+
+def Spherical_Plot_Transform(file_name,Option_Dictionary):
+	""" Plot the input data after transforming to spherical polar coordinates in the primed coordinates 
+	options should be passed as a dictionary with the following arguments:
+	opts : max_len ~ A maximum number of points to include
+	end_val : True ~ Prints an average of the last 100 points in the plot
+	save_fig : True ~ Save the figure in an appropriate way """
+
+
+	# Default settings 
+	labelx = -0.1  # x position of the yaxis labels
+
+	# Handle any additional options which are in the dictionary
+	if Option_Dictionary.has_key("nmax"):
+		max_n = int(Option_Dictionary['nmax']) 
+	else : max_n = -1
+	# Import the data in components x,y,z
+	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name,max_n) 
+
+	# Get the paramters of the run
+	Parameter_Dictionary = File_Functions.Params_From_File_Name(file_name)
+
+	epsI=Parameter_Dictionary['epsI']
+	epsA=Parameter_Dictionary['epsA']
+	chi=Parameter_Dictionary['chi']
+	beta=Beta_Function(epsI,epsA,chi)
+
+	(omega_x_prime,omega_y_prime,omega_z_prime) = Physics_Functions.Transform_Cartesian_Body_Frame_2_Effective_Body_Frame(omega_x,omega_y,omega_z,beta)
+
+	# Transform to the spherical polar coordinates
+	(omega_prime , a_prime ,phi_prime) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x_prime,omega_y_prime,omega_z_prime)
+	
+
+	if Option_Dictionary.has_key('no_omega'):
+
+		# Function to help scale the x-axis
+		(t_scaled , scale_val) = Plotting_Functions.Sort_Out_Some_Axis(time)	
+
+		# Plot omega_prime(t)
+		ax1=py.subplot(311) 
+		ax1.set_xticklabels([])
+		ax1.plot(t_scaled,omega_prime)
+
+		ax1.set_ylim(0,1.1*max(omega_prime))
+		#py.yticks(fig1.get_yticks()[1:-1])
+		ax1.set_ylabel(r"$\omega'$ [Hz]",rotation="vertical")
+		ax1.yaxis.set_label_coords(labelx, 0.5)
+
+		# Plot a_prime(t)
+		ax2=py.subplot(312) 
+		ax2.set_xticklabels([])
+		ax2.plot(t_scaled,a_prime)
+		#py.axhline(90,ls="--",color="k")
+
+		y_max = 105
+		ax2.set_ylim(0,y_max)
+		#py.yticks(fig2.get_yticks()[0:-2])
+		ax2.set_yticks(py.arange(0,y_max,15))
+		ax2.set_ylabel("$a'$ [deg]",rotation="vertical")
+		ax2.yaxis.set_label_coords(labelx, 0.5)
+
+		# Plot phi_prime(t)
+		ax3=py.subplot(313) 
+
+		# Check and fix rotations of 2pi in phi
+		phi_prime = Physics_Functions.Fix_Phi(phi_prime)
+
+		# Often phi becomes very large in which case we scale the axis
+		if abs(phi_prime[-1])>100:
+			#def Scale_Axis(axis):
+			#	max_item = max(axis) ; min_item = min(axis)
+			#	if abs(max_item) < abs(min_item): max_item = abs(min_item)
+			#	scale = round_to_n(max_item,0)
+			#	axis_scaled = [ ai/scale for ai in axis]
+			#	return (axis_scaled , scale)
+
+			
+			(phi_prime_scaled , scale) = Plotting_Functions.Sort_Out_Some_Axis(phi_prime)
+			ax3.plot(t_scaled,phi_prime_scaled)
+			ax3.set_ylabel(r"$\phi' [\;1\times 10^{"+str(int(py.log10(scale)))+"} $deg]",rotation="vertical")
+
+		else : 
+			ax3.plot(t_scaled,phi_prime)
+			ax3.set_ylabel("$\phi'$  [deg]",rotation="vertical")
+
+		#Ploptions
+		ax3.set_xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]",fontsize=16)		
+		ax3.yaxis.set_label_coords(labelx, 0.5)
+		ax3.set_yticks(ax3.get_yticks()[0:-2])
+
+	
+	else : 
+		print "here"
+			# Function to help scale the x-axis
+		(t_scaled,scale_val) = Plotting_Functions.Sort_Out_Some_Axis(time)	
+
+		fig=py.figure()
+
+		ax1 = py.subplot(111)
+
+		# Plot a_prime(t)
+		ax1.plot(t_scaled,a_prime,lw=1.0)
+		#py.axhline(90,ls="--",color="k")
+
+		# Ploptions
+		y_max = 105
+		py.ylim(0,y_max)
+		#py.yticks(fig2.get_yticks()[0:-2])
+		py.yticks(py.arange(0,y_max,15))
+		py.ylabel("$a' \;[^{\circ}]$",rotation="horizontal",fontsize=18)
+
+
+		# Plot phi_prime(t)
+		ax2 = ax1.twinx()
+
+		phi_prime = Physics_Functions.Fix_Phi(phi_prime)
+		if abs(phi_prime[-1])>100:
+			def Scale_Axis(axis):
+				max_item = max(axis) ; min_item = min(axis)
+				if abs(max_item) < abs(min_item): max_item = abs(min_item)
+				scale = round_to_n(max_item,0)
+				axis_scaled = [ ai/scale for ai in axis]
+				return (axis_scaled , scale)
+
+			(phi_prime_scaled , scale) = Scale_Axis(phi_prime)
+			ax2.plot(t_scaled,phi_prime_scaled,color="b",lw=1.0)
+
+			py.ylabel(r"$\phi' \; 1\times 10^{"+str(int(py.log10(scale)))+"} [^{\circ}]$",rotation="vertical")
+
+		else : 
+			ax2.plot(t_scaled,phi_prime,color="b",lw=1.0)
+			py.ylabel("$\phi' \; [^{\circ}]$",rotation="vertical")
+		#Ploptions
+		ax2.tick_params(axis='y', colors='blue')
+		ax2.yaxis.label.set_color('blue')
+		py.xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]",fontsize=16)
+	
+		
+	if Option_Dictionary.has_key('end_val') :
+		print " Data on the end value of the spherical components of omega"
+		omega_end = omega_prime[-100:-1]
+		print " Average of |omega| :  %s s^-1  \n Range of omega : %s"	% (py.average(omega_end),max(omega_end)-min(omega_end))
+		a_end = a_prime[-100:-1]
+		print " Average of a  : %s s^-1 \n Range of a : %s"	% (py.average(a_end),max(a_end)-min(a_end))
+		phi_end = omega_prime[-100:-1]
+		print " Average of phi :  %s s^-1 \n Range of phi : %s"	% (py.average(phi_end),max(phi_end)-min(phi_end))
+
+	if Option_Dictionary.has_key('save_fig'):
+		Save_Figure(file_name,"Spherical_Plot_Transform")
+	
+	py.show()
 
 def main():
 
@@ -429,16 +613,15 @@ def main():
 
 		parser.add_option("-s","--splot",help= Spherical_Plot.__doc__, metavar="FILE")
 
-
-#		parser.add_option("-c", "--Cplot", help ="Same as plot but transforming coordinates to principle axis of the effective moment of inertia tensor ", metavar="FILE")
-
-#		parser.add_option("-d", "--Csplot", help = , metavar="FILE")
-
 		parser.add_option("-a", "--alpha",help = Alpha_Plot.__doc__, metavar="FILE")
 
 		parser.add_option("-3", "--threeDplot", help = ThreeD_Plot_Cartesian.__doc__ ) 
 
-		parser.add_option("-g", "--angle_space", help = Angle_Space_Plot.__doc__)
+		parser.add_option("-g", "--angle_space", help = Angle_Space_Plot.__doc__ )
+
+		parser.add_option("-l", "--plot_beta_transform", help = Simple_Plot_Transform.__doc__ )
+
+		parser.add_option("-z", "--splot_beta_transform", help = Spherical_Plot_Transform.__doc__ )
 
 		parser.add_option("-o", "--opts")
 
@@ -468,9 +651,9 @@ def main():
 	
 	if options.angle_space : Angle_Space_Plot(options.angle_space,Option_Dictionary)
 
-#	if options.Cplot: Simple_Plot_Transform(options.Cplot,options)
+	if options.plot_beta_transform: Simple_Plot_Transform(options.plot_beta_transform,Option_Dictionary)
 
-#	if options.Csplot: Spherical_Plot_Transform(options.Csplot,options)
+	if options.splot_beta_transform: Spherical_Plot_Transform(options.splot_beta_transform,Option_Dictionary)
 
 
 

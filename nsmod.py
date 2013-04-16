@@ -93,7 +93,7 @@ def Run(Option_Dictionary):
 			args="no_anom"
 		else :
 			print " Running code WITH the anomalous torque"
-			file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_t1_%s.txt" % (chi,epsI,epsA,omega0t1) 
+			file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_t1_%s.txt" % (chi,epsI,epsA,omega0,t1) 
 			args = None
 
 		File_Functions.Write_File(chi,epsI,epsA,omega0,t1,err,args) # Note this is not the automatic writer..consider relabelling

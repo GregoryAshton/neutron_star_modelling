@@ -324,7 +324,11 @@ def ThreeD_Plot_Cartesian(file_name,Option_Dictionary):
 
 
 def Angle_Space_Plot(file_name,Option_Dictionary):
-	"""Experimental! USed to plot the angular components against each other of the spin vector. Option_Dictionary takes the following as arguments 
+	"""Experimental! Used to plot the angular components against each other of the spin vector. Option_Dictionary takes the following as arguments 
+	nmax : int ~ take only the first nmax points from the file
+	2D : True ~ This will plot the angular components phi and a in normal plot
+	3D : True ~ This will plot the angular components phi and a projected onto the unit sphere
+		split=n1/n2/n3/n4/... For use with 3D this will segment the data into chunks starting and stopping at the integers n1,n2...  
 	"""	
 	
 	# Handle any additional options which are in the dictionary
@@ -334,13 +338,21 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 	# Import the data in components x,y,z
 	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name,max_n) 
 
-
+	if Option_Dictionary.has_key('beta'):
+		Parameter_Dictionary = File_Functions.Params_From_File_Name(file_name)
+		epsI=Parameter_Dictionary['epsI']
+		epsA=Parameter_Dictionary['epsA']
+		chi=Parameter_Dictionary['chi']*pi/180
+		beta=Beta_Function(epsI,epsA,chi)
+		(omega_x,omega_y,omega_z) = Physics_Functions.Transform_Cartesian_Body_Frame_2_Effective_Body_Frame(omega_x,omega_y,omega_z,beta)
+		# Note we have chosen to the omega_x...here when this is actually in the primed coordinates. This is to avoid confusion but should we perhaps use some generic names instead?
+		
 	if Option_Dictionary.has_key('2D'):
 
 		# Transform to spherical coordinates
 		(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z)
 
-		#phi=Physics_Functions.Fix_Phi(phi) # By default we assume the phi is broken so fix it
+		phi=Physics_Functions.Fix_Phi(phi) # By default we assume the phi is broken so fix it
 
 		fig = py.figure()
 		ax1 = fig.add_subplot(111)
@@ -348,8 +360,12 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 		list_vals = py.linspace(0,1,n)
 
 		ax1.plot(phi,a)
-		ax1.set_xlabel("$\phi$ [deg]")
-		ax1.set_ylabel("$a$ [deg]")	
+		if Option_Dictionary.has_key('beta'):
+			ax1.set_xlabel("$\phi'$ [deg]")
+			ax1.set_ylabel("$a'$ [deg]")	
+		else:
+			ax1.set_xlabel("$\phi$ [deg]")
+			ax1.set_ylabel("$a$ [deg]")	
 		#ax1.set_xlim(0,180)
 		#ax1.set_ylim(0,180)
 
@@ -377,13 +393,24 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 		(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z,Angle_Type="Radians")
 
 		phi=Physics_Functions.Fix_Phi(phi,Angle_Type="Radians") # By default we assume the phi is broken so fix it	
+		if Option_Dictionary.has_key('split'):
+			values=[int(it) for it in Option_Dictionary['split'].split("/")]
+		
+			for j in range(0,len(values),2):
+				# Trajectory of path
+				low = values[j] ; high = values[j+1] 
+				x=[1.0*py.sin(a[i])*py.cos(phi[i]) for i in range(low,high)]
+				y=[1.0*py.sin(a[i])*py.sin(phi[i]) for i in range(low,high)]
+				z=[1.0*py.cos(a[i]) for i in range(low,high)]
 
-		# Trajectory of parh 
-		x=[1.0*py.sin(a[i])*py.cos(phi[i]) for i in range(len(time))]
-		y=[1.0*py.sin(a[i])*py.sin(phi[i]) for i in range(len(time))]
-		z=[1.0*py.cos(a[i]) for i in range(len(time))]
+				ax.plot3D(x,y,z,alpha=0.8)			
+		else :	
+			# Trajectory of path
+			x=[1.0*py.sin(a[i])*py.cos(phi[i]) for i in range(len(time))]
+			y=[1.0*py.sin(a[i])*py.sin(phi[i]) for i in range(len(time))]
+			z=[1.0*py.cos(a[i]) for i in range(len(time))]
 
-		ax.plot3D(x,y,z,alpha=0.8)
+			ax.plot3D(x,y,z,alpha=0.8)
 
 		# Sphere of unit radius
 		u = np.linspace(0, 2 * np.pi , 100)
@@ -394,10 +421,15 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 		
 		ax.plot_surface(x, y,z,rstride=4, cstride=9, color='white',alpha=0.9,lw=0.1)	
 
-
-		ax.set_xlabel(r"$\hat{\omega_{x}}$")
-		ax.set_ylabel(r"$\hat{\omega_{y}}$")
-		ax.set_zlabel(r"$\hat{\omega_{z}}$")
+		if Option_Dictionary.has_key('beta'):
+			ax.set_xlabel(r"$e_{1}$")
+			ax.set_ylabel(r"$e_{2}$")
+			ax.set_zlabel(r"$e_{3}$")
+			# These axis labels may prove to be wrong in the case of epsI<0
+		else :
+			ax.set_xlabel(r"$\hat{\omega_{x}}$")
+			ax.set_ylabel(r"$\hat{\omega_{y}}$")
+			ax.set_zlabel(r"$\hat{\omega_{z}}$")
 
 		ax.set_xticklabels([])
 		ax.set_yticklabels([])
@@ -412,7 +444,6 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 
 def Simple_Plot_Transform(file_name,Option_Dictionary):
 	""" Same as Simple_Plot() except transform to the effective MOI tensor principle axis, this has limited functionality as it is generally used for checking data is correct and not final plots """
-
 	
 	# Handle any additional options which are in the dictionary
 	if Option_Dictionary.has_key("nmax"):
@@ -604,11 +635,10 @@ def main():
 	def Create_Option_Dictionary(opts):
 		Option_Dictionary={}
 		for item in opts.split(","):
-			if "=" in item: Option_Dictionary[item.split("=")[0]] = float(item.split("=")[1])
-		
-		else : Option_Dictionary[item] = True
+			if "=" in item: Option_Dictionary[item.split("=")[0]] = item.split("=")[1]
+			else : Option_Dictionary[item] = True
 		return Option_Dictionary
-
+	
 	def parse_command_line(argvs):
 
 		parser = optparse.OptionParser()

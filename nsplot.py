@@ -340,7 +340,7 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 		# Transform to spherical coordinates
 		(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z)
 
-		phi=Physics_Functions.Fix_Phi(phi) # By default we assume the phi is broken so fix it
+		#phi=Physics_Functions.Fix_Phi(phi) # By default we assume the phi is broken so fix it
 
 		fig = py.figure()
 		ax1 = fig.add_subplot(111)

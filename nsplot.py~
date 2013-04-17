@@ -472,9 +472,10 @@ def Spherical_Plot_Transform(file_name,Option_Dictionary):
 
 	epsI=Parameter_Dictionary['epsI']
 	epsA=Parameter_Dictionary['epsA']
-	chi=Parameter_Dictionary['chi']
+	chi=Parameter_Dictionary['chi']*pi/180
 	beta=Beta_Function(epsI,epsA,chi)
-	print beta*180/pi
+	print 	
+	print "Beta  = %s degrees for %s" % (beta*180/pi,file_name)
 
 	(omega_x_prime,omega_y_prime,omega_z_prime) = Physics_Functions.Transform_Cartesian_Body_Frame_2_Effective_Body_Frame(omega_x,omega_y,omega_z,beta)
 

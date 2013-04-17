@@ -37,17 +37,24 @@ def Defaults():
 
 
 
+# OLD beta function
+#def Beta_Function(epsI,epsA,chi):
+#	if abs(chi) < 2*pi : print "Please check that the chi used in Beta_Function is in degrees and not radians"
+# 
+#	if epsI>=0:
+#		sign=-1.0
+#	else: sign=1.0
 
+#	b=py.sqrt(epsA*epsA+epsI*epsI-2*epsA*epsI*py.cos(2*chi))
+#	return py.arctan((epsI+epsA*(1-2*pow(py.cos(chi),2.0))+sign*b)/(2*epsA*py.sin(chi)*py.cos(chi)))
+
+## Beta function
 def Beta_Function(epsI,epsA,chi):
-	if abs(chi) < 2*pi : print "Please check that the chi used in Beta_Function is in degrees and not radians"
- 
-	if epsI>=0:
-		sign=-1.0
-	else: sign=1.0
-
-	b=py.sqrt(epsA*epsA+epsI*epsI-2*epsA*epsI*py.cos(2*chi))
-	return py.arctan((epsI+epsA*(1-2*pow(py.cos(chi),2.0))+sign*b)/(2*epsA*py.sin(chi)*py.cos(chi)))
-
+	if chi>2*pi :
+		print "Assuming chi has been given in degrees rather than radians, we now transform"
+		chi = chi*pi/180
+	a=epsA*epsA+epsI*epsI-2*epsA*epsI*py.cos(2*chi)
+	return py.arctan((epsI-epsA*py.cos(2*chi)-py.sqrt(a))/(2*epsA*py.sin(chi)*py.cos(chi)))
 
 # Plotting functions
 
@@ -465,8 +472,10 @@ def Spherical_Plot_Transform(file_name,Option_Dictionary):
 
 	epsI=Parameter_Dictionary['epsI']
 	epsA=Parameter_Dictionary['epsA']
-	chi=Parameter_Dictionary['chi']
+	chi=Parameter_Dictionary['chi']*pi/180
 	beta=Beta_Function(epsI,epsA,chi)
+	print 	
+	print "Beta  = %s degrees for %s" % (beta*180/pi,file_name)
 
 	(omega_x_prime,omega_y_prime,omega_z_prime) = Physics_Functions.Transform_Cartesian_Body_Frame_2_Effective_Body_Frame(omega_x,omega_y,omega_z,beta)
 
@@ -481,7 +490,7 @@ def Spherical_Plot_Transform(file_name,Option_Dictionary):
 
 		fig=py.figure()
 
-		ax1 = py.subplot(111)
+		ax1 = fig.add_subplot(111)
 
 		# Plot a_prime(t)
 		ax1.plot(t_scaled,a_prime,lw=1.0)
@@ -530,7 +539,8 @@ def Spherical_Plot_Transform(file_name,Option_Dictionary):
 		(t_scaled , scale_val) = Plotting_Functions.Sort_Out_Some_Axis(time)	
 
 		# Plot omega_prime(t)
-		ax1=py.subplot(311) 
+		fig = py.figure()		
+		ax1 = fig.add_subplot(311) 
 		ax1.set_xticklabels([])
 		ax1.plot(t_scaled,omega_prime)
 
@@ -540,7 +550,7 @@ def Spherical_Plot_Transform(file_name,Option_Dictionary):
 		ax1.yaxis.set_label_coords(labelx, 0.5)
 
 		# Plot a_prime(t)
-		ax2=py.subplot(312) 
+		ax2 = fig.add_subplot(312) 
 		ax2.set_xticklabels([])
 		ax2.plot(t_scaled,a_prime)
 		#py.axhline(90,ls="--",color="k")
@@ -553,21 +563,14 @@ def Spherical_Plot_Transform(file_name,Option_Dictionary):
 		ax2.yaxis.set_label_coords(labelx, 0.5)
 
 		# Plot phi_prime(t)
-		ax3=py.subplot(313) 
+		ax3 = fig.add_subplot(313) 
 
 		# Check and fix rotations of 2pi in phi
 		phi_prime = Physics_Functions.Fix_Phi(phi_prime)
 
 		# Often phi becomes very large in which case we scale the axis
-		if abs(phi_prime[-1])>100:
-			#def Scale_Axis(axis):
-			#	max_item = max(axis) ; min_item = min(axis)
-			#	if abs(max_item) < abs(min_item): max_item = abs(min_item)
-			#	scale = round_to_n(max_item,0)
-			#	axis_scaled = [ ai/scale for ai in axis]
-			#	return (axis_scaled , scale)
+		if abs(phi_prime[-1])>1000:
 
-			
 			(phi_prime_scaled , scale) = Plotting_Functions.Sort_Out_Some_Axis(phi_prime)
 			ax3.plot(t_scaled,phi_prime_scaled)
 			ax3.set_ylabel(r"$\phi' [\;1\times 10^{"+str(int(py.log10(scale)))+"} $deg]",rotation="vertical")
@@ -586,14 +589,14 @@ def Spherical_Plot_Transform(file_name,Option_Dictionary):
 		omega_end = omega_prime[-100:-1]
 		print " Average of |omega| :  %s s^-1  \n Range of omega : %s"	% (py.average(omega_end),max(omega_end)-min(omega_end))
 		a_end = a_prime[-100:-1]
-		print " Average of a  : %s s^-1 \n Range of a : %s"	% (py.average(a_end),max(a_end)-min(a_end))
-		phi_end = omega_prime[-100:-1]
-		print " Average of phi :  %s s^-1 \n Range of phi : %s"	% (py.average(phi_end),max(phi_end)-min(phi_end))
+		print " Average of a  : %s degrees \n Range of a : %s"	% (py.average(a_end),max(a_end)-min(a_end))
+		phi_end = phi_prime[-100:-1]
+		print " Average of phi :  %s  degrees \n Range of phi : %s"	% (py.average(phi_end),max(phi_end)-min(phi_end))
 
 	if Option_Dictionary.has_key('save_fig'):
 		Save_Figure(file_name,"Spherical_Plot_Transform")
-	
-	py.show()
+	else : 
+		py.show()
 
 def main():
 

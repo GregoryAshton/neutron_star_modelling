@@ -3,36 +3,47 @@
 from datetime import datetime
 import numpy as np
 
-def Params_From_File_Name(file_name):
+def Parameter_Dictionary(user_input):
 	# Could we improve this to give units?
-	"""Function to disect the standard filename a dictionary with all the values, this reduces the amount of code required on the other end"""
-	# Initiate dictionary 
-	p_d={}
+	"""Function to produce a dictionary with all the values, this reduces the amount of code required on the other end. Input can either be a string such as the default filenames used in nsmod, or a partial dictionary having at least epsI,epsA and omega0 to produce the other values"""
+	if type(user_input)==str:
+		# Initiate dictionary 
+		p_d={}
 
-	# Remove the file descriptor and the path directory
-	f = file_name.rstrip(".txt")
-	f = f.split("/")[-1]	
+		# Remove the file descriptor and the path directory
+		f = user_input.rstrip(".txt")
+		f = f.split("/")[-1]	
 
-	# Check if the anomalous torque was used or not
-	if "no_anom" in f: 
-		f = f.lstrip("no_anom_")
-		p_d["no_anom"] = True
-	else : p_d["no_anom"] = False
+		# Check if the anomalous torque was used or not
+		if "no_anom" in f: 
+			f = f.lstrip("no_anom_")
+			p_d["no_anom"] = True
+		else : p_d["no_anom"] = False
 	
-	# Import the rest of the parameters
-	f = f.split("_")
-	for i in range(0,len(f),2):
-		p_d[f[i]]=float(f[i+1])	
+		# Import the rest of the parameters
+		f = f.split("_")
+		for i in range(0,len(f),2):
+			p_d[f[i]]=f[i+1]
+
+
+	elif type(user_input)==dict:
+		p_d = user_input
 
 	# Standard values for c , R in cgs
 	c = 3e10 
 	R = 1e6
+	I0=1e45
 	# Compute a couple of often used variabes	
-	p_d["tauP"] = pow(p_d["omega0"]*p_d["epsI"],-1)
-	p_d["tauA"] = pow(p_d["omega0"]*p_d["epsA"],-1)
-	p_d["tauS"] = pow(p_d["omega0"]**2.0 *p_d["epsA"],-1)*3*c/(2*R)
-
+	omega0 = float(p_d["omega0"])
+	epsI = float(p_d["epsI"])
+	epsA = float(p_d["epsA"])
+	p_d["tauP"] = str(pow(omega0*epsI,-1))
+	p_d["tauA"] = str(pow(omega0*epsA,-1))
+	p_d["tauS"] = str(pow(omega0**2.0 *epsA,-1)*3*c/(2*R))
+	p_d["Bs"] = str(2*np.sqrt(epsA*I0*R*pow(c,2))/pow(R,3))
+	
 	return p_d
+		
 
 
 #	# Standard values for c , R in cgs
@@ -208,7 +219,7 @@ main (void)
 	gsl_odeiv2_step * s = gsl_odeiv2_step_alloc (T, 3);
 
 	// Specify absolute and relative errors (actual allowed error is a linear combination of these):
-	gsl_odeiv2_control * c = gsl_odeiv2_control_y_new (1e-12, 1.0e-12);
+	gsl_odeiv2_control * c = gsl_odeiv2_control_y_new (KEY_err, KEY_err);
 
 	// Created evolution function:
 	gsl_odeiv2_evolve * e  = gsl_odeiv2_evolve_alloc (3);
@@ -487,7 +498,7 @@ main (void)
 	gsl_odeiv2_step * s = gsl_odeiv2_step_alloc (T, 3);
 
 	// Specify absolute and relative errors (actual allowed error is a linear combination of these):
-	gsl_odeiv2_control * c = gsl_odeiv2_control_y_new (1e-12, 1.0e-12);
+	gsl_odeiv2_control * c = gsl_odeiv2_control_y_new (KEY_err, KEY_err);
 
 	// Created evolution function:
 	gsl_odeiv2_evolve * e  = gsl_odeiv2_evolve_alloc (3);

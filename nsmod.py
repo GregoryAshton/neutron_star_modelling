@@ -33,13 +33,16 @@ def Magnetic_Field_to_Epsilon_A(Bs):
 	epsA=pow(m,2)/(I0*R*pow(c,2))
 	print "Bs="+str(Bs)+" Epsilon_A="+str(epsA)
 
-def Epsilon_A_to_Magnetic_Field(Epsilon_A):
+def Epsilon_A_to_Magnetic_Field(Epsilon_A,Option_Dictionary={}):
 	R = 1e6 #cm
 	c=3e10 #cm/s
 	I0=1e45
 	m = py.sqrt(Epsilon_A*I0*R*pow(c,2))
 	Bs = 2*m/pow(R,3)
-	print "Bs="+str(Bs)+" Epsilon_A="+str(Epsilon_A)
+	if Option_Dictionary['verbose']==True:
+		print "Bs="+str(Bs)+" Epsilon_A="+str(Epsilon_A)
+	else :
+		return  Bs
 
 
 # Top level function to sort the dictionary of parameters write a .c script compile and output to a suitable .txt file
@@ -61,7 +64,8 @@ def Run(Option_Dictionary):
 	if Option_Dictionary.has_key('omega0') : omega0 = str(Option_Dictionary['omega0'])
 	else : print "ERROR you have not specified omega0"
 
-	if Option_Dictionary.has_key('err') : err = str(Option_Dictionary['err'])
+	if Option_Dictionary.has_key('err') : 
+		err = str(Option_Dictionary['err'])
 	else : 
 		#print " Using default error value of 1e-12" 
 		err = 1e-12
@@ -159,9 +163,9 @@ def main():
 	# Add the verbosity to the Option Dictionary
 	Option_Dictionary['verbose'] = option.verbose
 
-	if options.b_2_e : Magnetic_Field_to_Epsilon_A(options.b_2_e)
+	if options.b_2_e : Magnetic_Field_to_Epsilon_A(options.b_2_e,Option_Dictionary)
 
-	if options.e_2_b : Epsilon_A_to_Magnetic_Field(options.e_2_b)
+	if options.e_2_b : Epsilon_A_to_Magnetic_Field(options.e_2_b,Option_Dictionary)
 
 	if options.beta : Print_Beta(options.beta)
 

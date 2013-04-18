@@ -60,9 +60,14 @@ def Beta_Function(epsI,epsA,chi):
 
 def Simple_Plot(file_name,Option_Dictionary):
 	""" Plots the given file as a function of time, it is assumed the columns of data are given by time , omega_x , omega_y and omega_z"""
+
+	# Handle any additional options which are in the dictionary
+	if Option_Dictionary.has_key("nmax"):
+		max_n = int(Option_Dictionary['nmax']) 
+	else : max_n = -1
 		
 	# Import the data 
-	(time,x,y,z) = File_Functions.Import_Data(file_name)
+	(time,x,y,z) = File_Functions.Import_Data(file_name,max_n)
 
 	# Handle any additional options which are in the dictionary
 	if Option_Dictionary.has_key('tmax') : tmax = Option_Dictionary['tmax'] 
@@ -149,7 +154,7 @@ def Spherical_Plot(file_name,Option_Dictionary):
 
 	# Plot phi(t)
 	ax3=fig.add_subplot(3,1,3) 
-	phi=Physics_Functions.Fix_Phi(phi) # By default we assume the phi is broken so fix it
+	phi=Physics_Functions.Fix_Phi(phi,epsilon=70) # By default we assume the phi is broken so fix it
 	ax3.plot(t_scaled,phi)
 
 	#Ploptions
@@ -175,11 +180,11 @@ def Spherical_Plot(file_name,Option_Dictionary):
 	else:
 		py.show()
 	
-	ax = py.subplot(111)
-	chi = float(file_name.split("_")[3])
-	R = [(-pow(py.cos(a[i])*py.sin(chi),2)) for i in range(len(a))]
-	ax.plot(R)
-	py.show()
+#	ax = py.subplot(111)
+#	chi = float(file_name.split("_")[3])
+#	R = [(py.sin(a[i])*py.cos(a[i])*py.sin(chi)*py.cos(chi)-pow(py.cos(a[i])*py.sin(chi),2)) for i in range(len(a))]
+#	ax.plot(R)
+#	py.show()
 
 def Alpha_Plot(file_name,Option_Dictionary):
 	""" Plots the alignment of the input file [t,omega_x , omega_y and omega_z] against the magnetic dipole"""
@@ -193,13 +198,13 @@ def Alpha_Plot(file_name,Option_Dictionary):
 	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name,max_n) 
 
 	# Get the paramters of the run
-	Parameter_Dictionary = File_Functions.Params_From_File_Name(file_name)
+	Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
 
 
 	# Extract some parameters from the first line in the file 
-	epsI=Parameter_Dictionary["epsI"]
-	epsA=Parameter_Dictionary["epsA"]
-	chi=Parameter_Dictionary["chi"] # This will be returned in radians
+	epsI=float(Parameter_Dictionary["epsI"])
+	epsA=float(Parameter_Dictionary["epsA"])
+	chi=float(Parameter_Dictionary["chi"])*pi/180 # This will be returned in radians
 	
 	# Transform to spherical polar coordinates specifying that we wish the angles to be in Radians rather than degrees
 	(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z,"Radians")
@@ -242,7 +247,7 @@ def ThreeD_Plot_Cartesian(file_name,Option_Dictionary):
 	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name) 
 
 	# Get the paramters of the run
-	Parameter_Dictionary = File_Functions.Params_From_File_Name(file_name)
+	Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
 
 	# Set the defaults and then overide if they exist in Option_Dictionary
 	start = 0 
@@ -261,9 +266,9 @@ def ThreeD_Plot_Cartesian(file_name,Option_Dictionary):
 	time = time[start:stop] ; omega_x = omega_x[start:stop] ; omega_y = omega_y[start:stop] ; omega_z = omega_z[start:stop]
 
 	# Extract some parameters from the dictionary
-	epsI=Parameter_Dictionary["epsI"]
-	epsA=Parameter_Dictionary["epsA"]
-	chi =Parameter_Dictionary["chi"]
+	epsI=float(Parameter_Dictionary["epsI"])
+	epsA=float(Parameter_Dictionary["epsA"])
+	chi=float(Parameter_Dictionary["chi"])*pi/180 # This will be returned in radians
 
 	# Compute the rotation angle of primed axis and transform the solution omega_{xyz} into these coordinates
 #	beta=Beta_Function(epsI,epsA,chi)
@@ -348,10 +353,10 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name,max_n) 
 
 	if Option_Dictionary.has_key('beta'):
-		Parameter_Dictionary = File_Functions.Params_From_File_Name(file_name)
-		epsI=Parameter_Dictionary['epsI']
-		epsA=Parameter_Dictionary['epsA']
-		chi=Parameter_Dictionary['chi']*pi/180
+		Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
+		epsI=float(Parameter_Dictionary["epsI"])
+		epsA=float(Parameter_Dictionary["epsA"])
+		chi=float(Parameter_Dictionary["chi"])*pi/180 # This will be returned in radians
 		beta=Beta_Function(epsI,epsA,chi)
 		(omega_x,omega_y,omega_z) = Physics_Functions.Transform_Cartesian_Body_Frame_2_Effective_Body_Frame(omega_x,omega_y,omega_z,beta)
 		# Note we have chosen to the omega_x...here when this is actually in the primed coordinates. This is to avoid confusion but should we perhaps use some generic names instead?
@@ -361,7 +366,7 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 		# Transform to spherical coordinates
 		(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z)
 
-		phi=Physics_Functions.Fix_Phi(phi) # By default we assume the phi is broken so fix it
+		phi=Physics_Functions.Fix_Phi(phi,epsilon=70) # By default we assume the phi is broken so fix it
 
 		fig = py.figure()
 		ax1 = fig.add_subplot(111)
@@ -422,34 +427,40 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 				x=[1.0*py.sin(a[i])*py.cos(phi[i]) for i in range(low,high)]
 				y=[1.0*py.sin(a[i])*py.sin(phi[i]) for i in range(low,high)]
 				z=[1.0*py.cos(a[i]) for i in range(low,high)]
+				elevation = 25.0
+				azimuth = 25.0
+				Plotting_Functions.ThreeD_Sphere(ax,elevation,azimuth,x,y,z,ls="-",lw=0.8,color=colors[j/2])
+				
 
-				# Remove points from the back of the sphere
-				front_x = [] ; front_y=[] ; front_z=[]
-				back_x = [] ; back_y=[] ; back_z=[]
-				for i in range(len(x)):
-					
-					if -180 < py.arctan2(y[i],x[i])*180/pi < -50 :
-						front_x.append(x[i])
-						front_y.append(y[i])
-						front_z.append(z[i])
-					elif 140 < py.arctan2(y[i],x[i])*180/pi < 180 :
-						front_x.append(x[i])
-						front_y.append(y[i])
-						front_z.append(z[i])
-					else : 
-						back_x.append(x[i])
-						back_y.append(y[i])
-						back_z.append(z[i])
-						
-				ax.plot3D(front_x,front_y,front_z,".",alpha=1.0,color=colors[j/2])	
-				ax.plot3D(back_x,back_y,back_z,".",alpha=0.1,color=colors[j/2])		
+#				# Remove points from the back of the sphere
+#				front_x = [] ; front_y=[] ; front_z=[]
+#				back_x = [] ; back_y=[] ; back_z=[]
+#				for i in range(len(x)):
+#					
+#					if -180 < py.arctan2(y[i],x[i])*180/pi < -50 :
+#						front_x.append(x[i])
+#						front_y.append(y[i])
+#						front_z.append(z[i])
+#					elif 140 < py.arctan2(y[i],x[i])*180/pi < 180 :
+#						front_x.append(x[i])
+#						front_y.append(y[i])
+#						front_z.append(z[i])
+#					else : 
+#						back_x.append(x[i])
+#						back_y.append(y[i])
+##						back_z.append(z[i])
+#						
+#				ax.plot3D(front_x,front_y,front_z,".",alpha=1.0,color=colors[j/2])	
+#				ax.plot3D(back_x,back_y,back_z,".",alpha=0.1,color=colors[j/2])		
 		else :	
 			# Trajectory of path
 			x=[1.0*py.sin(a[i])*py.cos(phi[i]) for i in range(len(time))]
 			y=[1.0*py.sin(a[i])*py.sin(phi[i]) for i in range(len(time))]
 			z=[1.0*py.cos(a[i]) for i in range(len(time))]
 
-			ax.plot3D(x,y,z,alpha=0.8)
+			elevation = 25.0
+			azimuth = 25.0
+			Plotting_Functions.ThreeD_Sphere(ax,elevation,azimuth,x,y,z,ls="-",lw=0.8,color="k")
 
 		# Sphere of unit radius
 		u = np.linspace(0, 2 * np.pi , 100)
@@ -493,11 +504,11 @@ def Simple_Plot_Transform(file_name,Option_Dictionary):
 	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name,max_n) 
 
 	# Get the paramters of the run
-	Parameter_Dictionary = File_Functions.Params_From_File_Name(file_name)
+	Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
 
-	epsI=Parameter_Dictionary['epsI']
-	epsA=Parameter_Dictionary['epsA']
-	chi=Parameter_Dictionary['chi']
+	epsI=float(Parameter_Dictionary["epsI"])
+	epsA=float(Parameter_Dictionary["epsA"])
+	chi=float(Parameter_Dictionary["chi"])*pi/180 # This will be returned in radians
 	beta=Beta_Function(epsI,epsA,chi)
 
 	(omega_x_prime,omega_y_prime,omega_z_prime) = Physics_Functions.Transform_Cartesian_Body_Frame_2_Effective_Body_Frame(omega_x,omega_y,omega_z,beta)
@@ -539,11 +550,11 @@ def Spherical_Plot_Transform(file_name,Option_Dictionary):
 	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name,max_n) 
 
 	# Get the paramters of the run
-	Parameter_Dictionary = File_Functions.Params_From_File_Name(file_name)
+	Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
 
-	epsI=Parameter_Dictionary['epsI']
-	epsA=Parameter_Dictionary['epsA']
-	chi=Parameter_Dictionary['chi']*pi/180
+	epsI=float(Parameter_Dictionary["epsI"])
+	epsA=float(Parameter_Dictionary["epsA"])
+	chi=float(Parameter_Dictionary["chi"])*pi/180 # This will be returned in radians
 	beta=Beta_Function(epsI,epsA,chi)
 	print 	
 	print "Beta  = %s degrees for %s" % (beta*180/pi,file_name)

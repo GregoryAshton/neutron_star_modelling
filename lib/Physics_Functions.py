@@ -49,7 +49,7 @@ def Fix_Phi(phi,epsilon=170.0,Angle_Type="Degrees"):
 		return phi
 
 	elif Angle_Type in ["Radians","Radian","Rads"] :
-		# Change the default value of epsilon
+		# Change the default value of epsilon make sure the 1st argument is the default
 		if epsilon==170.0 : epsilon = 1.0 
 
 		phi_fix=[] ; fix = 0.0 ;  phi_fix.append(phi[0])

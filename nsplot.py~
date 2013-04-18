@@ -272,6 +272,9 @@ def ThreeD_Plot_Cartesian(file_name,Option_Dictionary):
 	x = omega_x ; y = omega_y ; z = omega_z
 
 	ax = py.subplot(111, projection='3d')
+	elev = 15.0
+	azim = -134.0
+	ax.view_init(elev, azim) 
 
 	# Create and label the primed axis
 #	ax.plot(py.zeros(100),py.zeros(100),py.linspace(-max(z),max(z),100),color="k")
@@ -387,23 +390,53 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 			py.show()
 
 	if Option_Dictionary.has_key('3D'):
+		
 		ax = py.subplot(111, projection='3d')
+		# Set the viewing position
+		elev = 15.0
+		azim = -134.0
+		ax.view_init(elev, azim) 
+
 	
 		# Transform to spherical coordinates
 		(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z,Angle_Type="Radians")
 
 		phi=Physics_Functions.Fix_Phi(phi,Angle_Type="Radians") # By default we assume the phi is broken so fix it	
+
+		
 		if Option_Dictionary.has_key('split'):
+			# Import the values to split by
 			values=[int(it) for it in Option_Dictionary['split'].split("/")]
-			print values
+		
+			# Define color library for the splits
+			colors = ["b","r","k","c"]
 			for j in range(0,len(values),2):
 				# Trajectory of path
-				low = values[j] ; high = values[j+1] ; print low,high
+				low = values[j] ; high = values[j+1] 
 				x=[1.0*py.sin(a[i])*py.cos(phi[i]) for i in range(low,high)]
 				y=[1.0*py.sin(a[i])*py.sin(phi[i]) for i in range(low,high)]
 				z=[1.0*py.cos(a[i]) for i in range(low,high)]
 
-				ax.plot3D(x,y,z,alpha=0.8)			
+				# Remove points from the back of the sphere
+				front_x = [] ; front_y=[] ; front_z=[]
+				back_x = [] ; back_y=[] ; back_z=[]
+				for i in range(len(x)):
+					
+					if -180 < py.arctan2(y[i],x[i])*180/pi < -50 :
+						front_x.append(x[i])
+						front_y.append(y[i])
+						front_z.append(z[i])
+					elif 140 < py.arctan2(y[i],x[i])*180/pi < 180 :
+						front_x.append(x[i])
+						front_y.append(y[i])
+						front_z.append(z[i])
+					else : 
+						back_x.append(x[i])
+						back_y.append(y[i])
+						back_z.append(z[i])
+						
+				ax.plot3D(front_x,front_y,front_z,".",alpha=1.0,color=colors[j/2])	
+				ax.plot3D(back_x,back_y,back_z,".",alpha=0.1,color=colors[j/2])		
 		else :	
 			# Trajectory of path
 			x=[1.0*py.sin(a[i])*py.cos(phi[i]) for i in range(len(time))]
@@ -424,7 +457,7 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 		if Option_Dictionary.has_key('beta'):
 			ax.set_xlabel(r"$e_{1}$")
 			ax.set_ylabel(r"$e_{2}$")
-			ax.set_zlabel(r"$e_{3}$")
+			ax.set_zlabel(r"$e_{3}$",rotation="horizontal")
 			# These axis labels may prove to be wrong in the case of epsI<0
 		else :
 			ax.set_xlabel(r"$\hat{\omega_{x}}$")
@@ -434,6 +467,7 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 		ax.set_xticklabels([])
 		ax.set_yticklabels([])
 		ax.set_zticklabels([])
+
 
 		ax.grid(False)
 

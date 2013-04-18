@@ -67,4 +67,39 @@ def Plot_a_phi(time,a,phi):
 
 	py.show()
 
+def ThreeD_Sphere(axis,elevation,azimuth,x,y,z,colour="b",LS="."):
+	"""Function which given an axis with 3D projection and the azimuth and elevation plots the x,y,z shading the values which are on the opposite side of the unit sphere to the viewer. This should primarily only be used with drawing on the unit sphere.""" 
 
+	# Set the viewing angle
+	axis.view_init(elevation, azimuth)
+
+	# Init. lists for the front and back 
+	front_x = [] ; front_y=[] ; front_z=[]
+	back_x = [] ; back_y=[] ; back_z=[]
+
+	# Get the viewing limits from the azimuth
+	view_angle_low = azimuth-90
+	view_angle_high = azimuth + 90
+	if view_angle_low < -180 :
+		view_angle_low_2 = view_angle_low+360
+	else : view_angle_low_2 = 180
+
+	# Cycle through points and check which list they should be added to
+	for i in range(len(x)):
+		
+		if view_angle_low < py.arctan2(y[i],x[i])*180/py.pi < view_angle_high :
+			front_x.append(x[i])
+			front_y.append(y[i])
+			front_z.append(z[i])
+		elif view_angle_low_2 < py.arctan2(y[i],x[i])*180/py.pi < 180 :
+			front_x.append(x[i])
+			front_y.append(y[i])
+			front_z.append(z[i])
+		else : 
+			back_x.append(x[i])
+			back_y.append(y[i])
+			back_z.append(z[i])
+	
+	# Plot the points using plot3D 
+	axis.plot3D(front_x,front_y,front_z,LS,alpha=1.0,color=colour)	
+	axis.plot3D(back_x,back_y,back_z,LS,alpha=0.3,color=colour)	

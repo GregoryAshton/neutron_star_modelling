@@ -174,6 +174,12 @@ def Spherical_Plot(file_name,Option_Dictionary):
 		Save_Figure(file_name,"Spherical_Plot")
 	else:
 		py.show()
+	
+	ax = py.subplot(111)
+	chi = float(file_name.split("_")[3])
+	R = [(-pow(py.cos(a[i])*py.sin(chi),2)) for i in range(len(a))]
+	ax.plot(R)
+	py.show()
 
 def Alpha_Plot(file_name,Option_Dictionary):
 	""" Plots the alignment of the input file [t,omega_x , omega_y and omega_z] against the magnetic dipole"""
@@ -314,7 +320,7 @@ def ThreeD_Plot_Cartesian(file_name,Option_Dictionary):
 	ax.grid(False)
 
 	if Option_Dictionary.has_key('save_fig') and Option_Dictionary['save_fig'] == True :
-		Save_Figure(file_name,"Spherical_Plot")
+		Save_Figure(file_name,"ThreeD_Plot_Cartesian")
 	else:
 		py.show()
 

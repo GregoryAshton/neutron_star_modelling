@@ -440,8 +440,12 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 			z=[1.0*py.cos(a[i]) for i in range(len(time))]
 
 			elevation = 25.0
-			azimuth = 25.0
-			Plotting_Functions.ThreeD_Sphere(ax,elevation,azimuth,x,y,z,ls="-",lw=0.8,color="k")
+			azimuth = 20.0
+			if Option_Dictionary.has_key('delta'):
+				delta = Option_Dictionary['delta']
+			else :
+				delta = 1.0
+			Plotting_Functions.ThreeD_Sphere(ax,elevation,azimuth,x,y,z,ls="-",lw=0.8,color="k",delta=delta)
 
 		# Sphere of unit radius
 		u = np.linspace(0, 2 * np.pi , 100)

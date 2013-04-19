@@ -83,7 +83,7 @@ def Plot_a_phi(time,a,phi):
 
 	py.show()
 
-def ThreeD_Sphere(axis,elevation,azimuth,x,y,z,color="b",ls=".",lw=1):
+def ThreeD_Sphere(axis,elevation,azimuth,x,y,z,color="b",ls=".",lw=1,delta=1.0):
 	"""Function which given an axis with 3D projection and the azimuth and elevation plots the x,y,z shading the values which are on the opposite side of the unit sphere to the viewer. This should primarily only be used with drawing on the unit sphere.""" 
 
 	# Set the viewing angle
@@ -94,10 +94,10 @@ def ThreeD_Sphere(axis,elevation,azimuth,x,y,z,color="b",ls=".",lw=1):
 	back_x = [] ; back_y=[] ; back_z=[]
 
 	# Get the viewing limits from the azimuth
-	view_angle_low = azimuth-90
-	view_angle_high = azimuth + 90
+	view_angle_low = azimuth-110
+	view_angle_high = azimuth + 110
 	if view_angle_low < -180 :
-		view_angle_low_2 = view_angle_low+360
+		view_angle_low_2 = view_angle_low+370
 	else : view_angle_low_2 = 180
 
 	# Cycle through points and check which list they should be added to
@@ -107,6 +107,7 @@ def ThreeD_Sphere(axis,elevation,azimuth,x,y,z,color="b",ls=".",lw=1):
 			front_x.append(x[i])
 			front_y.append(y[i])
 			front_z.append(z[i])
+			
 		if view_angle_low_2 < py.arctan2(y[i],x[i])*180/py.pi < 180 :
 			front_x.append(x[i])
 			front_y.append(y[i])
@@ -123,20 +124,19 @@ def ThreeD_Sphere(axis,elevation,azimuth,x,y,z,color="b",ls=".",lw=1):
 	
 	# Plot the points using plot3D 
 	if ls in ["-","--",":","-."]:
-		def plot(x,y,z,alpha,delta=1.0):
+		def plot(x,y,z,delta,alpha):
+			delta = float(delta)
 			j=0
 			for i in range(1,len(x)):
-				#if py.norm([x[i]-x[i-1],y[i]-y[i-1],z[i]-z[i-1]]) < delta:
-				if x[i]*x[i-1] > 0.0 and y[i]*y[i-1]>0.0 :
-					pass
-				else :
+				if py.norm([x[i]-x[i-1],y[i]-y[i-1],z[i]-z[i-1]]) > delta:
 					axis.plot3D(x[j:i-1],y[j:i-1],z[j:i-1],ls,alpha=alpha,color=color,lw=lw)
 					j=i
+			if j==0 : print "Bugger"
 			if i !=j :
 				axis.plot3D(x[j:i-1],y[j:i-1],z[j:i-1],ls,alpha=alpha,color=color,lw=lw )
 
-		plot(front_x,front_y,front_z,alpha=1.0)
-		plot(back_x,back_y,back_z,alpha=0.4)
+		plot(front_x,front_y,front_z,delta,alpha=1.0)
+		plot(back_x,back_y,back_z,delta,alpha=0.4)
 	else :
 		axis.plot3D(front_x,front_y,front_z,ls,alpha=1.0,color=color,lw=lw )
 		axis.plot3D(back_x,back_y,back_z,ls,alpha=0.3,color=color,lw=lw )

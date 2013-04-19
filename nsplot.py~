@@ -441,7 +441,11 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 
 			elevation = 25.0
 			azimuth = 25.0
-			Plotting_Functions.ThreeD_Sphere(ax,elevation,azimuth,x,y,z,ls="-",lw=0.8,color="k")
+			if Option_Dictionary.has_key('delta'):
+				delta = Option_Dictionary['delta']
+			else :
+				delta = 1.0
+			Plotting_Functions.ThreeD_Sphere(ax,elevation,azimuth,x,y,z,ls="-",lw=0.8,color="k",delta=delta)
 
 		# Sphere of unit radius
 		u = np.linspace(0, 2 * np.pi , 100)
@@ -645,7 +649,7 @@ def Spherical_Plot_Transform(file_name,Option_Dictionary):
 		#Ploptions
 		ax3.set_xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]",fontsize=16)		
 		ax3.yaxis.set_label_coords(labelx, 0.5)
-		ax3.set_yticks(ax3.get_yticks()[0:-2])
+		ax3.set_yticks(ax3.get_yticks()[0:-1])
 
 	if Option_Dictionary.has_key('end_val') :
 		print " Data on the end value of the spherical components of omega"

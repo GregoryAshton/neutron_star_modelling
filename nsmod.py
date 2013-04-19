@@ -48,7 +48,17 @@ def Epsilon_A_to_Magnetic_Field(Epsilon_A,Option_Dictionary={}):
 # Top level function to sort the dictionary of parameters write a .c script compile and output to a suitable .txt file
 # may be able to use http://docs.python.org/2/tutorial/controlflow.html instead eg **dictionary
 def Run(Option_Dictionary):
-	""" Takes as input a dictionary of parameters chi,epsI,epsA,omega_0,eta,err=1.0e-12,*args from the input. chi must be unit degrees and not radians"""
+	"""Create the generic write file that can be compiled
+	 and run in C. The input should be of the form of a dictionary including 
+
+	chi,epsI,epsA,omega_0,eta,err=1.0e-12,*args 
+
+	where
+	chi = angle between magnetic dipole and z axis
+	epsI = elastic deformation 
+	epsA magnetic deformation 
+	omega_0 = initial spin period 
+	eta = Simultion will stop when omega**2.0 < eta*omega_0**2.0 """
 
 	# Currently this will take either eta, or t but it's starting to get messy. Consider simplfying.
 	# Minimum number of input parameters
@@ -118,6 +128,7 @@ def Run(Option_Dictionary):
 	return file_name
 
 def Print_Parameters(file_name):
+	""" Print a list of parameters about the file to the terminal """
 	from lib.File_Functions import Parameter_Dictionary
 	Parameter_Dictionary = Parameter_Dictionary(file_name)
 	for item in Parameter_Dictionary:
@@ -143,20 +154,9 @@ def main():
 
 		parser.add_option("-B", "--beta" ,help="Takes as input =sign,epsI,epsA,chi and returns the angle Beta through which the xz coordinates rotate", metavar="FILE")
 
-		parser.add_option("-r", "--run" , help = 
-									"""Create the generic write file that can be compiled
-									 and run in C. The input should be of the form of a dictionary including 
+		parser.add_option("-r", "--run" , help = Run.__doc__)
 
-									chi,epsI,epsA,omega_0,eta,err=1.0e-12,*args 
-
-									where
-									chi = angle between magnetic dipole and z axis
-									epsI = elastic deformation 
-									epsA magnetic deformation 
-									omega_0 = initial spin period 
-									eta = Simultion will stop when omega**2.0 < eta*omega_0**2.0 """)
-
-		parser.add_option("-p","--print_parameters",help=Print_Parameters.__doc__)
+		parser.add_option("-p","--print_parameters",help = Print_Parameters.__doc__)
 
 		# Additional arguments are passed to opts 
 		parser.add_option("-o","--opts")

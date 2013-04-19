@@ -117,7 +117,8 @@ def ThreeD_Sphere(axis,elevation,azimuth,x,y,z,color="b",ls=".",lw=1):
 		def plot(x,y,z,alpha,delta=1.0):
 			j=0
 			for i in range(1,len(x)):
-				if py.norm([x[i]-x[i-1],y[i]-y[i-1],z[i]-z[i-1]]) < delta:
+				#if py.norm([x[i]-x[i-1],y[i]-y[i-1],z[i]-z[i-1]]) < delta:
+				if x[i]*x[i-1] > 0.0 and y[i]*y[i-1]>0.0 :
 					pass
 				else :
 					axis.plot3D(x[j:i-1],y[j:i-1],z[j:i-1],ls,alpha=alpha,color=color,lw=lw)

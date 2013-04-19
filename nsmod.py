@@ -73,22 +73,23 @@ def Run(Option_Dictionary):
 
 	# Create file name 
 	if Option_Dictionary.has_key('eta'):
-		eta = str(Option_Dictionary['eta'])
-		# Caluclate the relative eta 
-		eta_relative = str(float(eta)*pow(float(omega0),2))
+		if Option_Dictionary['eta']!=False:
+			eta = str(Option_Dictionary['eta'])
+			# Caluclate the relative eta 
+			eta_relative = str(float(eta)*pow(float(omega0),2))
 
-		if Option_Dictionary.has_key('no_anom') and Option_Dictionary['no_anom']==True:
-			print " Running code WITHOUT the anomalous torque"
-			file_name = "no_anom_chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) 
-			args="no_anom"
-		else :
-			print " Running code WITH the anomalous torque"
-			file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) 
-			args = None
+			if Option_Dictionary.has_key('no_anom') and Option_Dictionary['no_anom']==True:
+				print " Running code WITHOUT the anomalous torque"
+				file_name = "no_anom_chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) 
+				args="no_anom"
+			else :
+				print " Running code WITH the anomalous torque"
+				file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) 
+				args = None
 
-		File_Functions.Write_File_Automatic(chi,epsI,epsA,omega0,eta_relative,err,args)
+			File_Functions.Write_File_Automatic(chi,epsI,epsA,omega0,eta_relative,err,args)
 
-	elif Option_Dictionary.has_key('t1'):
+	if Option_Dictionary.has_key('t1'):
 		t1 = str(Option_Dictionary['t1'])
 
 		if Option_Dictionary.has_key('no_anom') and Option_Dictionary['no_anom']==True:
@@ -102,8 +103,12 @@ def Run(Option_Dictionary):
 
 		File_Functions.Write_File(chi,epsI,epsA,omega0,t1,err,args) # Note this is not the automatic writer..consider relabelling
 
-	else : print " You have not specified either eta or t1"
-
+	if 'file_name' not in locals(): print "You have not specified either eta or t1"
+	try :
+		file_name
+	except NameError:
+		print "You have not specified either eta or t1" # This needs to be fixed
+		
 	os.system("gcc -Wall -I/usr/local/include -c generic_script.c")
 	os.system("gcc -static generic_script.o -lgsl -lgslcblas -lm")
 	os.system("./a.out >  %s" % (file_name) )
@@ -111,6 +116,13 @@ def Run(Option_Dictionary):
 	print " Run is complete for this data, the output is saved in the file "+file_name
 	print 
 	return file_name
+
+def Print_Parameters(file_name):
+	from lib.File_Functions import Parameter_Dictionary
+	Parameter_Dictionary = Parameter_Dictionary(file_name)
+	for item in Parameter_Dictionary:
+		print " %s = %s " % (item,Parameter_Dictionary[item])
+	
 
 def Create_Option_Dictionary(opts):
 	Option_Dictionary={}
@@ -144,6 +156,8 @@ def main():
 									omega_0 = initial spin period 
 									eta = Simultion will stop when omega**2.0 < eta*omega_0**2.0 """)
 
+		parser.add_option("-p","--print_parameters",help=Print_Parameters.__doc__)
+
 		# Additional arguments are passed to opts 
 		parser.add_option("-o","--opts")
 	
@@ -161,7 +175,7 @@ def main():
 	else : Option_Dictionary = {}
 
 	# Add the verbosity to the Option Dictionary
-	Option_Dictionary['verbose'] = option.verbose
+	Option_Dictionary['verbose'] = options.verbose
 
 	if options.b_2_e : Magnetic_Field_to_Epsilon_A(options.b_2_e,Option_Dictionary)
 
@@ -171,6 +185,8 @@ def main():
 
 	# For the fun command the argument should be a dictionary of values. No Option_Dictionary exists
 	if options.run : Run(options.run)
+
+	if options.print_parameters : Print_Parameters(options.print_parameters)
 
 
 if __name__ == "__main__":

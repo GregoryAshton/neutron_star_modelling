@@ -14,6 +14,7 @@ from mpl_toolkits.mplot3d import proj3d
 import lib.File_Functions as File_Functions
 import lib.Physics_Functions as Physics_Functions 
 import lib.Plotting_Functions as Plotting_Functions
+from lib.Physics_Functions import Beta_Function #?
 
 def Save_Figure(file_name,type_of_plot,format_type=".png"):
 	plot_file_name = type_of_plot+"_"+file_name.rstrip(".txt")+format_type
@@ -48,13 +49,13 @@ def Defaults():
 #	b=py.sqrt(epsA*epsA+epsI*epsI-2*epsA*epsI*py.cos(2*chi))
 #	return py.arctan((epsI+epsA*(1-2*pow(py.cos(chi),2.0))+sign*b)/(2*epsA*py.sin(chi)*py.cos(chi)))
 
-## Beta function
-def Beta_Function(epsI,epsA,chi):
-	if chi>2*pi :
-		print "Assuming chi has been given in degrees rather than radians, we now transform"
-		chi = chi*pi/180
-	a=epsA*epsA+epsI*epsI-2*epsA*epsI*py.cos(2*chi)
-	return py.arctan((epsI-epsA*py.cos(2*chi)-py.sqrt(a))/(2*epsA*py.sin(chi)*py.cos(chi)))
+### Beta function
+#def Beta_Function(epsI,epsA,chi):
+#	if chi>2*pi :
+#		print "Assuming chi has been given in degrees rather than radians, we now transform"
+#		chi = chi*pi/180
+#	a=epsA*epsA+epsI*epsI-2*epsA*epsI*py.cos(2*chi)
+#	return py.arctan((epsI-epsA*py.cos(2*chi)-py.sqrt(a))/(2*epsA*py.sin(chi)*py.cos(chi)))
 
 # Plotting functions
 
@@ -508,7 +509,7 @@ def Simple_Plot_Transform(file_name,Option_Dictionary):
 	fig2.plot(time,omega_z_prime)
 	py.xlabel(r"$t$",fontsize=20)
 	py.ylabel("$\omega_{z}' $",fontsize=20,rotation="horizontal")
-
+	py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12,hspace=0.0)
 	py.show()
 
 def Spherical_Plot_Transform(file_name,Option_Dictionary):
@@ -617,7 +618,7 @@ def Spherical_Plot_Transform(file_name,Option_Dictionary):
 		ax2.plot(t_scaled,a_prime)
 		#py.axhline(90,ls="--",color="k")
 
-		y_max = 105
+		y_max = 120
 		ax2.set_ylim(0,y_max)
 		#py.yticks(fig2.get_yticks()[0:-2])
 		ax2.set_yticks(py.arange(0,y_max,15))
@@ -644,7 +645,7 @@ def Spherical_Plot_Transform(file_name,Option_Dictionary):
 		#Ploptions
 		ax3.set_xlabel(r"time  [$1\times 10^{"+str(scale_val)+"}$ s]",fontsize=16)		
 		ax3.yaxis.set_label_coords(labelx, 0.5)
-		ax3.set_yticks(ax3.get_yticks()[0:-2])
+		ax3.set_yticks(ax3.get_yticks()[0:-1])
 
 	if Option_Dictionary.has_key('end_val') :
 		print " Data on the end value of the spherical components of omega"
@@ -655,6 +656,7 @@ def Spherical_Plot_Transform(file_name,Option_Dictionary):
 		phi_end = phi_prime[-100:-1]
 		print " Average of phi :  %s  degrees \n Range of phi : %s"	% (py.average(phi_end),max(phi_end)-min(phi_end))
 
+	py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12,hspace=0.0)
 	if Option_Dictionary.has_key('save_fig'):
 		Save_Figure(file_name,"Spherical_Plot_Transform")
 	else : 

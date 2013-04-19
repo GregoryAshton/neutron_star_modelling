@@ -36,7 +36,7 @@ def Transform_Cartesian_Body_Frame_2_Effective_Body_Frame(x,y,z,Beta):
 def Rotational_Kinetic_Energy(Ix,Iy,Iz,omega_x,omega_y,omega_z):
 	return 0.5*(Ix*pow(omega_x,2)+Iy*pow(omega_y,2)+Iz*pow(omega_z,2))
 
-def Fix_Phi(phi,epsilon=100.0,Angle_Type="Degrees"):
+def Fix_Phi(phi,epsilon=170.0,Angle_Type="Degrees"):
 	""" Takes a list of phi values and looks for jumps greater than epsilon, assuming these reflect a full rotation (2pi-0) it adds a correction factor to the subsequent data"""
 	
 	if Angle_Type == "Degrees" :
@@ -50,7 +50,7 @@ def Fix_Phi(phi,epsilon=100.0,Angle_Type="Degrees"):
 
 	elif Angle_Type in ["Radians","Radian","Rads"] :
 		# Change the default value of epsilon make sure the 1st argument is the default
-		if epsilon==175.0 : epsilon = 1.0 
+		if epsilon==170.0 : epsilon = 1.0 
 
 		phi_fix=[] ; fix = 0.0 ;  phi_fix.append(phi[0])
 		for i in range(1,len(phi)):

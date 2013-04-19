@@ -4,12 +4,21 @@
 import pylab as py 
 from math import floor
 
-def Texify_Float(f,n=1):
-	"""This isn't really a Plotting function, but the other functions are in here.."""
+def Texify_Float(f,n=1,power=True):
+	"""This isn't really a Plotting function, but the other functions are in here. 
+		Takes a float and returns a string that looks nice in Latex, takes arguments 
+	n=int ~ Number of sig.fig
+	power = Bool ~ Whether to produce a *10^{x} or just a regular number"""
+	# Ensure the input is a float
 	f = float(f)
-	f_power = int(py.log10(Round_To_n(f,0)))
-	f_SF = Round_To_n(f,n)*pow(10,-f_power)
-	return r" %s\times 10^{%s} " % (f_SF,f_power)
+	if power==True:
+		f_power = int(py.log10(Round_To_n(f,0)))
+		f_SF = Round_To_n(f,n)*pow(10,-f_power)
+		return r" %s\times 10^{%s} " % (f_SF,f_power)
+	else :
+		print f
+		f_SF = Round_To_n(f,n)
+		return  str(f_SF)
 
 # Generic functions 
 
@@ -26,7 +35,7 @@ def Sort_Out_Some_Axis(x):
 	
 
 def Round_To_n(x,n):
-	return round(x, -int(floor(py.log10(x)))+n)
+	return round(x, -int(floor(py.sign(x)*py.log10(abs(x))))+n)
 
 
 

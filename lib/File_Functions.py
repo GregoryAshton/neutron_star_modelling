@@ -42,6 +42,10 @@ def Parameter_Dictionary(user_input):
 	p_d["tauS"] = str(pow(omega0**2.0 *epsA,-1)*3*c/(2*R))
 	p_d["Bs"] = str(2*np.sqrt(epsA*I0*R*pow(c,2))/pow(R,3))
 	
+	# Need to import the beta function
+	from Physics_Functions import Beta_Function
+	p_d["beta30"] = str(Beta_Function(epsI,epsA,30*np.pi/180)*180/np.pi)
+	p_d["beta75"] = str(Beta_Function(epsI,epsA,75*np.pi/180)*180/np.pi)
 	return p_d
 		
 

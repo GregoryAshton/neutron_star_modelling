@@ -60,3 +60,11 @@ def Fix_Phi(phi,epsilon=170.0,Angle_Type="Degrees"):
 		phi=phi_fix
 		return phi
 
+## Beta function
+def Beta_Function(epsI,epsA,chi):
+	if chi>2*pi :
+		print "Assuming chi has been given in degrees rather than radians, we now transform"
+		chi = chi*pi/180
+	a=epsA*epsA+epsI*epsI-2*epsA*epsI*py.cos(2*chi)
+	return py.arctan((epsI-epsA*py.cos(2*chi)-py.sqrt(a))/(2*epsA*py.sin(chi)*py.cos(chi)))
+

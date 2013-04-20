@@ -47,18 +47,6 @@ def Parameter_Dictionary(user_input):
 	p_d["beta30"] = str(Beta_Function(epsI,epsA,30*np.pi/180)*180/np.pi)
 	p_d["beta75"] = str(Beta_Function(epsI,epsA,75*np.pi/180)*180/np.pi)
 	return p_d
-		
-
-
-#	# Standard values for c , R in cgs
-#	c = 3e10 
-#	R = 1e6
-#	# Compute a couple of often used variabes	
-#	tau_P = pow(omega0*epsI,-1)
-#	tau_A = pow(omega0*epsA,-1)
-#	tau_S = pow(omega0*omega0*epsA)*3*c/(2*R)
-
-#	return (chi,epsI,epsA,omega0,eta)
 
 def Import_Data(file_name,max_int=-1,d_int=1):
 	if max_int != -1 : max_int = 4 *max_int # Note it is 4 since each line contains 4 columns so the total data set is 4*nmax
@@ -72,39 +60,6 @@ def Import_Data(file_name,max_int=-1,d_int=1):
 
 	return (time,x,y,z)
 
-
-# Old code which used the params header
-#def Import_Data(file_name,max_int=None,*args):
-#	""" Return the contents of 'file_name' as 4 lists + a list of params"""
-#	t1 = datetime.now() # Used in testing time
-#	data=open(file_name,"r")	
-#	time=[] ; x=[] ; y=[] ; z=[] ; params=[]
-#	if max_int == None : 
-#		for line in data:
-#			line=line.split()
-#			if len(params)==0:
-#				params=(line)
-#			else:
-#				time.append(float(line[0]))
-#				x.append(float(line[1]))
-#				y.append(float(line[2]))
-#				z.append(float(line[3]))
-#	else :
-#		for line in data:
-#			line=line.split()
-#			if len(params)==0:
-#				params=(line)
-#			else:
-#				time.append(float(line[0]))
-#				x.append(float(line[1]))
-#				y.append(float(line[2]))
-#				z.append(float(line[3]))
-#			if len(x) > max_int : break
-#
-#	t2 = datetime.now()
-#	if "timing" in args:
-#		print "Time for operations = ",t2-t1	
-#	return (time,x,y,z,params)
 
 def Import_Data_Array_Method(file_name,max_int=None,*args):
 	t1 = datetime.now() # Used for testing time 
@@ -123,10 +78,10 @@ def Import_Data_Array_Method(file_name,max_int=None,*args):
 
 	return (time,x,y,z,params)
 
-def Write_File(chi,eps_I,eps_A,omega_0,t1,err=1.0e-12,*args):
+def Write_File_t1(chi,eps_I,eps_A,omega_0,t1,err=1.0e-12,no_anom=False):
 	"""Write a generic script to be compiles and run in C with paramaters chi,eps_I,eps_A,omega_0,t1.err=1.0e-12, if "no_anom" in *args the generated code will not contain the anomalous torque"""
 
-	if "no_anom" in args:
+	if "no_anom":
 		text= r'''
 /* THIS IS AN AUTOMATED FILE AND SHOULD NOT BE EDITED */
 
@@ -402,10 +357,10 @@ main (void)
 	write_file.close()
 
 
-def Write_File_Automatic(chi,eps_I,eps_A,omega_0,eta_relative,err=1.0e-12,*args):
-	"""Write a generic script to be compiles and run in C with paramaters chi,eps_I,eps_A,omega_0,eta,err=1.0e-12, if "no_anom" in *args the generated code will not contain the anomalous torque"""
+def Write_File_Eta(chi,eps_I,eps_A,omega_0,eta_relative,err=1.0e-12,no_anom=False):
+	"""Write a generic script to be compiles and run in C with paramaters chi,eps_I,eps_A,omega_0,eta,err=1.0e-12, if "no_anom" in the generated code will not contain the anomalous torque"""
 
-	if "no_anom" in args:
+	if "no_anom" :
 		text= r'''
 /* THIS IS AN AUTOMATED FILE AND SHOULD NOT BE EDITED */
 

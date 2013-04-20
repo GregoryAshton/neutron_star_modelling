@@ -51,11 +51,13 @@ def Run(Input_Dictionary):
 	file_name_list = []
 	if Input_Dictionary.get('no_anom'):
 		file_name_list .append("no_anom")
-		args="no_anom"
+		no_anom=True
+	else :
+		no_anom=False
 		
 	try :
 		chi = Input_Dictionary['chi']
-		file_name_list.append("_chi_"+str(Input_Dictionary['chi']))
+		file_name_list.append("chi_"+str(Input_Dictionary['chi']))
 	except KeyError:
 		print " ERROR: You need to specify chi in the input dictionary"
 
@@ -90,12 +92,6 @@ def Run(Input_Dictionary):
 	except KeyError:
 		t1 = None
 
-	if t1 and eta : 
-		print " ERROR: You have not specified either eta or t1"
-	else : 	
-		print "ERROR: You have specified both eta and t1, this is incorrect"
-		return 
-	
 	# Optional Arguments
 	try :
 		err = str(Input_Dictionary['err'])
@@ -103,47 +99,19 @@ def Run(Input_Dictionary):
 		# Use a default value 
 		err = 1e-12
 
-
+	#  Write the generic write_file
+	if t1==eta : 
+		print " ERROR: You have not specified either eta or t1"
+		return 
+	if t1 != None:
+		File_Functions.Write_File_t1(chi,epsI,epsA,omega0,t1,err,no_anom)
+	if eta != None:
+		File_Functions.Write_File_t1(chi,epsI,epsA,omega0,t1,err,no_anom)
+	
 	# Create file name 
+	file_name_list.append(".txt")
 	file_name = "".join(file_name_list)
-	print file_name
-#	if Option_Dictionary.has_key('eta'):
-#		if Option_Dictionary['eta']!=False:
-#			eta = str(Option_Dictionary['eta'])
-#			# Caluclate the relative eta 
-#			
 
-#			if Option_Dictionary.has_key('no_anom') and Option_Dictionary['no_anom']==True:
-#				print " Running code WITHOUT the anomalous torque"
-#				file_name = "no_anom_chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) 
-#				args="no_anom"
-#			else :
-#				print " Running code WITH the anomalous torque"
-#				file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) 
-#				args = None
-
-#			File_Functions.Write_File_Automatic(chi,epsI,epsA,omega0,eta_relative,err,args)
-
-#	if Option_Dictionary.has_key('t1'):
-#		t1 = str(Option_Dictionary['t1'])
-
-#		if Option_Dictionary.has_key('no_anom') and Option_Dictionary['no_anom']==True:
-#			print " Running code WITHOUT the anomalous torque"
-#			file_name = "no_anom_chi_%s_epsI_%s_epsA_%s_omega0_%s_t1_%s.txt" % (chi,epsI,epsA,omega0,t1) 
-#			args="no_anom"
-#		else :
-#			print " Running code WITH the anomalous torque"
-#			file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_t1_%s.txt" % (chi,epsI,epsA,omega0,t1) 
-#			args = None
-
-#		File_Functions.Write_File(chi,epsI,epsA,omega0,t1,err,args) # Note this is not the automatic writer..consider relabelling
-
-	if 'file_name' not in locals(): print "You have not specified either eta or t1"
-	try :
-		file_name
-	except NameError:
-		print "You have not specified either eta or t1" # This needs to be fixed
-		
 	os.system("gcc -Wall -I/usr/local/include -c generic_script.c")
 	os.system("gcc -static generic_script.o -lgsl -lgslcblas -lm")
 	os.system("./a.out >  %s" % (file_name) )
@@ -163,7 +131,7 @@ def Print_Parameters(file_name):
 def Create_Dictionary(opts):
 	Option_Dictionary={}
 	for item in opts.split(","):
-		if "=" in item: Option_Dictionary[item.split("=")[0]] = float(item.split("=")[1])
+		if "=" in item: Option_Dictionary[item.split("=")[0]] = item.split("=")[1]
 	else : Option_Dictionary[item] = True
 	return Option_Dictionary
 	

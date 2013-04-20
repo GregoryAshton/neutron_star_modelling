@@ -1,29 +1,10 @@
 #!/usr/bin/python 
 
-import lib.File_Functions as File_Functions
-
 import optparse, sys, os
 import pylab as py
 
-# Define the functions
-
-def Beta_func(epsI,epsA,chi):
-	if epsI>=0:
-		sign=-1.0
-	else: sign=1.0
-
-	b=py.sqrt(epsA*epsA+epsI*epsI-2*epsA*epsI*py.cos(2*chi))
-	return py.arctan((epsI+epsA*(1-2*pow(py.cos(chi),2.0))+sign*b)/(2*epsA*py.sin(chi)*py.cos(chi)))
-
-def Print_Beta(foptions):
-	"""This functions takes as input the three parameters epsI,epsA and chi and returns Beta the angle between the principle axis of the new MOI tensor which aligns with the original z axis, and the original z axis."""
-	foptions = foptions.split(",")
-	sign=float(foptions[0])
-	epsI=sign*pow(10,float(foptions[1]))
-	epsA=pow(10,float(foptions[2]))
-	chi=float(foptions[3])*pi/180.0
-	print "epsI="+str(epsI)+"  epsA="+str(round_to_n(epsA,2))+"  chi="+str(foptions[3])
-	print "beta=" , Beta_func(epsI,epsA,chi)*180.0/pi, " degrees"
+# Import internal modules
+import lib.File_Functions as File_Functions
 
 def Magnetic_Field_to_Epsilon_A(Bs):
 	R = 1e6 #cm
@@ -44,74 +25,118 @@ def Epsilon_A_to_Magnetic_Field(Epsilon_A,Option_Dictionary={}):
 	else :
 		return  Bs
 
+def Run(Input_Dictionary):
+	""" Create a generic write file, compile and run in C. 
 
-# Top level function to sort the dictionary of parameters write a .c script compile and output to a suitable .txt file
-# may be able to use http://docs.python.org/2/tutorial/controlflow.html instead eg **dictionary
-def Run(Option_Dictionary):
-	"""Create the generic write file that can be compiled
-	 and run in C. The input should be of the form of a dictionary including 
+	Keyword arguments must be passed as a dictionary
+	chi=float [degrees] -- angle between magnetic dipole and z axis
+	epsI=float []-- elastic deformation 
+	epsA =float []-- magnetic deformation 
+	omega_0 =float [Hz]-- initial spin period 
+	either 
+		eta =float []-- Threshold for which to stop the simulation. Simulation is initiated using omega**2.0 < eta*omega_0**2.0 
+	or
+		t1=float [s] -- Time for which to run simulation for		
 
-	chi,epsI,epsA,omega_0,eta,err=1.0e-12,*args 
+	Optional arguments
+	err = float[] -- Error argument to pass to the GCC compiler 
 
-	where
-	chi = angle between magnetic dipole and z axis
-	epsI = elastic deformation 
-	epsA magnetic deformation 
-	omega_0 = initial spin period 
-	eta = Simultion will stop when omega**2.0 < eta*omega_0**2.0 """
+	For help with the GCC compiler see documentation at http://www.gnu.org/software/gsl/manual/html_node/Ordinary-Differential-Equations.html 
+	The generic script is written by Write_File in File_Functions
+	"""
 
-	# Currently this will take either eta, or t but it's starting to get messy. Consider simplfying.
-	# Minimum number of input parameters
-	if Option_Dictionary.has_key('chi') : chi = str(Option_Dictionary['chi'])
-	else : print "ERROR you have not specified chi" 
+	#  Required paramaters
 
-	if Option_Dictionary.has_key('epsI') : epsI = str(Option_Dictionary['epsI'])
-	else : print "ERROR you have not specified epsI"
+	# Check if the anomalous torque should be used or not and initiate the file_name
+	file_name_list = []
+	if Input_Dictionary.get('no_anom'):
+		file_name_list .append("no_anom")
+		args="no_anom"
+		
+	try :
+		chi = Input_Dictionary['chi']
+		file_name_list.append("_chi_"+str(Input_Dictionary['chi']))
+	except KeyError:
+		print " ERROR: You need to specify chi in the input dictionary"
 
-	if Option_Dictionary.has_key('epsA') : epsA = str(Option_Dictionary['epsA'])
-	else : print "ERROR you have not specified epsA"
+	try :
+		epsI= str(Input_Dictionary['epsI'])
+		file_name_list.append("_epsI_"+str(Input_Dictionary['epsI']))
+	except KeyError:
+		print " ERROR: You need to specify epsI in the input dictionary"
 
-	if Option_Dictionary.has_key('omega0') : omega0 = str(Option_Dictionary['omega0'])
-	else : print "ERROR you have not specified omega0"
+	try :
+		epsA = str(Input_Dictionary['epsA'])
+		file_name_list.append("_epsA_"+str(Input_Dictionary['epsA']))
+	except KeyError:
+		print " ERROR: You need to specify epsA in the input dictionary"
 
-	if Option_Dictionary.has_key('err') : 
-		err = str(Option_Dictionary['err'])
-	else : 
-		#print " Using default error value of 1e-12" 
+	try :
+		omega0 = str(Input_Dictionary['omega0'])
+		file_name_list.append("_omega0_"+str(Input_Dictionary['omega0']))
+	except KeyError:
+		print " ERROR: You need to specify omega0 in the input dictionary"
+
+	# Take either t1 or eta but not both
+	try :
+		eta = str(Input_Dictionary['eta'])
+		file_name_list.append("_eta_"+str(Input_Dictionary['eta']))
+		eta_relative = str(float(eta)*pow(float(omega0),2)) 
+	except KeyError:
+		eta = None
+	try :
+		t1 = str(Input_Dictionary['t1'])
+		file_name_list.append("_t1_"+str(Input_Dictionary['t1']))
+	except KeyError:
+		t1 = None
+
+	if t1 and eta : 
+		print " ERROR: You have not specified either eta or t1"
+	else : 	
+		print "ERROR: You have specified both eta and t1, this is incorrect"
+		return 
+	
+	# Optional Arguments
+	try :
+		err = str(Input_Dictionary['err'])
+	except KeyError:
+		# Use a default value 
 		err = 1e-12
 
 
 	# Create file name 
-	if Option_Dictionary.has_key('eta'):
-		if Option_Dictionary['eta']!=False:
-			eta = str(Option_Dictionary['eta'])
-			# Caluclate the relative eta 
-			eta_relative = str(float(eta)*pow(float(omega0),2))
+	file_name = "".join(file_name_list)
+	print file_name
+#	if Option_Dictionary.has_key('eta'):
+#		if Option_Dictionary['eta']!=False:
+#			eta = str(Option_Dictionary['eta'])
+#			# Caluclate the relative eta 
+#			
 
-			if Option_Dictionary.has_key('no_anom') and Option_Dictionary['no_anom']==True:
-				print " Running code WITHOUT the anomalous torque"
-				file_name = "no_anom_chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) 
-				args="no_anom"
-			else :
-				print " Running code WITH the anomalous torque"
-				file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) 
-				args = None
+#			if Option_Dictionary.has_key('no_anom') and Option_Dictionary['no_anom']==True:
+#				print " Running code WITHOUT the anomalous torque"
+#				file_name = "no_anom_chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) 
+#				args="no_anom"
+#			else :
+#				print " Running code WITH the anomalous torque"
+#				file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_eta_%s.txt" % (chi,epsI,epsA,omega0,eta) 
+#				args = None
 
-			File_Functions.Write_File_Automatic(chi,epsI,epsA,omega0,eta_relative,err,args)
+#			File_Functions.Write_File_Automatic(chi,epsI,epsA,omega0,eta_relative,err,args)
 
-	if Option_Dictionary.has_key('t1'):
-		t1 = str(Option_Dictionary['t1'])
+#	if Option_Dictionary.has_key('t1'):
+#		t1 = str(Option_Dictionary['t1'])
 
-		if Option_Dictionary.has_key('no_anom') and Option_Dictionary['no_anom']==True:
-			print " Running code WITHOUT the anomalous torque"
-			file_name = "no_anom_chi_%s_epsI_%s_epsA_%s_omega0_%s_t1_%s.txt" % (chi,epsI,epsA,omega0,t1) 
-			args="no_anom"
-		else :
-			print " Running code WITH the anomalous torque"
-			file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_t1_%s.txt" % (chi,epsI,epsA,omega0,t1) 
-			args = None
+#		if Option_Dictionary.has_key('no_anom') and Option_Dictionary['no_anom']==True:
+#			print " Running code WITHOUT the anomalous torque"
+#			file_name = "no_anom_chi_%s_epsI_%s_epsA_%s_omega0_%s_t1_%s.txt" % (chi,epsI,epsA,omega0,t1) 
+#			args="no_anom"
+#		else :
+#			print " Running code WITH the anomalous torque"
+#			file_name = "chi_%s_epsI_%s_epsA_%s_omega0_%s_t1_%s.txt" % (chi,epsI,epsA,omega0,t1) 
+#			args = None
 
-		File_Functions.Write_File(chi,epsI,epsA,omega0,t1,err,args) # Note this is not the automatic writer..consider relabelling
+#		File_Functions.Write_File(chi,epsI,epsA,omega0,t1,err,args) # Note this is not the automatic writer..consider relabelling
 
 	if 'file_name' not in locals(): print "You have not specified either eta or t1"
 	try :
@@ -135,7 +160,7 @@ def Print_Parameters(file_name):
 		print " %s = %s " % (item,Parameter_Dictionary[item])
 	
 
-def Create_Option_Dictionary(opts):
+def Create_Dictionary(opts):
 	Option_Dictionary={}
 	for item in opts.split(","):
 		if "=" in item: Option_Dictionary[item.split("=")[0]] = float(item.split("=")[1])
@@ -171,7 +196,7 @@ def main():
 	options, arguments = parse_command_line(sys.argv)
 
 	# Create the options dictionary 
-	if options.opts : Option_Dictionary = Create_Option_Dictionary(options.opts)
+	if options.opts : Option_Dictionary = Create_Dictionary(options.opts)
 	else : Option_Dictionary = {}
 
 	# Add the verbosity to the Option Dictionary
@@ -183,8 +208,9 @@ def main():
 
 	if options.beta : Print_Beta(options.beta)
 
-	# For the fun command the argument should be a dictionary of values. No Option_Dictionary exists
-	if options.run : Run(options.run)
+	# For the Run command the argument should be a dictionary of values. We create this from the argument, need to document
+	Input_Dictionary = Create_Dictionary(options.run)
+	if options.run : Run(Input_Dictionary)
 
 	if options.print_parameters : Print_Parameters(options.print_parameters)
 

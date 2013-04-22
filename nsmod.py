@@ -106,13 +106,13 @@ def Run(Input_Dictionary):
 	if t1 != None:
 		File_Functions.Write_File_t1(chi,epsI,epsA,omega0,t1,err,no_anom)
 	if eta != None:
-		File_Functions.Write_File_t1(chi,epsI,epsA,omega0,t1,err,no_anom)
+		File_Functions.Write_File_eta(chi,epsI,epsA,omega0,eta_relative,err,no_anom)
 	
 	# Create file name 
 	file_name_list.append(".txt")
 	file_name = "".join(file_name_list)
 
-	
+
 	os.system("gcc -Wall -I/usr/local/include -c generic_script.c")
 	os.system("gcc -static generic_script.o -lgsl -lgslcblas -lm")
 	os.system("./a.out >  %s" % (file_name) )

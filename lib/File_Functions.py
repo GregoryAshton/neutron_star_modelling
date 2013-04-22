@@ -357,7 +357,7 @@ main (void)
 	write_file.close()
 
 
-def Write_File_Eta(chi,eps_I,eps_A,omega_0,eta_relative,err=1.0e-12,no_anom=False):
+def Write_File_eta(chi,eps_I,eps_A,omega_0,eta_relative,err=1.0e-12,no_anom=False):
 	"""Write a generic script to be compiles and run in C with paramaters chi,eps_I,eps_A,omega_0,eta,err=1.0e-12, if "no_anom" in the generated code will not contain the anomalous torque"""
 
 	if "no_anom" :

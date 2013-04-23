@@ -1,8 +1,7 @@
 #!/usr/bin/python 
-import optparse, sys, os
+import argparse, sys, os
 import numpy as np
 import pylab as py 
-import optparse, sys, os
 from math import pi 
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib.patches import FancyArrowPatch
@@ -35,27 +34,6 @@ def Defaults():
 	py.rcParams['axes.grid']=True
 	py.rcParams['figure.figsize']= (10.0, 8.0)
 	#py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12,hspace=0.0)
-
-
-
-# OLD beta function
-#def Beta_Function(epsI,epsA,chi):
-#	if abs(chi) < 2*pi : print "Please check that the chi used in Beta_Function is in degrees and not radians"
-# 
-#	if epsI>=0:
-#		sign=-1.0
-#	else: sign=1.0
-
-#	b=py.sqrt(epsA*epsA+epsI*epsI-2*epsA*epsI*py.cos(2*chi))
-#	return py.arctan((epsI+epsA*(1-2*pow(py.cos(chi),2.0))+sign*b)/(2*epsA*py.sin(chi)*py.cos(chi)))
-
-### Beta function
-#def Beta_Function(epsI,epsA,chi):
-#	if chi>2*pi :
-#		print "Assuming chi has been given in degrees rather than radians, we now transform"
-#		chi = chi*pi/180
-#	a=epsA*epsA+epsI*epsI-2*epsA*epsI*py.cos(2*chi)
-#	return py.arctan((epsI-epsA*py.cos(2*chi)-py.sqrt(a))/(2*epsA*py.sin(chi)*py.cos(chi)))
 
 # Plotting functions
 
@@ -440,7 +418,7 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 			z=[1.0*py.cos(a[i]) for i in range(len(time))]
 
 			elevation = 25.0
-			azimuth = 25.0
+			azimuth = 20.0
 			if Option_Dictionary.has_key('delta'):
 				delta = Option_Dictionary['delta']
 			else :
@@ -518,10 +496,13 @@ def Simple_Plot_Transform(file_name,Option_Dictionary):
 
 def Spherical_Plot_Transform(file_name,Option_Dictionary):
 	""" Plot the input data after transforming to spherical polar coordinates in the primed coordinates 
-	options should be passed as a dictionary with the following arguments:
+	options should be passed as a dictionary with the following arguments: \n
+
 	opts : max_len ~ A maximum number of points to include
 	end_val : True ~ Prints an average of the last 100 points in the plot
-	save_fig : True ~ Save the figure in an appropriate way """
+	save_fig : True ~ Save the figure in an appropriate way 
+
+	"""
 
 
 	# Default settings 
@@ -678,32 +659,33 @@ def main():
 	
 	def parse_command_line(argvs):
 
-		parser = optparse.OptionParser()
-	
+		#parser = optparse.OptionParser()
+		parser = argparse.ArgumentParser(formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=10,width=100))
 
-		parser.add_option("-p","--plot",help=Simple_Plot.__doc__, metavar="FILE")
+		parser.add_argument("-p","--plot",help=Simple_Plot.__doc__, metavar="FILE")
 
-		parser.add_option("-s","--splot",help= Spherical_Plot.__doc__, metavar="FILE")
+		parser.add_argument("-s","--splot",help= Spherical_Plot.__doc__, metavar="FILE")
 
-		parser.add_option("-a", "--alpha",help = Alpha_Plot.__doc__, metavar="FILE")
+		parser.add_argument("-a", "--alpha",help = Alpha_Plot.__doc__, metavar="FILE")
 
-		parser.add_option("-3", "--threeDplot", help = ThreeD_Plot_Cartesian.__doc__ ) 
+		parser.add_argument("-3", "--threeDplot", help = ThreeD_Plot_Cartesian.__doc__ ) 
 
-		parser.add_option("-g", "--angle_space", help = Angle_Space_Plot.__doc__ )
+		parser.add_argument("-g", "--angle_space", help = Angle_Space_Plot.__doc__ )
 
-		parser.add_option("-l", "--plot_beta_transform", help = Simple_Plot_Transform.__doc__ )
+		parser.add_argument("-l", "--plot_beta_transform", help = Simple_Plot_Transform.__doc__ )
 
-		parser.add_option("-z", "--splot_beta_transform", help = Spherical_Plot_Transform.__doc__ )
+		parser.add_argument("-z", "--splot_beta_transform", help = Spherical_Plot_Transform.__doc__ )
 
-		parser.add_option("-o", "--opts")
+		parser.add_argument("-o", "--opts")
 
 		# Set the verbose/quite options, this will be passed to the option dictionary
-		parser.add_option("-v", action="store_true", dest="verbose", default=True)
-		parser.add_option("-q", action="store_false", dest="verbose")
+		parser.add_argument("-v", action="store_true", dest="verbose", default=True)
+		parser.add_argument("-q", action="store_false", dest="verbose")
 
 
-		(options,arguments) = parser.parse_args(argvs)
-		return options, arguments
+		#(options,arguments) = parser.parse_args(argvs)
+		arguments = parser.parse_args()
+		return arguments
 
 	options, arguments = parse_command_line(sys.argv)
 

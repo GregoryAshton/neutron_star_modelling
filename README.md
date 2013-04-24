@@ -1,5 +1,5 @@
 # ReadMe for nsmod
 
 nsmod.py
---------
-A file callable from the command line to run different simulations and report magnetic fields based on elastic deformations and vice versa.
+
+This module shoud contain be importable and allow the user to acces needed functions from either the terminal or IPython.

@@ -70,7 +70,7 @@ def main():
 		# Model arguments
 		parser.add_argument("-r", "--run" , help = Model.Run.__doc__)
 
-#		parser.add_argument("-p","--print_parameters",help = Print_Parameters.__doc__)
+		parser.add_argument("--print_parameters",help = Print_Parameters.__doc__)
 
 		# Plotting arguments
 
@@ -114,7 +114,7 @@ def main():
 		Input_Dictionary = Create_Dictionary(arguments.run)
 		Model.Run(Input_Dictionary)
 
-#	if arguments.print_parameters : Print_Parameters(arguments.print_parameters)
+	if arguments.print_parameters : Print_Parameters(arguments.print_parameters)
 
 	if arguments.plot: Plot.Simple_Plot(arguments.plot,Option_Dictionary)
 

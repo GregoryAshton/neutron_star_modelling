@@ -59,47 +59,47 @@ def Create_Dictionary(opts):
 
 	return Option_Dictionary
 	
+def parse_command_line(argvs):
 
-def main():
-	def parse_command_line(argvs):
-
-		parser = argparse.ArgumentParser() 
+	parser = argparse.ArgumentParser() 
 
 #		parser.add_option("-B", "--beta" ,help="Takes as input =sign,epsI,epsA,chi and returns the angle Beta through which the xz coordinates rotate", metavar="FILE")
 
-		# Model arguments
-		parser.add_argument("-r", "--run" , help = Model.Run.__doc__)
+	# Model arguments
+	parser.add_argument("-r", "--run" , help = Model.Run.__doc__)
 
-		parser.add_argument("--print_parameters",help = Print_Parameters.__doc__)
+	parser.add_argument("--print_parameters",help = Print_Parameters.__doc__)
 
-		# Plotting arguments
+	# Plotting arguments
 
-		parser.add_argument("-p","--plot",help=Plot.Simple_Plot.__doc__, metavar="FILE")
+	parser.add_argument("-p","--plot",help=Plot.Simple_Plot.__doc__, metavar="FILE")
 
-		parser.add_argument("-s","--splot",help= Plot.Spherical_Plot.__doc__, metavar="FILE")
+	parser.add_argument("-s","--splot",help= Plot.Spherical_Plot.__doc__, metavar="FILE")
 
-		parser.add_argument("-a", "--alpha",help = Plot.Alpha_Plot.__doc__, metavar="FILE")
+	parser.add_argument("-a", "--alpha",help = Plot.Alpha_Plot.__doc__, metavar="FILE")
 
-		parser.add_argument("-3", "--threeDplot", help = Plot.ThreeD_Plot_Cartesian.__doc__ ) 
+	parser.add_argument("-3", "--threeDplot", help = Plot.ThreeD_Plot_Cartesian.__doc__ ) 
 
-		parser.add_argument("-g", "--angle_space", help = Plot.Angle_Space_Plot.__doc__ )
+	parser.add_argument("-g", "--angle_space", help = Plot.Angle_Space_Plot.__doc__ )
 
-		parser.add_argument("-l", "--plot_beta_transform", help = Plot.Simple_Plot_Transform.__doc__ )
+	parser.add_argument("-l", "--plot_beta_transform", help = Plot.Simple_Plot_Transform.__doc__ )
 
-		parser.add_argument("-z", "--splot_beta_transform", help = Plot.Spherical_Plot_Transform.__doc__ )
+	parser.add_argument("-z", "--splot_beta_transform", help = Plot.Spherical_Plot_Transform.__doc__ )
 
-		parser.add_argument("-n", "--param_space_plot",help = NLD_Functions.Parameter_Space_Plot.__doc__)
+	parser.add_argument("-n", "--param_space_plot",help = NLD_Functions.Parameter_Space_Plot.__doc__)
 
 
-		# Additional arguments are passed to opts 
-		parser.add_argument("-o","--options")
-	
-		# Set the verbose/quite options, this will be passed to the option dictionary
-		parser.add_argument("-v", action="store_true", dest="verbose", default=True)
-		parser.add_argument("-q", action="store_false", dest="verbose")
+	# Additional arguments are passed to opts 
+	parser.add_argument("-o","--options")
 
-		arguments = parser.parse_args()
-		return arguments
+	# Set the verbose/quite options, this will be passed to the option dictionary
+	parser.add_argument("-v", action="store_true", dest="verbose", default=True)
+	parser.add_argument("-q", action="store_false", dest="verbose")
+
+	arguments = parser.parse_args()
+	return arguments
+
+def main():
 
 	arguments = parse_command_line(sys.argv)
 

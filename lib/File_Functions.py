@@ -2,6 +2,12 @@
 
 from datetime import datetime
 import numpy as np
+import pylab as py
+
+def Save_Figure(file_name,type_of_plot,format_type=".png"):
+	plot_file_name = type_of_plot+"_"+file_name.rstrip(".txt")+format_type
+	py.savefig(plot_file_name)
+	print "Saving figure as %s" % plot_file_name
 
 def Parameter_Dictionary(user_input):
 	# Could we improve this to give units?

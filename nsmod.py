@@ -7,6 +7,7 @@ import pylab as py
 import lib.File_Functions as File_Functions
 
 def Magnetic_Field_to_Epsilon_A(Bs):
+	Bs=float(Bs)
 	R = 1e6 #cm
 	c=3e10 #cm/s
 	I0=1e45
@@ -171,15 +172,16 @@ def main():
 	# Add the verbosity to the Option Dictionary
 	Option_Dictionary['verbose'] = options.verbose
 
-	if options.b_2_e : Magnetic_Field_to_Epsilon_A(options.b_2_e,Option_Dictionary)
+	if options.b_2_e : Magnetic_Field_to_Epsilon_A(options.b_2_e)
 
-	if options.e_2_b : Epsilon_A_to_Magnetic_Field(options.e_2_b,Option_Dictionary)
+	if options.e_2_b : Epsilon_A_to_Magnetic_Field(options.e_2_b)
 
 	if options.beta : Print_Beta(options.beta)
 
 	# For the Run command the argument should be a dictionary of values. We create this from the argument, need to document
-	Input_Dictionary = Create_Dictionary(options.run)
-	if options.run : Run(Input_Dictionary)
+	if options.run : 
+		Input_Dictionary = Create_Dictionary(options.run)
+		Run(Input_Dictionary)
 
 	if options.print_parameters : Print_Parameters(options.print_parameters)
 

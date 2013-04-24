@@ -89,7 +89,7 @@ def Parameter_Space_Plot(file_name,Option_Dictionary):
 	ax.set_zticks(ax.get_zticks()[0:-1:2])
 
 	if Option_Dictionary.has_key('save_fig'):
-		File_Functions.Save_Figure(file_name,"Parameter_Space_Plot")
+		Save_Figure(file_name,"Parameter_Space_Plot")
 	else : 
 		py.show()
 

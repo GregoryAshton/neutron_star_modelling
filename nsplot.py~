@@ -8,7 +8,7 @@ from matplotlib.patches import FancyArrowPatch
 from mpl_toolkits.mplot3d import proj3d
 
 # Import functions external files
-#import lib.NLD_Functions as NLD_Functions
+import lib.NLD_Functions as NLD_Functions
 #import lib.GSL_ODE_Functions as ODE_Functions
 import lib.File_Functions as File_Functions
 import lib.Physics_Functions as Physics_Functions 
@@ -647,6 +647,11 @@ def Spherical_Plot_Transform(file_name,Option_Dictionary):
 	else : 
 		py.show()
 
+# Is this the best way to implement this?
+def Parameter_Space_Plot(file_name,Option_Dictionary):
+	NLD_Functions.Parameter_Space_Plot(file_name,Option_Dictionary)
+	return
+
 def main():
 
 	# A function which translates the options.opts input into a dictionary of parameters
@@ -659,8 +664,7 @@ def main():
 	
 	def parse_command_line(argvs):
 
-		#parser = optparse.OptionParser()
-		parser = argparse.ArgumentParser(formatter_class=lambda prog: argparse.HelpFormatter(prog,max_help_position=10,width=100))
+		parser = argparse.ArgumentParser() 
 
 		parser.add_argument("-p","--plot",help=Simple_Plot.__doc__, metavar="FILE")
 
@@ -676,6 +680,8 @@ def main():
 
 		parser.add_argument("-z", "--splot_beta_transform", help = Spherical_Plot_Transform.__doc__ )
 
+		parser.add_argument("-n", "--param_space_plot",help = NLD_Functions.Parameter_Space_Plot.__doc__)
+
 		parser.add_argument("-o", "--opts")
 
 		# Set the verbose/quite options, this will be passed to the option dictionary
@@ -683,32 +689,36 @@ def main():
 		parser.add_argument("-q", action="store_false", dest="verbose")
 
 
-		#(options,arguments) = parser.parse_args(argvs)
 		arguments = parser.parse_args()
 		return arguments
 
-	options, arguments = parse_command_line(sys.argv)
+	arguments = parse_command_line(sys.argv)
 
-	if options.opts : Option_Dictionary = Create_Option_Dictionary(options.opts)
+	print arguments 
+
+	if arguments.opts : Option_Dictionary = Create_Option_Dictionary(arguments.opts)
 	else : Option_Dictionary = {}
 
 	# Add the verbosity to the Option Dictionary
-	Option_Dictionary['verbose'] = options.verbose
+	Option_Dictionary['verbose'] = arguments.verbose
 
-	if options.plot: Simple_Plot(options.plot,Option_Dictionary)
+	if arguments.plot: Simple_Plot(arguments.plot,Option_Dictionary)
 
-	if options.splot: Spherical_Plot(options.splot,Option_Dictionary)
+	if arguments.splot: Spherical_Plot(arguments.splot,Option_Dictionary)
 
-	if options.alpha : Alpha_Plot(options.alpha,Option_Dictionary)
+	if arguments.alpha : Alpha_Plot(arguments.alpha,Option_Dictionary)
 
-	if options.threeDplot :  ThreeD_Plot_Cartesian(options.threeDplot,Option_Dictionary)
+	if arguments.threeDplot :  ThreeD_Plot_Cartesian(arguments.threeDplot,Option_Dictionary)
 	
-	if options.angle_space : Angle_Space_Plot(options.angle_space,Option_Dictionary)
+	if arguments.angle_space : Angle_Space_Plot(arguments.angle_space,Option_Dictionary)
 
-	if options.plot_beta_transform: Simple_Plot_Transform(options.plot_beta_transform,Option_Dictionary)
+	if arguments.plot_beta_transform: Simple_Plot_Transform(arguments.plot_beta_transform,Option_Dictionary)
 
-	if options.splot_beta_transform: Spherical_Plot_Transform(options.splot_beta_transform,Option_Dictionary)
+	if arguments.splot_beta_transform: Spherical_Plot_Transform(arguments.splot_beta_transform,Option_Dictionary)
+	
+	# These functions are found in the lib as it is getting crowded in here
 
+	if arguments.param_space_plot: Parameter_Space_Plot(arguments.param_space_plot,Option_Dictionary)
 
 
 

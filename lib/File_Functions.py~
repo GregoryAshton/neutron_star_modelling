@@ -3,6 +3,11 @@
 from datetime import datetime
 import numpy as np
 
+def Save_Figure(file_name,type_of_plot,format_type=".png"):
+	plot_file_name = type_of_plot+"_"+file_name.rstrip(".txt")+format_type
+	py.savefig(plot_file_name)
+	print "Saving figure as %s" % plot_file_name
+
 def Parameter_Dictionary(user_input):
 	# Could we improve this to give units?
 	"""Function to produce a dictionary with all the values, this reduces the amount of code required on the other end. Input can either be a string such as the default filenames used in nsmod, or a partial dictionary having at least epsI,epsA and omega0 to produce the other values"""
@@ -357,7 +362,7 @@ main (void)
 	write_file.close()
 
 
-def Write_File_Eta(chi,eps_I,eps_A,omega_0,eta_relative,err=1.0e-12,no_anom=False):
+def Write_File_eta(chi,eps_I,eps_A,omega_0,eta_relative,err=1.0e-12,no_anom=False):
 	"""Write a generic script to be compiles and run in C with paramaters chi,eps_I,eps_A,omega_0,eta,err=1.0e-12, if "no_anom" in the generated code will not contain the anomalous torque"""
 
 	if "no_anom" :

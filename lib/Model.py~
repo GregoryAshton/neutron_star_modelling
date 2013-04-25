@@ -88,7 +88,17 @@ def Run(Input_Dictionary):
 		print " ERROR: You have not specified either eta or t1"
 		return 
 	if t1 != None:
-		File_Functions.Write_File_t1(chi,epsI,epsA,omega0,t1,err,no_anom)
+		# Ugly fix for the moment 
+		if 'tri' in Input_Dictionary:
+			epsI3 = epsI
+			epsI1 = Input_Dictionary['epsI1']
+			File_Functions.Write_File_t1_TRIAXIAL(chi,epsI1,epsI3,epsA,omega0,eta_relative)
+			file_name_list.reverse()
+			file_name_list.append("TRIAXIAL_")
+			file_name_list.reverse()
+			print "something"
+		else :
+			File_Functions.Write_File_t1(chi,epsI,epsA,omega0,t1,err,no_anom)
 	if eta != None:
 		File_Functions.Write_File_eta(chi,epsI,epsA,omega0,eta_relative,err,no_anom)
 	

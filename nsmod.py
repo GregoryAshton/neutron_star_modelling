@@ -7,6 +7,7 @@ import pylab as py
 import lib.Model as Model
 import lib.NLD_Functions as NLD_Functions
 import lib.Plot as Plot
+import lib.Useful_Tools as Useful_Tools
 
 
 
@@ -31,13 +32,6 @@ import lib.Plot as Plot
 #		return  Bs
 
 
-def Print_Parameters(file_name):
-	""" Print a list of parameters about the file to the terminal """
-	from lib.File_Functions import Parameter_Dictionary
-	Parameter_Dictionary = Parameter_Dictionary(file_name)
-	for item in Parameter_Dictionary:
-		print " %s = %s " % (item,Parameter_Dictionary[item])
-	
 
 def Create_Dictionary(opts):
 	"""
@@ -68,7 +62,7 @@ def parse_command_line(argvs):
 	# Model arguments
 	parser.add_argument("-r", "--run" , help = Model.Run.__doc__)
 
-	parser.add_argument("--print_parameters",help = Print_Parameters.__doc__)
+	parser.add_argument("-pp", "--print_parameters",help = Useful_Tools.Print_Parameters.__doc__)
 
 	# Plotting arguments
 
@@ -104,7 +98,7 @@ def main():
 	arguments = parse_command_line(sys.argv)
 
 	# Create the options dictionary 
-	if arguments.options : Option_Dictionary = Create_Dictionary(arguments.opts)
+	if arguments.options : Option_Dictionary = Create_Dictionary(arguments.options)
 	else : Option_Dictionary = {}
 
 	# Add the verbosity to the Option Dictionary
@@ -114,7 +108,7 @@ def main():
 		Input_Dictionary = Create_Dictionary(arguments.run)
 		Model.Run(Input_Dictionary)
 
-	if arguments.print_parameters : Print_Parameters(arguments.print_parameters)
+	if arguments.print_parameters : Useful_Tools.Print_Parameters(arguments.print_parameters)
 
 	if arguments.plot: Plot.Simple_Plot(arguments.plot,Option_Dictionary)
 
@@ -129,6 +123,8 @@ def main():
 	if arguments.plot_beta_transform: Plot.Simple_Plot_Transform(arguments.plot_beta_transform,Option_Dictionary)
 
 	if arguments.splot_beta_transform: Plot.Spherical_Plot_Transform(arguments.splot_beta_transform,Option_Dictionary)
+
+	if arguments.param_space_plot: NLD_Functions.Parameter_Space_Plot(arguments.param_space_plot,Option_Dictionary)
 
 if __name__ == "__main__":
     main()

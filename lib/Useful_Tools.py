@@ -1,28 +1,30 @@
 #!/usr/bin/python 
-""" Some commonly used functions in plotting called from tools"""
+""" Some useful functions"""
 
 import pylab as py 
 from math import floor
 
 def Texify_Float(f,n=1,power=True):
-	"""This isn't really a Plotting function, but the other functions are in here. 
-		Takes a float and returns a string that looks nice in Latex, takes arguments 
+	"""
+ 
+	Takes a float and returns a string that looks nice in Latex, takes arguments 
+
 	n=int ~ Number of sig.fig
 	power = Bool ~ Whether to produce a *10^{x} or just a regular number"""
-	# Ensure the input is a float
+
 	f = float(f)
 	if power==True:
 		f_power = int(py.log10(Round_To_n(f,0)))
 		f_SF = Round_To_n(f,n)*pow(10,-f_power)
 		return r" %s\times 10^{%s} " % (f_SF,f_power)
 	else :
-		print f
 		f_SF = Round_To_n(f,n)
 		return  str(f_SF)
 
-# Generic functions 
 
 def Sort_Out_Some_Axis(x):
+	""" Scales an axis appropriately returns a list of the scaled axis and the order of magnitude through which it has been scaled """
+
 	largest_value = max(x)
 	largest_value_0sf = Round_To_n(largest_value,0)
         
@@ -37,6 +39,21 @@ def Sort_Out_Some_Axis(x):
 def Round_To_n(x,n):
 	return round(x, -int(floor(py.sign(x)*py.log10(abs(x))))+n)
 
+def Print_Parameters(file_name):
+	""" Print a list of parameters about the file to the terminal """
+	from lib.File_Functions import Parameter_Dictionary
+	Parameter_Dictionary = Parameter_Dictionary(file_name)
+	for key in Parameter_Dictionary:
+		# If value is float lets make it look nice when it is printed
+		try :
+			value = float(Parameter_Dictionary[key])
+			if value > 1000.0 :
+				value = Texify_Float(value,n=3,power=True)
+			else :
+				value = Texify_Float(value,n=3,power=False)
+		except ValueError :
+			value = Parameter_Dictionary[key]
+		print " %s = %s " % (key,value)
 
 
 def Plot_a_phi(time,a,phi):
@@ -141,3 +158,16 @@ def ThreeD_Sphere(axis,elevation,azimuth,x,y,z,color="b",ls=".",lw=1,delta=1.0):
 		axis.plot3D(front_x,front_y,front_z,ls,alpha=1.0,color=color,lw=lw )
 		axis.plot3D(back_x,back_y,back_z,ls,alpha=0.3,color=color,lw=lw )
 
+
+def Fit_Function(x,y,n):
+	""" Fits a polynomial of degree n to y at the points x. Note that len(x)=len(y) """
+
+	f_p=py.polyfit(x,y,n)
+
+	y_fit=[] ; x_fit=py.linspace(x[0],x[-1],100*len(x))  
+	for i in range(len(x_fit)):
+		f_val=0.0
+		for j in range(n+1): f_val+=f_p[j]*pow(x_fit[i],n-j)
+		y_fit.append(f_val)
+
+	return x_fit,y_fit ,f_p

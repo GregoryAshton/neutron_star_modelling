@@ -101,49 +101,74 @@ def Plot_a_phi(time,a,phi):
 	py.show()
 
 def ThreeD_Sphere(axis,elevation,azimuth,x,y,z,color="b",ls=".",lw=1,delta=1.0):
-	"""Function which given an axis with 3D projection and the azimuth and elevation plots the x,y,z shading the values which are on the opposite side of the unit sphere to the viewer. This should primarily only be used with drawing on the unit sphere.""" 
-
-	# Set the viewing angle
-	axis.view_init(elevation, azimuth)
+	"""Function which given an axis with 3D projection and the azimuth and elevation plots the x,y,z shading the values which are on the opposite side of the unit sphere to the viewer.""" 
 
 	# Init. lists for the front and back 
 	front_x = [] ; front_y=[] ; front_z=[]
 	back_x = [] ; back_y=[] ; back_z=[]
 
-	# Get the viewing limits from the azimuth
-	view_angle_low = azimuth-110
-	view_angle_high = azimuth + 110
-	if view_angle_low < -180 :
-		view_angle_low_2 = view_angle_low+370
-	else : view_angle_low_2 = 180
+	# Get the viewing limits from the azimuth, we use cylindrical coords here so a large elevation angle will look strange
+	view_angle_low = azimuth-90
+	view_angle_high = azimuth + 90
 
+	# If the edges of the view angle go outside -180 -> 180 we need to correct for this 
+	if view_angle_low < -180 :
+		print "low"
+		view_angle_low = view_angle_low+360
+	if view_angle_high > 180 :
+		print "high"
+		view_angle_high = view_angle_high-360
+
+	print  view_angle_low,view_angle_high
+	# Check it they have been reordered
+#	if view_angle_high < view_angle_low:	
+#		(view_angle_high,view_angle_low) = (view_angle_low,view_angle_high) 
+		
+	print  view_angle_low,view_angle_high
 	# Cycle through points and check which list they should be added to
 	for i in range(len(x)):
-		
-		if view_angle_low -5 < py.arctan2(y[i],x[i])*180/py.pi < view_angle_high +5:
+		#print py.arctan2(y[i],x[i])*180/py.pi
+		#raw_input()
+		if view_angle_high -5 < py.arctan2(y[i],x[i])*180/py.pi < 180.0 or -180.0 > py.arctan2(y[i],x[i])*180/py.pi > view_angle_low :
 			front_x.append(x[i])
 			front_y.append(y[i])
 			front_z.append(z[i])
-			
-		if view_angle_low_2 < py.arctan2(y[i],x[i])*180/py.pi < 180 :
-			front_x.append(x[i])
-			front_y.append(y[i])
-			front_z.append(z[i])
-		if	-180 < py.arctan2(y[i],x[i])*180/py.pi <  view_angle_low  :
+		else :
 			back_x.append(x[i])
 			back_y.append(y[i])
 			back_z.append(z[i])
-		if	view_angle_high   < py.arctan2(y[i],x[i])*180/py.pi <  180 :
-			back_x.append(x[i])
-			back_y.append(y[i])
-			back_z.append(z[i])
+#	else :	
+#		# Cycle through points and check which list they should be added to
+#		for i in range(len(x)):
+#	
+#			if view_angle_low -5 < py.arctan2(y[i],x[i])*180/py.pi < view_angle_high +5:
+#				front_x.append(x[i])
+#				front_y.append(y[i])
+#				front_z.append(z[i])
+#			else :
+#				back_x.append(x[i])
+#				back_y.append(y[i])
+#				back_z.append(z[i])
+#		if view_angle_low_2 < py.arctan2(y[i],x[i])*180/py.pi < 180 :
+#			front_x.append(x[i])
+#			front_y.append(y[i])
+##			front_z.append(z[i])
+#		if	-180 < py.arctan2(y[i],x[i])*180/py.pi <  view_angle_low  :
+#			back_x.append(x[i])
+#			back_y.append(y[i])
+#			back_z.append(z[i])
+#		if	view_angle_high   < py.arctan2(y[i],x[i])*180/py.pi <  180 :
+#			back_x.append(x[i])
+#			back_y.append(y[i])
+#			back_z.append(z[i])
 
 	
 	# Plot the points using plot3D 
 	if ls in ["-","--",":","-."]:
 		def plot(x,y,z,delta,alpha):
 			delta = float(delta)
-			j=0
+			print len(x)
+			j=0 ; i=0
 			for i in range(1,len(x)):
 				if py.norm([x[i]-x[i-1],y[i]-y[i-1],z[i]-z[i-1]]) > delta:
 					axis.plot3D(x[j:i-1],y[j:i-1],z[j:i-1],ls,alpha=alpha,color=color,lw=lw)
@@ -153,7 +178,7 @@ def ThreeD_Sphere(axis,elevation,azimuth,x,y,z,color="b",ls=".",lw=1,delta=1.0):
 				axis.plot3D(x[j:i-1],y[j:i-1],z[j:i-1],ls,alpha=alpha,color=color,lw=lw )
 
 		plot(front_x,front_y,front_z,delta,alpha=1.0)
-		plot(back_x,back_y,back_z,delta,alpha=0.4)
+		plot(back_x,back_y,back_z,delta,alpha=0.1)
 	else :
 		axis.plot3D(front_x,front_y,front_z,ls,alpha=1.0,color=color,lw=lw )
 		axis.plot3D(back_x,back_y,back_z,ls,alpha=0.3,color=color,lw=lw )

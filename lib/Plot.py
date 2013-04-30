@@ -318,6 +318,7 @@ def ThreeD_Plot_Cartesian(file_name,Option_Dictionary):
 def Angle_Space_Plot(file_name,Option_Dictionary):
 	"""Experimental! Used to plot the angular components against each other of the spin vector. Option_Dictionary takes the following as arguments 
 	nmax : int ~ take only the first nmax points from the file
+	EBF : True ~ Rotate the Effective Body Frame axis
 	2D : True ~ This will plot the angular components phi and a in normal plot
 	3D : True ~ This will plot the angular components phi and a projected onto the unit sphere
 	3D : elevation/azimuthal the viewing angle deliminated by a slash
@@ -329,22 +330,22 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 	if Option_Dictionary.has_key("nmax"):
 		max_n = int(Option_Dictionary['nmax']) 
 	else : max_n = -1
-	# Import the data in components x,y,z
-	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name,max_n) 
+	# Import the data in components x,y,z we use generic x,y,z so as to not confused the EFB
+	(time,x,y,z)= File_Functions.Import_Data(file_name,max_n) 
 
-	if Option_Dictionary.has_key('beta'):
+	if Option_Dictionary.has_key('EBF'):
 		Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
 		epsI=float(Parameter_Dictionary["epsI"])
 		epsA=float(Parameter_Dictionary["epsA"])
 		chi=float(Parameter_Dictionary["chi"])*pi/180 # This will be returned in radians
 		beta=Beta_Function(epsI,epsA,chi)
-		(omega_x,omega_y,omega_z) = Physics_Functions.Transform_Cartesian_Body_Frame_2_Effective_Body_Frame(omega_x,omega_y,omega_z,beta)
-		# Note we have chosen to the omega_x...here when this is actually in the primed coordinates. This is to avoid confusion but should we perhaps use some generic names instead?
+		(x,y,z) = Physics_Functions.Transform_Cartesian_Body_Frame_2_Effective_Body_Frame(x,y,z,beta)
+		
 		
 	if Option_Dictionary.has_key('2D'):
 
 		# Transform to spherical coordinates
-		(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z)
+		(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(x,y,z)
 
 		phi=Physics_Functions.Fix_Phi(phi,epsilon=70) # By default we assume the phi is broken so fix it
 
@@ -381,19 +382,24 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 			py.show()
 
 	if Option_Dictionary.has_key('3D'):
-		print Option_Dictionary		
+
 		ax = py.subplot(111, projection='3d')
+
 		# Set the viewing position
-		if "/" not in Option_Dictionary['3D']:
-			elevation = 25.0
+		if Option_Dictionary.get('azimuth'):
+			azimuth = float(Option_Dictionary['azimuth'])
+		else:
 			azimuth = 145.0
-		else :
-			[elevation , azimuth] = [float(item) for item in Option_Dictionary['3D'].split("/")]
+		if Option_Dictionary.get('elevation'):
+			elevation = float(Option_Dictionary['elevation'])
+		else:
+			elevation=25.0
+
 		ax.view_init(elevation, azimuth) 
 
 	
-		# Transform to spherical coordinates
-		(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z,Angle_Type="Radians")
+		# Transform to spherical coordinates, 
+		(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(x,y,z,Angle_Type="Radians")
 
 		phi=Physics_Functions.Fix_Phi(phi,Angle_Type="Radians") # By default we assume the phi is broken so fix it	
 

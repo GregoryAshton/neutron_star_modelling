@@ -158,3 +158,18 @@ def ThreeD_Sphere(axis,elevation,azimuth,x,y,z,color="b",ls=".",lw=1,delta=1.0):
 		axis.plot3D(front_x,front_y,front_z,ls,alpha=1.0,color=color,lw=lw )
 		axis.plot3D(back_x,back_y,back_z,ls,alpha=0.3,color=color,lw=lw )
 
+
+def Fit_Function(x,y,n):
+	""" Fits a polynomial of degree n to y at the points x. Note that len(x)=len(y) """
+
+	f_p=py.polyfit(x,y,n)
+
+	y_fit=[] ; x_fit=py.linspace(x[0],x[-1],100*len(x))  
+	for i in range(len(x_fit)):
+		f_val=0.0
+		for j in range(n+1): f_val+=f_p[j]*pow(x_fit[i],n-j)
+		y_fit.append(f_val)
+
+	return x_fit,y_fit ,f_p
+
+def Arrow_3D

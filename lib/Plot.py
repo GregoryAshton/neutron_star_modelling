@@ -78,7 +78,10 @@ def Simple_Plot(file_name,Option_Dictionary):
 
 
 def Spherical_Plot(file_name,Option_Dictionary):
-	""" Plot the input data after transforming to spherical polar coordinates 
+	""" 
+
+	Plot the input data after transforming to spherical polar coordinates 
+
 	The opts dictionary may contain 
 	nmax=int limit the data from 0:nmax
 	tmax=float, tmin=float ~ limit the xaxis
@@ -235,11 +238,7 @@ def ThreeD_Plot_Cartesian(file_name,Option_Dictionary):
 	if Option_Dictionary.has_key("start") : start =  int(Option_Dictionary["start"])
 	if Option_Dictionary.has_key("stop") : stop =  int(Option_Dictionary["stop"])
 
-	if Option_Dictionary['verbose'] ==True :
-		print 
-		print " Reducing plotted data size from %s to %s" % (len(time) , stop-start)
-		print " The observation time  is from t=%s to %s seconds" % ( time[start] , time[stop])
-		print 
+
 	
 	# Reduce the number of points
 	time = time[start:stop] ; omega_x = omega_x[start:stop] ; omega_y = omega_y[start:stop] ; omega_z = omega_z[start:stop]
@@ -321,7 +320,9 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 	nmax : int ~ take only the first nmax points from the file
 	2D : True ~ This will plot the angular components phi and a in normal plot
 	3D : True ~ This will plot the angular components phi and a projected onto the unit sphere
-		split=n1/n2/n3/n4/... For use with 3D this will segment the data into chunks starting and stopping at the integers n1,n2...  
+	3D : elevation/azimuthal the viewing angle deliminated by a slash
+		split=n1/n2/n3/n4/... For use with 3D this will segment the data into chunks starting and stopping at the integers n1,n2...
+          
 	"""	
 	
 	# Handle any additional options which are in the dictionary
@@ -380,12 +381,15 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 			py.show()
 
 	if Option_Dictionary.has_key('3D'):
-		
+		print Option_Dictionary		
 		ax = py.subplot(111, projection='3d')
 		# Set the viewing position
-		elev = 15.0
-		azim = -134.0
-		ax.view_init(elev, azim) 
+		if "/" not in Option_Dictionary['3D']:
+			elevation = 25.0
+			azimuth = 145.0
+		else :
+			[elevation , azimuth] = [float(item) for item in Option_Dictionary['3D'].split("/")]
+		ax.view_init(elevation, azimuth) 
 
 	
 		# Transform to spherical coordinates
@@ -406,8 +410,6 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 				x=[1.0*py.sin(a[i])*py.cos(phi[i]) for i in range(low,high)]
 				y=[1.0*py.sin(a[i])*py.sin(phi[i]) for i in range(low,high)]
 				z=[1.0*py.cos(a[i]) for i in range(low,high)]
-				elevation = 25.0
-				azimuth = 25.0
 				Useful_Tools.ThreeD_Sphere(ax,elevation,azimuth,x,y,z,ls="-",lw=0.8,color=colors[j/2])
 				
 
@@ -417,14 +419,33 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 			y=[1.0*py.sin(a[i])*py.sin(phi[i]) for i in range(len(time))]
 			z=[1.0*py.cos(a[i]) for i in range(len(time))]
 
-			elevation = 25.0
-			azimuth = 20.0
 			if Option_Dictionary.has_key('delta'):
 				delta = Option_Dictionary['delta']
 			else :
 				delta = 1.0
 			Useful_Tools.ThreeD_Sphere(ax,elevation,azimuth,x,y,z,ls="-",lw=0.8,color="k",delta=delta)
 
+
+		if Option_Dictionary.has_key('arrows'):	
+
+			class Arrow3D(FancyArrowPatch):
+				def __init__(self, xs, ys, zs, *args, **kwargs):
+					FancyArrowPatch.__init__(self, (0,0), (0,0), *args, **kwargs)
+					self._verts3d = xs, ys, zs
+
+				def draw(self, renderer):
+					xs3d, ys3d, zs3d = self._verts3d
+					xs, ys, zs = proj3d.proj_transform(xs3d, ys3d, zs3d, renderer.M)
+					self.set_positions((xs[0],ys[0]),(xs[1],ys[1]))
+					FancyArrowPatch.draw(self, renderer)
+
+			arrow_points = [int(arrow) for arrow in Option_Dictionary['arrows'].split("/")]
+			for i in arrow_points:
+				print i
+				artist = Arrow3D([x[i],x[i+1]],[y[i],y[i+1]],[z[i],z[i+1]], mutation_scale=20, lw=1, arrowstyle="-|>", color="b")
+				ax.add_artist(artist)
+
+	
 		# Sphere of unit radius
 		u = np.linspace(0, 2 * np.pi , 100)
 		v = np.linspace(0, np.pi, 100)

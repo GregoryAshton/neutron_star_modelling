@@ -28,7 +28,7 @@ def Run(Input_Dictionary):
 	# Check if the anomalous torque should be used or not and initiate the file_name
 	file_name_list = []
 	if Input_Dictionary.get('no_anom'):
-		file_name_list .append("no_anom")
+		file_name_list .append("no_anom_")
 		no_anom=True
 	else :
 		no_anom=False
@@ -113,3 +113,82 @@ def Run(Input_Dictionary):
 	if "verbose" in Input_Dictionary:
 		print " Run is complete for this data, the output is saved in the file "+file_name 
 	return file_name
+
+def Scipy_Ode_Solver(Input_Dictionary):
+	"""
+
+	Model using the scipy ODE solvers for now this should simply replicate the behaviour of Run to compare speeds
+
+	"""
+
+	from scipy.integrate import ode
+	from pylab import cos,sin,pi
+
+
+	#  Required paramaters
+
+	# Check if the anomalous torque should be used or not and initiate the file_name
+	file_name_list = []
+	if Input_Dictionary.get('no_anom'):
+		file_name_list .append("no_anom")
+		no_anom=True
+	else :
+		no_anom=False
+		
+	# At the moment these erros do not raise correctly. 
+
+	try :
+		chi = Input_Dictionary['chi']
+		file_name_list.append("chi_"+str(Input_Dictionary['chi']))
+	except KeyError:
+		print " ERROR: You need to specify chi in the input dictionary"
+		return
+
+	try :
+		epsI= str(Input_Dictionary['epsI'])
+		file_name_list.append("_epsI_"+str(Input_Dictionary['epsI']))
+	except KeyError:
+		print " ERROR: You need to specify epsI in the input dictionary"
+		return
+
+	try :
+		epsA = str(Input_Dictionary['epsA'])
+		file_name_list.append("_epsA_"+str(Input_Dictionary['epsA']))
+	except KeyError:
+		print " ERROR: You need to specify epsA in the input dictionary"
+		return
+
+	try :
+		omega0 = str(Input_Dictionary['omega0'])
+		file_name_list.append("_omega0_"+str(Input_Dictionary['omega0']))
+	except KeyError:
+		print " ERROR: You need to specify omega0 in the input dictionary"
+		return
+
+	# Take either t1 or eta but not both 
+	# Note: For now we will use only t1 
+	try :
+		eta = str(Input_Dictionary['eta'])
+		file_name_list.append("_eta_"+str(Input_Dictionary['eta']))
+		eta_relative = str(float(eta)*pow(float(omega0),2)) 
+	except KeyError:
+		eta = None
+	try :
+		t1 = str(Input_Dictionary['t1'])
+		file_name_list.append("_t1_"+str(Input_Dictionary['t1']))
+	except KeyError:
+		t1 = None
+
+#	#  Additional Arguments
+#	try :
+#		err = str(Input_Dictionary['err'])
+#	except KeyError:
+#		# Use a default value 
+#		err = 1e-12
+
+	#------------------------------------
+
+
+
+
+

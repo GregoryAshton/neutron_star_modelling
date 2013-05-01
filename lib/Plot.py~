@@ -225,41 +225,32 @@ def ThreeD_Plot_Cartesian(file_name,Option_Dictionary):
 	power = float 
 	"""
 
-	# Import the data in components x,y,z
-	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name) 
-
-	# Get the paramters of the run
-	Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
+	# Import the data in components x,y,z we use generic names incase the EBF axis is used
+	(time,x,y,z)= File_Functions.Import_Data(file_name) 
 
 	# Set the defaults and then overide if they exist in Option_Dictionary
 	start = 0 
 	stop = -1
-
 	if Option_Dictionary.has_key("start") : start =  int(Option_Dictionary["start"])
 	if Option_Dictionary.has_key("stop") : stop =  int(Option_Dictionary["stop"])
 
-
-	
 	# Reduce the number of points
-	time = time[start:stop] ; omega_x = omega_x[start:stop] ; omega_y = omega_y[start:stop] ; omega_z = omega_z[start:stop]
+	time = time[start:stop] ; x = x[start:stop] ; y = y[start:stop] ; z = z[start:stop]
 
-	# Extract some parameters from the dictionary
-	epsI=float(Parameter_Dictionary["epsI"])
-	epsA=float(Parameter_Dictionary["epsA"])
-	chi=float(Parameter_Dictionary["chi"])*pi/180 # This will be returned in radians
 
-	# Compute the rotation angle of primed axis and transform the solution omega_{xyz} into these coordinates
-#	beta=Beta_Function(epsI,epsA,chi)
+	# Check if we should use the Effective body frame axis
+	if Option_Dictionary.has_key('EBF'):
+		if Option_Dictionary.get('verbose'):
+			print " Using the effective body frame axis in this plot "
 
-#	Cb=py.cos(beta) ; Sb=py.sin(beta)
-
-#	xprime=[x[i]*Cb - z[i]*Sb for i in range(len(x))]
-#	zprime=[z[i]*Cb + x[i]*Sb for i in range(len(x))]
-#	yprime = y
-
-	#fig = py.figure()
-	x = omega_x ; y = omega_y ; z = omega_z
-
+		Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
+		epsI=float(Parameter_Dictionary["epsI"])
+		epsA=float(Parameter_Dictionary["epsA"])
+		chi=float(Parameter_Dictionary["chi"])*pi/180 # This will be returned in radians
+		beta=Beta_Function(epsI,epsA,chi)
+		(x,y,z) = Physics_Functions.Transform_Cartesian_Body_Frame_2_Effective_Body_Frame(x,y,z,beta)
+	
+	# Create subplot and define view angle, this is fixed
 	ax = py.subplot(111, projection='3d')
 	elev = 15.0
 	azim = -134.0
@@ -288,31 +279,27 @@ def ThreeD_Plot_Cartesian(file_name,Option_Dictionary):
 	else :
 		ax.plot(x,y,z)
 
-
-
-	#py.ylabel(r"$\omega_{y}'$")
-	#py.zlabel(r"$\omega_{z}'$")
-
-	#ax.set_xticklabels([])
-	#ax.set_yticklabels([])
-	#ax.set_zticklabels([])
-
-	ax.set_xlabel(r"$\hat{x}$",rotation='horizontal')
-	ax.set_ylabel(r"$\hat{y}$",rotation='horizontal')
-	ax.set_zlabel(r"$\hat{z}$",rotation='horizontal')
+	if Option_Dictionary.has_key('EBF'):
+		ax.set_xlabel(r"$e_{1}$")
+		ax.set_ylabel(r"$e_{2}$")
+		ax.set_zlabel(r"$e_{3}$")
+		# These axis labels may prove to be wrong in the case of epsI<0
+	else :
+		ax.set_xlabel(r"$\hat{\omega_{x}}$")
+		ax.set_ylabel(r"$\hat{\omega_{y}}$")
+		ax.set_zlabel(r"$\hat{\omega_{z}}$")
 	ax.grid(False)
+
+	# Remove ticks since we do not need them
+	ax.set_xticklabels([])
+	ax.set_yticklabels([])
+	ax.set_zticklabels([])
+
 
 	if Option_Dictionary.has_key('save_fig') and Option_Dictionary['save_fig'] == True :
 		Save_Figure(file_name,"ThreeD_Plot_Cartesian")
 	else:
 		py.show()
-
-#	if options.save_data:
-#		file_name=options.save_data
-#		write_file=open(file_name,"w+")
-#		for i in range (len(xprime)):
-#			write_file.write(str(time[i])+" "+str(xprime[i])+" "+str(yprime[i])+" "+str(zprime[i])+"\n")
-#		write_file.close()
 
 
 def Angle_Space_Plot(file_name,Option_Dictionary):
@@ -330,22 +317,26 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 	if Option_Dictionary.has_key("nmax"):
 		max_n = int(Option_Dictionary['nmax']) 
 	else : max_n = -1
-	# Import the data in components x,y,z
-	(time,omega_x,omega_y,omega_z)= File_Functions.Import_Data(file_name,max_n) 
+	# Import the data in components x,y,z we use generic x,y,z so as to not confused the EFB
+	(time,x,y,z)= File_Functions.Import_Data(file_name,max_n) 
 
+	# Check if we should use the Effective body frame axis
 	if Option_Dictionary.has_key('EBF'):
+		if Option_Dictionary.get('verbose'):
+			print " Using the effective body frame axis in this plot "
+
 		Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
 		epsI=float(Parameter_Dictionary["epsI"])
 		epsA=float(Parameter_Dictionary["epsA"])
 		chi=float(Parameter_Dictionary["chi"])*pi/180 # This will be returned in radians
 		beta=Beta_Function(epsI,epsA,chi)
-		(omega_x,omega_y,omega_z) = Physics_Functions.Transform_Cartesian_Body_Frame_2_Effective_Body_Frame(omega_x,omega_y,omega_z,beta)
-		# Note we have chosen to the omega_x...here when this is actually in the primed coordinates. This is to avoid confusion but should we perhaps use some generic names instead?
+		(x,y,z) = Physics_Functions.Transform_Cartesian_Body_Frame_2_Effective_Body_Frame(x,y,z,beta)
+		
 		
 	if Option_Dictionary.has_key('2D'):
 
 		# Transform to spherical coordinates
-		(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z)
+		(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(x,y,z)
 
 		phi=Physics_Functions.Fix_Phi(phi,epsilon=70) # By default we assume the phi is broken so fix it
 
@@ -398,8 +389,8 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 		ax.view_init(elevation, azimuth) 
 
 	
-		# Transform to spherical coordinates
-		(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(omega_x,omega_y,omega_z,Angle_Type="Radians")
+		# Transform to spherical coordinates, 
+		(omega,a,phi) = Physics_Functions.Transform_Cartesian_2_Spherical(x,y,z,Angle_Type="Radians")
 
 		phi=Physics_Functions.Fix_Phi(phi,Angle_Type="Radians") # By default we assume the phi is broken so fix it	
 
@@ -461,7 +452,7 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 		
 		ax.plot_surface(x, y,z,rstride=4, cstride=9, color='white',alpha=0.9,lw=0.1)	
 
-		if Option_Dictionary.has_key('beta'):
+		if Option_Dictionary.has_key('EBF'):
 			ax.set_xlabel(r"$e_{1}$")
 			ax.set_ylabel(r"$e_{2}$")
 			ax.set_zlabel(r"$e_{3}$",rotation="horizontal")
@@ -471,6 +462,7 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 			ax.set_ylabel(r"$\hat{\omega_{y}}$")
 			ax.set_zlabel(r"$\hat{\omega_{z}}$")
 
+		# Remove the ticks as these are not required
 		ax.set_xticklabels([])
 		ax.set_yticklabels([])
 		ax.set_zticklabels([])

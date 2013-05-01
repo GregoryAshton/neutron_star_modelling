@@ -101,42 +101,51 @@ def Plot_a_phi(time,a,phi):
 	py.show()
 
 def ThreeD_Sphere(axis,elevation,azimuth,x,y,z,color="b",ls=".",lw=1,delta=1.0):
-	"""Function which given an axis with 3D projection and the azimuth and elevation plots the x,y,z shading the values which are on the opposite side of the unit sphere to the viewer.""" 
+	"""Function which given an axis with 3D projection and the azimuth and elevation plots the x,y,z shading the values which are on the opposite side of the unit sphere to the viewer.
+
+	Inputs
+	axis ~ an axis instance
+	elevation ~ 
+	axiumuth ~ view positions in degrees
+	x,y,z 3 N length arrays to be plotted
+		
+
+	""" 
 
 	# Init. lists for the front and back 
 	front_x = [] ; front_y=[] ; front_z=[]
 	back_x = [] ; back_y=[] ; back_z=[]
 
 	# Get the viewing limits from the azimuth, we use cylindrical coords here so a large elevation angle will look strange
-	view_angle_low = azimuth-90
-	view_angle_high = azimuth + 90
+#	view_angle_low = azimuth-90
+#	view_angle_high = azimuth + 90
 
 	# If the edges of the view angle go outside -180 -> 180 we need to correct for this 
-	if view_angle_low < -180 :
-		print "low"
-		view_angle_low = view_angle_low+360
-	if view_angle_high > 180 :
-		print "high"
-		view_angle_high = view_angle_high-360
+#	if view_angle_low < -180 :
+#		print "low"
+#		view_angle_low = view_angle_low+360
+#	if view_angle_high > 180 :
+#		print "high"
+#		view_angle_high = view_angle_high-360
 
-	print  view_angle_low,view_angle_high
+#	print  view_angle_low,view_angle_high
 	# Check it they have been reordered
 #	if view_angle_high < view_angle_low:	
-#		(view_angle_high,view_angle_low) = (view_angle_low,view_angle_high) 
-		
-	print  view_angle_low,view_angle_high
-	# Cycle through points and check which list they should be added to
-	for i in range(len(x)):
-		#print py.arctan2(y[i],x[i])*180/py.pi
-		#raw_input()
-		if view_angle_high -5 < py.arctan2(y[i],x[i])*180/py.pi < 180.0 or -180.0 > py.arctan2(y[i],x[i])*180/py.pi > view_angle_low :
-			front_x.append(x[i])
-			front_y.append(y[i])
-			front_z.append(z[i])
-		else :
-			back_x.append(x[i])
-			back_y.append(y[i])
-			back_z.append(z[i])
+##		(view_angle_high,view_angle_low) = (view_angle_low,view_angle_high) 
+#		
+#	print  view_angle_low,view_angle_high
+#	# Cycle through points and check which list they should be added to
+#	for i in range(len(x)):
+#		#print py.arctan2(y[i],x[i])*180/py.pi
+#		#raw_input()
+#		if view_angle_high -5 < py.arctan2(y[i],x[i])*180/py.pi < 180.0 or -180.0 > py.arctan2(y[i],x[i])*180/py.pi > view_angle_low :
+#			front_x.append(x[i])
+#			front_y.append(y[i])
+#			front_z.append(z[i])
+#		else :
+#			back_x.append(x[i])
+#			back_y.append(y[i])
+#			back_z.append(z[i])
 #	else :	
 #		# Cycle through points and check which list they should be added to
 #		for i in range(len(x)):
@@ -161,6 +170,32 @@ def ThreeD_Sphere(axis,elevation,azimuth,x,y,z,color="b",ls=".",lw=1,delta=1.0):
 #			back_x.append(x[i])
 #			back_y.append(y[i])
 #			back_z.append(z[i])
+
+	def angle_between_vectors(a,b):
+		""" Returns angle between a and b which can be either list [a1,a2,a3] or numpy arrays """
+		angle = py.arccos(sum(py.array(a)*py.array(b))/(py.norm(a)*py.norm(b)))*180/py.pi
+		return angle
+
+	# Define vector of the viewing position
+	elevation=90.0
+	view_pos = [py.sin(elevation*py.pi/180)*py.cos(azimuth*py.pi/180), \
+                py.sin(elevation*py.pi/180)*py.sin(azimuth*py.pi/180), \
+				py.cos(elevation*py.pi/180)]
+
+	for i in xrange(len(x)):
+		point_vec = [x[i],y[i],z[i]]
+		angle = angle_between_vectors(point_vec,view_pos)
+		
+		#print py.arctan2(y[i],x[i])*180/py.pi
+		#raw_input()
+		if 	angle < 90.0 :
+			front_x.append(x[i])
+			front_y.append(y[i])
+			front_z.append(z[i])
+		else :
+			back_x.append(x[i])
+			back_y.append(y[i])
+			back_z.append(z[i])
 
 	
 	# Plot the points using plot3D 

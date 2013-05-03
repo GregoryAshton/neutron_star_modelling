@@ -114,10 +114,8 @@ def Run(Input_Dictionary):
 		print " Run is complete for this data, the output is saved in the file "+file_name 
 	return file_name
 
-def Scipy_Ode_Solver(Input_Dictionary):
+def Run_Cython(Input_Dictionary):
 	"""
-
-	Model using the scipy ODE solvers for now this should simply replicate the behaviour of Run to compare speeds
 
 	"""
 
@@ -138,7 +136,7 @@ def Scipy_Ode_Solver(Input_Dictionary):
 	# At the moment these erros do not raise correctly. 
 
 	try :
-		chi = Input_Dictionary['chi']
+		chi_degrees = Input_Dictionary['chi']
 		file_name_list.append("chi_"+str(Input_Dictionary['chi']))
 	except KeyError:
 		print " ERROR: You need to specify chi in the input dictionary"
@@ -180,13 +178,149 @@ def Scipy_Ode_Solver(Input_Dictionary):
 		t1 = None
 
 #	#  Additional Arguments
-#	try :
-#		err = str(Input_Dictionary['err'])
-#	except KeyError:
-#		# Use a default value 
-#		err = 1e-12
+	try :
+		err = str(Input_Dictionary['err'])
+	except KeyError:
+		# Use a default value 
+		err = 1e-12
 
 	#------------------------------------
+
+	import scipy.weave as weave
+
+	def run(chi_degrees,epsI,epsA,omega0,t1,err):
+
+		assert(type(chi_degrees) == float)
+		assert(type(epsI) == float)
+		assert(type(epsA) == float)
+		assert(type(omega0) == float)
+		assert(type(t1) == float)
+		assert(type(err) == float)
+		
+		code = '''
+/********************************************************************/
+/*                                                                  */
+/* Evolution of omega , a and phi for ODEs from Goldreich           */
+/*                                                                  */
+/********************************************************************/
+
+
+/* Function containing the ODEs*/
+
+int
+func (double t, const double y[], double f[] , void *params)
+{
+	/* Import the three time dependant variables from y[]*/
+	double wx=y[0]; 
+	double wy=y[1];
+	double wz=y[2];
+
+	/* Calculate w*w labelled as w_2 */
+	double w_2 = pow(wx,2.0)+pow(wy,2.0)+pow(wz,2.0);
+
+	/* Import the constant variables from params*/
+	double *P = (double *) params;
+	double lambda = P[0];    /* = 2R/3C */
+	double eps_I= P[1];
+	double eps_A = P[2];
+	double chi = P[3];      
+
+	/* Calculate the angular parts of the three equations to avoid repeating the same calculation */
+	double Cx = cos(chi) ;
+	double Sx = sin(chi) ;
+
+	/* Define the three ODEs in f[] as functions of the above variables*/
+	f[0] = eps_A*(lambda*w_2*Cx*(wz*Sx-wx*Cx)+(Sx*wx+Cx*wz)*wy*Cx) - wy*wz*eps_I;
+
+	f[1] = eps_A*(-lambda*w_2*wy+(Sx*wx+Cx*wz)*(wz*Sx-wx*Cx)) + wx*wz*eps_I;
+
+	f[2] = (eps_A/(1+eps_I)) * (lambda*w_2*Sx*(wx*Cx - wz*Sx) -(Sx*wx+Cx*wz)*wy*Sx) ;
+
+	return GSL_SUCCESS;
+}
+
+/* Currently jac is unused by the ODE solver so is left empty*/
+int
+jac (double t, const double y[], double *dfdy, 
+	 double dfdt[], void *params)
+{
+
+	return GSL_SUCCESS;
+}
+
+int
+main (void)
+{
+	/* Input parameters*/
+	double chi=M_PI*chi_degrees/180; 		// Radians	
+	double R = 1.0e6;               	// cm
+	double c_speed = 3e10 ;         	// cm/s
+	double lambda = 2*R / (3*c_speed) ;     // s
+
+	double eps_I ;           
+	double eps_A ;
+
+	/* Initial value of omega, a_int is the initial angle against the z-axis*/    
+	double omega_0; 
+	double a_int=M_PI*50.0/180; 
+	double y[3] = { omega_0*sin(a_int), 0.0 , omega_0*cos(a_int) };
+
+	// Start and stop times for integration:
+	double t = 0.0, t1 ;
+
+	double params[4];	
+	params[0] = lambda;
+	params[1] = eps_I ; 
+	params[2] = eps_A;
+	params[3] = chi;
+
+
+	/*************************************************************/
+	/* GSL ODE desclarations                                     */
+	/*************************************************************/
+
+	// Choose the stepping alogrithm:
+	const gsl_odeiv2_step_type * T  = gsl_odeiv2_step_rk8pd;
+
+	// Specify number of dependent variables:
+	gsl_odeiv2_step * s = gsl_odeiv2_step_alloc (T, 3);
+
+	// Specify absolute and relative errors (actual allowed error is a linear combination of these):
+	gsl_odeiv2_control * c = gsl_odeiv2_control_y_new (err, err);
+
+	// Created evolution function:
+	gsl_odeiv2_evolve * e  = gsl_odeiv2_evolve_alloc (3);
+
+	// Tell GSL the dimension of the system and the names of the functions containing the ODEs:
+	gsl_odeiv2_system sys = {func, jac, 3, &params};
+
+	// Trial step size for first step
+	double h = 1e-10;
+
+	/*************************************************************/
+
+	while (t < t1)
+	{
+		int status = gsl_odeiv2_evolve_apply (e, c, s, &sys, &t, t1, &h, y);
+		if (status != GSL_SUCCESS)
+	 	{
+			printf ("error, return value=%d\n", status);
+			break;
+	 	}
+
+		printf ("%.16e %.16e %.16e %.16e\n", t, y[0], y[1] , y[2]);
+	}
+
+	   gsl_odeiv2_evolve_free (e);
+	   gsl_odeiv2_control_free (c);
+	   gsl_odeiv2_step_free (s);
+	return 0;
+}
+		''' 
+		return weave.inline(code,['chi_degrees','epsI','epsA','omega0','t1','err'], compiler = 'gcc',headers = ['<stdio.h>','<gsl/gsl_errno.h>','<gsl/gsl_matrix.h>','<gsl/gsl_odeiv2.h>','<math.h>'])
+
+	run(float(chi_degrees),float(epsI),float(epsA),float(omega0),float(t1),float(err))
+	
 
 
 

@@ -1,5 +1,7 @@
 from cython_gsl cimport *
 import math
+#from tables import *
+import numpy as np
 
 # Functions to solve
 cdef int with_anom_torque (double t, double y[], double f[], void *params) nogil:
@@ -87,6 +89,22 @@ cdef int jac (double t, double y[], double *dfdy, double dfdt[], void *params) n
 
 def main (epsI=1.0e-2, epsA=1.0e-3 , omega0=1.0e4, error=1e-5, t1=1.0e6 , chi_degrees = 30.0 ,anom_torque=True,file_name = "generic.txt", K=0.0, Ishell=1e45, Icore=145):
 	"""  """
+#	# Define the vector class
+#	class time (IsDescription):
+#		name = StringCol(16)	
+#		t = Int32()
+
+#	class vector(IsDescription):
+#		name= StringCol(16)   # 16-character String
+#		i  = Int32Col()			# 32-bit integer
+#		j  = Int32Col() 			# 32-bit integer
+#		k = Int32Col() 			# 32-bit integer
+
+#	h5file = tables.openFile("tutorial1.h5", mode = "r", title = "Test file")
+#	group = h5file.createGroup("/", 'spin_vectors',"Spin vectors of the crust and core")
+#	shell_table = h5file.createTable(group, 'shellvector', vector, "	")
+#	core_table = h5file.createTable(group, 'corevector',vector," ")
+#	time_table = h5file.createTable(group,'time',time," " )
 
 	# Define default variables
 	cdef double chi,R,c_speed,Lambda
@@ -145,20 +163,28 @@ def main (epsI=1.0e-2, epsA=1.0e-3 , omega0=1.0e4, error=1e-5, t1=1.0e6 , chi_de
 
 	cdef int status
 	# Currently we use python to write to file, would it be quicker to do this in C?
-	write_file = open(file_name,"w+")
+	#write_file = open(file_name,"w+")
 
+	x = []
 	while (t < t1):
 		status = gsl_odeiv_evolve_apply (e, c, s, &sys, &t, t1, &h, y)
 
 		if (status != GSL_SUCCESS):
 			break
 
-		write_file.write("%.16e %.16e %.16e %.16e %.16e %.16e %.16e\n" %(t, y[0], y[1],y[2],y[3], y[4],y[5]) )
-		
+		#write_file.write("%.16e %.16e %.16e %.16e %.16e %.16e %.16e\n" %(t, y[0], y[1],y[2],y[3], y[4],y[5]) )	
+#			time_table.row['t'] =t
+#			shell_table.row['i']=y[0]
+#			shell_table.row['j']=y[1]
+#			shell_table.row['k']=y[2]
+#			shell_table.row.append()
+		x.append(y[0])
+	
+
 		
 
 	gsl_odeiv_evolve_free (e)
 	gsl_odeiv_control_free (c)
 	gsl_odeiv_step_free (s)
-
-	write_file.close()
+	return x
+	#write_file.close()

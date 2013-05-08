@@ -25,6 +25,11 @@ def Parameter_Dictionary(user_input):
 			f = f.lstrip("no_anom_")
 			p_d["no_anom"] = True
 		else : p_d["no_anom"] = False
+
+		if "TRIAXIAL" in f: 
+			f = f.lstrip("TRIAXIAL_")
+			p_d["TRIAXIAL"] = True
+		else : p_d["TRIAXIAL"] = False
 	
 		# Import the rest of the parameters
 		f = f.split("_")
@@ -264,7 +269,7 @@ func (double t, const double y[], double f[] , void *params)
 
 	f[1] = eps_A*(-lambda*w_2*wy+(Sx*wx+Cx*wz)*(wz*Sx-wx*Cx)) + wx*wz*eps_I;
 
-	f[2] = (eps_A/(1+eps_I)) * (lambda*w_2*Sx*(wx*Cx - wz*Sx) -(Sx*wx+Cx*wz)*wy*Sx) ;
+	f[2] = epsA*pow(1+epsI,-1) * (lambda*w_2*Sx*(wx*Cx - wz*Sx) -(Sx*wx+Cx*wz)*wy*Sx) ;
 
 	return GSL_SUCCESS;
 }
@@ -296,7 +301,7 @@ main (void)
 	double y[3] = { omega_0*sin(a_int), 0.0 , omega_0*cos(a_int) };
 
 	// Start and stop times for integration:
-	double t = 0.0, t1 = KEY_t1;
+	double t = 0.0, t1 = KEY_t1
 
 	double params[4];	
 	params[0] = lambda;

@@ -269,7 +269,7 @@ func (double t, const double y[], double f[] , void *params)
 
 	f[1] = eps_A*(-lambda*w_2*wy+(Sx*wx+Cx*wz)*(wz*Sx-wx*Cx)) + wx*wz*eps_I;
 
-	f[2] = (eps_A/(1+eps_I)) * (lambda*w_2*Sx*(wx*Cx - wz*Sx) -(Sx*wx+Cx*wz)*wy*Sx) ;
+	f[2] = epsA*pow(1+epsI,-1) * (lambda*w_2*Sx*(wx*Cx - wz*Sx) -(Sx*wx+Cx*wz)*wy*Sx) ;
 
 	return GSL_SUCCESS;
 }
@@ -478,6 +478,7 @@ main (void)
 
 	// Trial step size for first step
 	double h = 1e-10;
+
 
 	/*************************************************************/
 	

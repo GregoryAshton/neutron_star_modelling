@@ -2,6 +2,7 @@
 
 import File_Functions
 import os 
+import nsmod_two_component_model 
 
 def Run(Input_Dictionary):
 	""" Create a generic write file, compile and run in C. 
@@ -210,6 +211,116 @@ def Run_Cython(Input_Dictionary):
 						anom_torque = anom_torque , error=float(error))
 
 	
+def Run_Cython_Two_Component(Input_Dictionary):
+	""" Create a generic write file, compile and run in C for the two component model. 
+
+	Keyword arguments must be passed as a dictionary
+	chi:float [degrees] -- angle between magnetic dipole and z axis
+	epsI:float []-- elastic deformation 
+	epsA :float []-- magnetic deformation 
+	omega0 :float [Hz]-- initial spin period 
+	t1:float [s] -- Time for which to run simulation for		
+	K:float -- Coupling constant between the two components
+	Ishell:MOI of the biaxial crust
+	Icore:MOI of the spherical core	
+
+	Optional arguments
+	err : float[] -- Error argument to pass to the GCC compiler 
+
+	For help with the GCC compiler see documentation at http://www.gnu.org/software/gsl/manual/html_node/Ordinary-Differential-Equations.html 
+	The generic script is written by Write_File in File_Functions
+	"""
+
+	import nsmod_cython
+
+	#  Required paramaters
+
+	# Check if the anomalous torque should be used or not and initiate the file_name
+	file_name_list = []
+
+	# We ask the user to turn of the anom torque, it is by default, on, in the program. 
+	if Input_Dictionary.get('no_anom'):
+		file_name_list .append("no_anom_")
+		anom_torque=False
+	else :
+		anom_torque=True
+		
+	# At the moment these erros do not raise correctly. 
+
+	try :
+		chi_degrees = Input_Dictionary['chi']
+		file_name_list.append("chi_"+str(Input_Dictionary['chi']))
+	except KeyError:
+		print " ERROR: You need to specify chi in the input dictionary"
+		return
+
+	try :
+		epsI= str(Input_Dictionary['epsI'])
+		file_name_list.append("_epsI_"+str(Input_Dictionary['epsI']))
+	except KeyError:
+		print " ERROR: You need to specify epsI in the input dictionary"
+		return
+
+	try :
+		epsA = str(Input_Dictionary['epsA'])
+		file_name_list.append("_epsA_"+str(Input_Dictionary['epsA']))
+	except KeyError:
+		print " ERROR: You need to specify epsA in the input dictionary"
+		return
+
+	try :
+		omega0 = str(Input_Dictionary['omega0'])
+		file_name_list.append("_omega0_"+str(Input_Dictionary['omega0']))
+	except KeyError:
+		print " ERROR: You need to specify omega0 in the input dictionary"
+		return
+
+
+	try :
+		t1 = str(Input_Dictionary['t1'])
+		file_name_list.append("_t1_"+str(Input_Dictionary['t1']))
+	except KeyError:
+		print "ERROR: You must specify t1, eta is not yet implemented "
+		return
+	
+	try : 
+		K = str(Input_Dictionary['K'])
+		file_name_list.append("_K_"+str(Input_Dictionary['t1']))	
+	except KeyError:
+		print "ERROR: You must specify K"
+		return
+
+	try : 
+		Ishell = str(Input_Dictionary['Ishell'])
+		file_name_list.append("_Ishell_"+str(Input_Dictionary['Ishell']))	
+	except KeyError:
+		print "ERROR: Ishell not specified using default"
+
+
+	try : 
+		Icore = str(Input_Dictionary['Icore'])
+		file_name_list.append("_Icore_"+str(Input_Dictionary['Icore']))	
+	except KeyError:
+		print "ERROR: Icore not specified using default"
+
+
+
+#	#  Additional Arguments
+	try :
+		error = str(Input_Dictionary['error'])
+	except KeyError:
+		# Use a default value 
+		error = 1e-5
+
+	# Create file name 
+	file_name_list.append(".txt")
+	file_name = "".join(file_name_list)
+
+	nsmod_two_component_model.main(chi_degrees=float(chi_degrees) , file_name = file_name,
+						 epsA = float(epsA) , epsI=float(epsI) , 
+						omega0=float(omega0) , t1 = float(t1) ,
+						anom_torque = anom_torque , error=float(error),Ishell=float(Ishell),Icore=float(Icore),K=float(K))
+
 
 	
 	

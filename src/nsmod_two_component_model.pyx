@@ -87,24 +87,9 @@ cdef int jac (double t, double y[], double *dfdy, double dfdt[], void *params) n
 
 
 
-def main (epsI=1.0e-2, epsA=1.0e-3 , omega0=1.0e4, error=1e-5, t1=1.0e6 , eta=0.0, chi_degrees = 30.0 ,anom_torque=True,file_name = "generic.txt", K=0.0, Ishell=1e45, Icore=145):
-	"""  """
-#	# Define the vector class
-#	class time (IsDescription):
-#		name = StringCol(16)	
-#		t = Int32()
+def main (epsI=1.0e-2, epsA=1.0e-3 , omega0=1.0e4, error=1e-5, t1=1.0e6 , eta=0.0, chi_degrees = 30.0 ,anom_torque=True,file_name = "generic.txt", K=0.0, Ishell=1e45, Icore=1e45,n=None):
+	""" Solve the two component model  using gsl_odeiv2_step_rk8pd"""
 
-#	class vector(IsDescription):
-#		name= StringCol(16)   # 16-character String
-#		i  = Int32Col()			# 32-bit integer
-#		j  = Int32Col() 			# 32-bit integer
-#		k = Int32Col() 			# 32-bit integer
-
-#	h5file = tables.openFile("tutorial1.h5", mode = "r", title = "Test file")
-#	group = h5file.createGroup("/", 'spin_vectors',"Spin vectors of the crust and core")
-#	shell_table = h5file.createTable(group, 'shellvector', vector, "	")
-#	core_table = h5file.createTable(group, 'corevector',vector," ")
-#	time_table = h5file.createTable(group,'time',time," " )
 
 	# Define default variables
 	cdef double chi,R,c_speed,Lambda
@@ -125,30 +110,7 @@ def main (epsI=1.0e-2, epsA=1.0e-3 , omega0=1.0e4, error=1e-5, t1=1.0e6 , eta=0.
 	params[5] = Ishell
 	params[6] = Icore
 
-	# Setup the solver
-	cdef gsl_odeiv_step_type * T
-	T = gsl_odeiv_step_rk8pd
-
-	cdef gsl_odeiv_step * s
-	s = gsl_odeiv_step_alloc (T, 6)
-	cdef gsl_odeiv_control * c
-	c = gsl_odeiv_control_y_new (error, error)
-	cdef gsl_odeiv_evolve * e
-	e = gsl_odeiv_evolve_alloc (6)
-
-	cdef gsl_odeiv_system sys
-
-	# Test if the anomalous torque is required or not
-	if anom_torque :
-		sys.function = with_anom_torque 
-#	else :
-#		sys.function = no_anom_torque
-
-	sys.jacobian = jac
-	sys.dimension = 6
-	sys.params = params
-
-
+	# Initial values and calculate eta_relative
 	cdef int i
 	cdef double t, y[6] ,h, eta_relative
 	eta_relative = eta*pow(omega0,2)
@@ -157,32 +119,89 @@ def main (epsI=1.0e-2, epsA=1.0e-3 , omega0=1.0e4, error=1e-5, t1=1.0e6 , eta=0.
 	y[0] = omega0*sin(a_int)
 	y[1] = 0.0
 	y[2] = omega0*cos(a_int)
-	y[3] = 0.0 #omega0*sin(a_int)
+	y[3] = omega0*sin(a_int)
 	y[4] = 0.0
-	y[5] = omega0 #*cos(a_int)
+	y[5] = omega0*cos(a_int)
 
+	# Inititate the system and define the set of functions 
+	cdef gsl_odeiv2_system sys
+
+	# Test if the anomalous torque is required or not
+	if anom_torque :
+		sys.function = with_anom_torque 
+#	else :
+#		sys.function = no_anom_torque
+
+	sys.jacobian = jac
+	sys.dimension = 6 
+	sys.params = params # The paramaters are passed here
+
+	# List variables to save to
+	time = [] ; w1=[] ; w2=[] ; w3=[] ; o1=[] ; o2=[] ; o3=[]
+
+	# Setup the solver ~ Note not all of these cdefs are always used. It seems cython won't accept a cdef inside an if statement. Check how much this costs
+	cdef gsl_odeiv2_driver * d
+	d = gsl_odeiv2_driver_alloc_y_new(
+	&sys, gsl_odeiv2_step_rk8pd,
+	error, error, 0.0)
+
+	# Setup the solver
+	cdef gsl_odeiv2_step_type * T
+	T = gsl_odeiv2_step_rk8pd
+
+	cdef gsl_odeiv2_step * s
+	s = gsl_odeiv2_step_alloc (T, 6)
+	cdef gsl_odeiv2_control * c
+	c = gsl_odeiv2_control_y_new (error, error)
+	cdef gsl_odeiv2_evolve * e
+	e = gsl_odeiv2_evolve_alloc (6)
 
 	cdef int status
+	cdef double ti
 
-	time = [] ; w1=[] ; w2=[] ; w3=[] ; o1=[] ; o2=[] ; o3=[]
-	while (pow(y[0],2)+pow(y[1],2)+pow(y[2],2) > eta_relative and t < t1 ):
-		status = gsl_odeiv_evolve_apply (e, c, s, &sys, &t, t1, &h, y)
+	if n :
+		
+		# Run saving at discrete time values
+			
+		for i from 1 <= i <= n:
+			ti = i * t1 / n
+			status = gsl_odeiv2_driver_apply (d, &t, ti, y)
 
-		if (status != GSL_SUCCESS):
-			break
+			if (status != GSL_SUCCESS):
+				print("error, return value=%d\n" % status)
+				break
 
-		time.append(t)
-		w1.append(y[0])
-		w2.append(y[1])
-		w3.append(y[2])
-		o1.append(y[3])
-		o2.append(y[4])
-		o3.append(y[6])
+			time.append(t)
+			w1.append(y[0])
+			w2.append(y[1])
+			w3.append(y[2])
+			o1.append(y[3])
+			o2.append(y[4])
+			o3.append(y[6])
 
-	gsl_odeiv_evolve_free (e)
-	gsl_odeiv_control_free (c)
-	gsl_odeiv_step_free (s)
+		gsl_odeiv2_driver_free(d)
 
+	else : 
+
+		while (pow(y[0],2)+pow(y[1],2)+pow(y[2],2) > eta_relative and t < t1 ):
+			status = gsl_odeiv2_evolve_apply (e, c, s, &sys, &t, t1, &h, y)
+
+			if (status != GSL_SUCCESS):
+				break
+
+			time.append(t)
+			w1.append(y[0])
+			w2.append(y[1])
+			w3.append(y[2])
+			o1.append(y[3])
+			o2.append(y[4])
+			o3.append(y[6])
+
+		gsl_odeiv2_evolve_free (e)
+		gsl_odeiv2_control_free (c)
+		gsl_odeiv2_step_free (s)
+
+	# Save the data to file
 	f = h5py.File(file_name,'w')
 	f.create_dataset("time",data=time)	
 	f.create_dataset("w1",data=w1)	
@@ -191,4 +210,5 @@ def main (epsI=1.0e-2, epsA=1.0e-3 , omega0=1.0e4, error=1e-5, t1=1.0e6 , eta=0.
 	f.create_dataset("o1",data=o1)	
 	f.create_dataset("o2",data=o2)	
 	f.create_dataset("o3",data=o3)	
+
 	return file_name

@@ -146,7 +146,6 @@ def main (epsI=1.0e-6, epsA=1.0e-8 , omega0=1.0e4, error=1e-12, t1=1.0e8 , eta=0
 	gsl_odeiv_control_free (c)
 	gsl_odeiv_step_free (s)
 
-	print file_name
 	f = h5py.File(file_name,'w')
 	f.create_dataset("time",data=time)	
 	f.create_dataset("w1",data=w1)	

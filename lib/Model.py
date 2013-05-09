@@ -284,16 +284,18 @@ def Run_Cython_Two_Component(Input_Dictionary):
 		t1 = str(Input_Dictionary['t1'])
 		file_name_list.append("_t1_"+str(Input_Dictionary['t1']))
 	except KeyError:
-		print "ERROR: You have not yet specified t1, using default values "
 		t1 = "1e15"
+		print "ERROR: You have not yet specified t1, using default value t1 = {}".format(t1)
+		
 
 	try :
 		eta = str(Input_Dictionary['eta'])
 		file_name_list.append("_eta_"+str(Input_Dictionary['eta']))
 		eta_relative = str(float(eta)*pow(float(omega0),2)) 
 	except KeyError:
-		print "ERROR: You have not yet specified t1, using default values "
 		eta = "0.0"
+		print "ERROR: You have not yet specified eta, using default values  eta ={}".format(eta)
+		
 
 	
 	try : 
@@ -307,16 +309,17 @@ def Run_Cython_Two_Component(Input_Dictionary):
 		Ishell = str(Input_Dictionary['Ishell'])
 		file_name_list.append("_Ishell_"+str(Input_Dictionary['Ishell']))	
 	except KeyError:
-		print "ERROR: Ishell not specified using default"
 		Ishell = 1e45
+		print "ERROR: Ishell not specified using default Ishell={}".format(Ishell)
+
 
 
 	try : 
 		Icore = str(Input_Dictionary['Icore'])
 		file_name_list.append("_Icore_"+str(Input_Dictionary['Icore']))	
 	except KeyError:
-		print "ERROR: Icore not specified using default"
 		Icore = 1e45
+		print "ERROR: Icore not specified using default Icore={}".format(Icore)
 
 
 
@@ -327,6 +330,14 @@ def Run_Cython_Two_Component(Input_Dictionary):
 		# Use a default value 
 		error = 1e-5
 
+	try :
+		n = str(Input_Dictionary['n'])
+		#if "_t1_" not in file_name_list: 
+			#print "Warning: Specifying n without t1 means you may get a very course save "
+	except KeyError:
+		# Don't save at n discrete intervals...
+		n=None
+
 	# Create file name 
 	file_name_list.append(".hdf5")
 	file_name = "".join(file_name_list)
@@ -334,7 +345,7 @@ def Run_Cython_Two_Component(Input_Dictionary):
 	# Tempory hack to remove old files seems to cause issues
 	if file_name in os.listdir("."): os.remove(file_name)
 	nsmod_two_component_model.main(chi_degrees=float(chi_degrees) , file_name = file_name,
-						 epsA = float(epsA) , epsI=float(epsI) , 
+						 epsA = float(epsA) , epsI=float(epsI) , n=int(n),
 						omega0=float(omega0) , t1 = float(t1) ,
 						anom_torque = anom_torque , error=float(error),Ishell=float(Ishell),Icore=float(Icore),K=float(K))
 

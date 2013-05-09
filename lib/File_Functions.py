@@ -63,7 +63,7 @@ def Parameter_Dictionary(user_input):
 	return p_d
 
 # This module should be erradicated at some point in favour of the dictionary
-def Import_Data(file_name,max_int=-1,d_int=1):
+def Simple_Import(file_name,max_int=-1,d_int=1):
 	# max_int and d_int are obsolete for now
 	f = Read_File(file_name)
 	time = f['time'].value

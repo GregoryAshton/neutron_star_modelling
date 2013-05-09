@@ -8,30 +8,8 @@ import lib.Model as Model
 import lib.NLD_Functions as NLD_Functions
 import lib.Plot as Plot
 import lib.Useful_Tools as Useful_Tools
-
-
-
-#def Magnetic_Field_to_Epsilon_A(Bs):
-#	Bs=float(Bs)
-#	R = 1e6 #cm
-#	c = 3e10 #cm/s
-#	I0=1e45
-#	m=0.5*Bs*pow(R,3)
-#	epsA=pow(m,2)/(I0*R*pow(c,2))
-#	print "Bs="+str(Bs)+" Epsilon_A="+str(epsA)
-
-#def Epsilon_A_to_Magnetic_Field(Epsilon_A,Option_Dictionary={}):
-#	R = 1e6 #cm
-#	c=3e10 #cm/s
-#	I0=1e45
-#	m = py.sqrt(Epsilon_A*I0*R*pow(c,2))
-#	Bs = 2*m/pow(R,3)
-#	if Option_Dictionary['verbose']==True:
-#		print "Bs="+str(Bs)+" Epsilon_A="+str(Epsilon_A)
-#	else :
-#		return  Bs
-
-
+import lib.File_Functions as File_Functions
+import lib.Physics_Functions as Physics_Functions
 
 def Create_Dictionary(opts):
 	"""

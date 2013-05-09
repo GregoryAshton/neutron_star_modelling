@@ -14,7 +14,7 @@ Dependencies
 * hdf5 
 * PyTables 
 * C compiler such as `gcc`
-nsmod.py
 
 
-This module shoud contain be importable and allow the user to acces needed functions from either the terminal or IPython.
+
+

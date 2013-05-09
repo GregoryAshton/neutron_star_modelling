@@ -1,5 +1,7 @@
 from cython_gsl cimport *
 import math
+import numpy as np
+import h5py
 
 # Functions to solve
 cdef int with_anom_torque (double t, double y[], double f[], void *params) nogil:
@@ -71,7 +73,7 @@ cdef int jac (double t, double y[], double *dfdy, double dfdt[], void *params) n
 
 
 
-def main (epsI=1.0e-6, epsA=1.0e-8 , omega0=1.0e4, error=1e-12, t1=1.0e8 , chi_degrees = 30.0 ,anom_torque=True,file_name = "generic.txt"):
+def main (epsI=1.0e-6, epsA=1.0e-8 , omega0=1.0e4, error=1e-12, t1=1.0e8 , eta=0.0 ,chi_degrees = 30.0 ,anom_torque=True , file_name="generic.hdf5"):
 	"""  """
 
 	# Define default variables
@@ -115,30 +117,40 @@ def main (epsI=1.0e-6, epsA=1.0e-8 , omega0=1.0e4, error=1e-12, t1=1.0e8 , chi_d
 
 
 	cdef int i
-	cdef double t, y[3] ,h
+	cdef double t , y[3] ,h , eta_relative
+	eta_relative = eta*pow(omega0,2)
 	h = 1e-15   # Initial step size
 	t = 0.0
 	y[0] = omega0*sin(a_int)
 	y[1] = 0.0
 	y[2] = omega0*cos(a_int)
 
-
 	cdef int status
-	# Currently we use python to write to file, would it be quicker to do this in C?
-	write_file = open(file_name,"w+")
 
-	while (t < t1):
+
+	time = [] ; w1=[] ; w2=[] ; w3=[] 
+
+	while (pow(y[0],2)+pow(y[1],2)+pow(y[2],2) > eta_relative and t < t1 ):
 		status = gsl_odeiv_evolve_apply (e, c, s, &sys, &t, t1, &h, y)
 
 		if (status != GSL_SUCCESS):
 			break
 
-		write_file.write("%.16e %.16e %.16e %.16e\n" %(t, y[0], y[1],y[2]) )
-		
+		time.append(t)
+		w1.append(y[0])
+		w2.append(y[1])
+		w3.append(y[2])
 		
 
 	gsl_odeiv_evolve_free (e)
 	gsl_odeiv_control_free (c)
 	gsl_odeiv_step_free (s)
 
-	write_file.close()
+	f = h5py.File(file_name,'w')
+	f.create_dataset("time",data=time)	
+	f.create_dataset("w1",data=w1)	
+	f.create_dataset("w2",data=w2)	
+	f.create_dataset("w3",data=w3)	
+	return file_name
+	
+	

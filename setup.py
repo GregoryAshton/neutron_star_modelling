@@ -23,3 +23,5 @@ setup(
                              include_dirs=[cython_gsl.get_cython_include_dir()])]
     )
 
+# python setup.py build_ext --inplace
+

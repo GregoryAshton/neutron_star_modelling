@@ -5,7 +5,7 @@ import pylab as py
 from math import pi
 
 
-def Transform_Cartesian_2_Spherical(x,y,z,Angle_Type="Degrees"):
+def Transform_Cartesian_2_Spherical(x,y,z,Angle_Type="Degrees",fix_phi=False):
 
 	if "Degrees" in Angle_Type:
 		""" Transform x,y,z to spherical coordinates returning omega,a,phi in degrees. This is the default"""
@@ -14,6 +14,8 @@ def Transform_Cartesian_2_Spherical(x,y,z,Angle_Type="Degrees"):
 		radial=[(x[i]*x[i]+y[i]*y[i]+z[i]*z[i])**0.5 for i in range(N)]
 		polar=[py.arccos(z[i]/radial[i])*180/pi for i in range(N)]
 		azimuth=[py.arctan(y[i]/x[i])*180/pi for i in range(N)]
+		if fix_phi:
+			azimuth = Fix_Phi(azimuth)
 		return (radial,polar,azimuth)
 
 	elif Angle_Type in ["Radians","Radian","Rads"]:

@@ -3,6 +3,7 @@
 import os 
 import nsmod_cython
 import nsmod_two_component_model 
+import pynotify
 
 # Obsolete code to be deleted by 9/June/2012
 
@@ -213,7 +214,15 @@ def Run(Input_Dictionary):
 						 epsA = float(epsA) , epsI=float(epsI) , 
 						omega0=float(omega0) , t1 = float(t1) ,
 						anom_torque = anom_torque , error=float(error))
+	
+	pynotify.init("Basic")
 
+	n = pynotify.Notification("Run complete",
+	  "output saved as {}".format(file_name)
+	)
+
+	n.show()
+	return file_name
 	
 def Run_Cython_Two_Component(Input_Dictionary):
 	""" Create a generic write file, compile and run in C for the two component model. 
@@ -331,7 +340,7 @@ def Run_Cython_Two_Component(Input_Dictionary):
 		error = 1e-5
 
 	try :
-		n = str(Input_Dictionary['n'])
+		n = int(Input_Dictionary['n'])
 		#if "_t1_" not in file_name_list: 
 			#print "Warning: Specifying n without t1 means you may get a very course save "
 	except KeyError:
@@ -345,7 +354,7 @@ def Run_Cython_Two_Component(Input_Dictionary):
 	# Tempory hack to remove old files seems to cause issues
 	if file_name in os.listdir("."): os.remove(file_name)
 	nsmod_two_component_model.main(chi_degrees=float(chi_degrees) , file_name = file_name,
-						 epsA = float(epsA) , epsI=float(epsI) , n=int(n),
+						 epsA = float(epsA) , epsI=float(epsI) , n=n,
 						omega0=float(omega0) , t1 = float(t1) ,
 						anom_torque = anom_torque , error=float(error),Ishell=float(Ishell),Icore=float(Icore),K=float(K))
 

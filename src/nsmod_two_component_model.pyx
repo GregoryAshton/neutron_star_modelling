@@ -38,7 +38,7 @@ cdef int with_anom_torque (double t, double y[], double f[], void *params) nogil
 
 	f[1] = epsA*(-Lambda*w_2*wy+(Sx*wx+Cx*wz)*(wz*Sx-wx*Cx)) + wx*wz*epsI  + K*(Oy-wy)*pow(Ishell,-1);
 
-	f[2] = epsA*pow(1+epsI,-1) * (Lambda*w_2*Sx*(wx*Cx - wz*Sx) -(Sx*wx+Cx*wz)*wy*Sx)  + K*(Oz-wz)*pow(Ishell,-1) ;
+	f[2] = pow(1+epsI,-1)*(epsA * (Lambda*w_2*Sx*(wx*Cx - wz*Sx) -(Sx*wx+Cx*wz)*wy*Sx)  + K*(Oz-wz)*pow(Ishell,-1)) ;
 
 	f[3] = -K*(Ox-wx)*pow(Icore,-1) - wy*Oz + wz*Oy ;
 
@@ -114,7 +114,7 @@ def main (epsI=1.0e-2, epsA=1.0e-3 , omega0=1.0e4, error=1e-5, t1=1.0e6 , eta=0.
 	cdef int i
 	cdef double t, y[6] ,h, eta_relative
 	eta_relative = eta*pow(omega0,2)
-	h = 1e-10   # Initial step size
+	h = 1e-15   # Initial step size
 	t = 0.0
 	y[0] = omega0*sin(a_int)
 	y[1] = 0.0

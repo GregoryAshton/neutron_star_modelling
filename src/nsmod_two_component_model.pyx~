@@ -34,17 +34,17 @@ cdef int with_anom_torque (double t, double y[], double f[], void *params) nogil
 	Sx = sin(chi) 
 
 	#  Define the three ODEs in f[] as functions of the above variables
-	f[0] = epsA*(Lambda*w_2*Cx*(wz*Sx-wx*Cx)+(Sx*wx+Cx*wz)*wy*Cx) - wy*wz*epsI -  K*(Ox-wx)*pow(Ishell,-1);
+	f[0] = epsA*(Lambda*w_2*Cx*(wz*Sx-wx*Cx)+(Sx*wx+Cx*wz)*wy*Cx) - wy*wz*epsI +  K*(Ox-wx)*pow(Ishell,-1);
 
-	f[1] = epsA*(-Lambda*w_2*wy+(Sx*wx+Cx*wz)*(wz*Sx-wx*Cx)) + wx*wz*epsI  - K*(Oy-wy)*pow(Ishell,-1);
+	f[1] = epsA*(-Lambda*w_2*wy+(Sx*wx+Cx*wz)*(wz*Sx-wx*Cx)) + wx*wz*epsI  + K*(Oy-wy)*pow(Ishell,-1);
 
-	f[2] = pow(1+epsI,-1)*(epsA * (Lambda*w_2*Sx*(wx*Cx - wz*Sx) -(Sx*wx+Cx*wz)*wy*Sx)  - K*(Oz-wz)*pow(Ishell,-1)) ;
+	f[2] = pow(1+epsI,-1)*(epsA * (Lambda*w_2*Sx*(wx*Cx - wz*Sx) -(Sx*wx+Cx*wz)*wy*Sx)  + K*(Oz-wz)*pow(Ishell,-1)) ;
 
-	f[3] = K*(Ox-wx)*pow(Icore,-1) - wy*Oz + wz*Oy ;
+	f[3] = -K*(Ox-wx)*pow(Icore,-1) - wy*Oz + wz*Oy ;
 
-	f[4] = K*(Oy-wy)*pow(Icore,-1) - wz*Ox + wx*Oz ;
+	f[4] = -K*(Oy-wy)*pow(Icore,-1) - wz*Ox + wx*Oz ;
 
-	f[5] = K*(Oz-wz)*pow(Icore,-1) - wx*Oy + wy*Ox ;
+	f[5] = -K*(Oz-wz)*pow(Icore,-1) - wx*Oy + wy*Ox ;
 
 	return GSL_SUCCESS
 
@@ -195,7 +195,7 @@ def main (epsI=1.0e-2, epsA=1.0e-3 , omega0=1.0e4, error=1e-5, t1=1.0e6 , eta=0.
 			w3.append(y[2])
 			o1.append(y[3])
 			o2.append(y[4])
-			o3.append(y[6])
+			o3.append(y[5])
 
 		gsl_odeiv2_evolve_free (e)
 		gsl_odeiv2_control_free (c)

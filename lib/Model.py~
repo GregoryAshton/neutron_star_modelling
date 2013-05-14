@@ -215,9 +215,9 @@ def Run(Input_Dictionary):
 						omega0=float(omega0) , t1 = float(t1) ,
 						anom_torque = anom_torque , error=float(error))
 	
-	#pynotify.init("Basic")
+	pynotify.init("Basic")
 
-	n = pynotify.Notification("Run complete",
+	n = pynotify.Notification("Run 1CM complete",
 	  "output saved as {}".format(file_name)
 	)
 
@@ -357,7 +357,13 @@ def Run_Cython_Two_Component(Input_Dictionary):
 						 epsA = float(epsA) , epsI=float(epsI) , n=n,
 						omega0=float(omega0) , t1 = float(t1) ,
 						anom_torque = anom_torque , error=float(error),Ishell=float(Ishell),Icore=float(Icore),K=float(K))
+	pynotify.init("Basic")
 
+	n = pynotify.Notification("Run 2CM complete",
+	  "output saved as {}".format(file_name)
+	)
+
+	n.show()
 	return file_name
 	
 

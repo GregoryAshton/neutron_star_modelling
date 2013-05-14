@@ -204,20 +204,29 @@ def Run(Input_Dictionary):
 		# Use a default value 
 		error = 1e-12
 
+	try :
+		n = int(Input_Dictionary['n'])
+		#if "_t1_" not in file_name_list: 
+			#print "Warning: Specifying n without t1 means you may get a very course save "
+	except KeyError:
+		# Don't save at n discrete intervals...
+		n=None
+
+
 	# Create file name 
 	file_name_list.append(".hdf5")
 	file_name = "".join(file_name_list)
 
 	# Tempory hack to remove old files seems to cause issues
 	if file_name in os.listdir("."): os.remove(file_name)
-	nsmod_cython.main(chi_degrees=float(chi_degrees),file_name=file_name,
+	nsmod_cython.main(chi_degrees=float(chi_degrees),file_name=file_name, n = n,
 						 epsA = float(epsA) , epsI=float(epsI) , 
 						omega0=float(omega0) , t1 = float(t1) ,
 						anom_torque = anom_torque , error=float(error))
 	
 	pynotify.init("Basic")
 
-	n = pynotify.Notification("Run complete",
+	n = pynotify.Notification("Run 1CM complete",
 	  "output saved as {}".format(file_name)
 	)
 
@@ -357,7 +366,13 @@ def Run_Cython_Two_Component(Input_Dictionary):
 						 epsA = float(epsA) , epsI=float(epsI) , n=n,
 						omega0=float(omega0) , t1 = float(t1) ,
 						anom_torque = anom_torque , error=float(error),Ishell=float(Ishell),Icore=float(Icore),K=float(K))
+	pynotify.init("Basic")
 
+	n = pynotify.Notification("Run 2CM complete",
+	  "output saved as {}".format(file_name)
+	)
+
+	n.show()
 	return file_name
 	
 

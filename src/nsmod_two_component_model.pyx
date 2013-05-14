@@ -140,12 +140,14 @@ def main (epsI=1.0e-2, epsA=1.0e-3 , omega0=1.0e4, error=1e-5, t1=1.0e6 , eta=0.
 	time = [] ; w1=[] ; w2=[] ; w3=[] ; o1=[] ; o2=[] ; o3=[]
 
 	# Setup the solver ~ Note not all of these cdefs are always used. It seems cython won't accept a cdef inside an if statement. Check how much this costs
+	
+	# For n
 	cdef gsl_odeiv2_driver * d
 	d = gsl_odeiv2_driver_alloc_y_new(
 	&sys, gsl_odeiv2_step_rk8pd,
 	error, error, 0.0)
 
-	# Setup the solver
+	# Setup the solver alternative to n
 	cdef gsl_odeiv2_step_type * T
 	T = gsl_odeiv2_step_rk8pd
 

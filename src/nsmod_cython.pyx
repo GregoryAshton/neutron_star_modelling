@@ -73,8 +73,8 @@ cdef int jac (double t, double y[], double *dfdy, double dfdt[], void *params) n
 
 
 
-def main (epsI=1.0e-6, epsA=1.0e-8 , omega0=1.0e4, error=1e-12, t1=1.0e8 , eta=0.0 ,chi_degrees = 30.0 ,anom_torque=True , file_name="generic.hdf5"):
-	"""  """
+def main (epsI=1.0e-6, epsA=1.0e-8 , omega0=1.0e4, error=1e-12, t1=1.0e8 , eta=0.0 ,chi_degrees = 30.0 ,anom_torque=True , file_name="generic.hdf5",n=None):
+	""" Solve the one component model  using gsl_odeiv2_step_rk8pd """
 
 	# Define default variables
 	cdef double chi,R,c_speed,Lambda
@@ -92,18 +92,19 @@ def main (epsI=1.0e-6, epsA=1.0e-8 , omega0=1.0e4, error=1e-12, t1=1.0e8 , eta=0
 	params[2] = epsA
 	params[3] = chi
 
-	# Setup the solver
-	cdef gsl_odeiv_step_type * T
-	T = gsl_odeiv_step_rk8pd
+	# Initial values and calculate eta_relative
+	cdef int i
+	cdef double t , y[3] ,h , eta_relative
+	eta_relative = eta*pow(omega0,2)
+	h = 1e-15   # Initial step size
+	t = 0.0
+	y[0] = omega0*sin(a_int)
+	y[1] = 0.0
+	y[2] = omega0*cos(a_int)
 
-	cdef gsl_odeiv_step * s
-	s = gsl_odeiv_step_alloc (T, 3)
-	cdef gsl_odeiv_control * c
-	c = gsl_odeiv_control_y_new (error, error)
-	cdef gsl_odeiv_evolve * e
-	e = gsl_odeiv_evolve_alloc (3)
 
-	cdef gsl_odeiv_system sys
+	# Inititate the system and define the set of functions 
+	cdef gsl_odeiv2_system sys
 
 	# Test if the anomalous torque is required or not
 	if anom_torque :
@@ -116,35 +117,69 @@ def main (epsI=1.0e-6, epsA=1.0e-8 , omega0=1.0e4, error=1e-12, t1=1.0e8 , eta=0
 	sys.params = params
 
 
-	cdef int i
-	cdef double t , y[3] ,h , eta_relative
-	eta_relative = eta*pow(omega0,2)
-	h = 1e-15   # Initial step size
-	t = 0.0
-	y[0] = omega0*sin(a_int)
-	y[1] = 0.0
-	y[2] = omega0*cos(a_int)
+	# Setup the solver ~ Note not all of these cdefs are always used. It seems cython won't accept a cdef inside an if statement. Check how much this costs
+
+	# For n
+	cdef gsl_odeiv2_driver * d
+	d = gsl_odeiv2_driver_alloc_y_new(
+	&sys, gsl_odeiv2_step_rk8pd,
+	error, error, 0.0)
+
+	# Setup the solver alternative to n
+	cdef gsl_odeiv2_step_type * T
+	T = gsl_odeiv2_step_rk8pd
+
+	cdef gsl_odeiv2_step * s
+	s = gsl_odeiv2_step_alloc (T, 3)
+	cdef gsl_odeiv2_control * c
+	c = gsl_odeiv2_control_y_new (error, error)
+	cdef gsl_odeiv2_evolve * e
+	e = gsl_odeiv2_evolve_alloc (3)
+
 
 	cdef int status
+	cdef double ti
 
 
 	time = [] ; w1=[] ; w2=[] ; w3=[] 
 
-	while (pow(y[0],2)+pow(y[1],2)+pow(y[2],2) > eta_relative and t < t1 ):
-		status = gsl_odeiv_evolve_apply (e, c, s, &sys, &t, t1, &h, y)
-
-		if (status != GSL_SUCCESS):
-			break
-
-		time.append(t)
-		w1.append(y[0])
-		w2.append(y[1])
-		w3.append(y[2])
+	if n :
 		
+		# Run saving at discrete time values
+			
+		for i from 1 <= i <= n:
+			ti = i * t1 / n
+			status = gsl_odeiv2_driver_apply (d, &t, ti, y)
 
-	gsl_odeiv_evolve_free (e)
-	gsl_odeiv_control_free (c)
-	gsl_odeiv_step_free (s)
+			if (status != GSL_SUCCESS):
+				print("error, return value=%d\n" % status)
+				break
+
+			time.append(t)
+			w1.append(y[0])
+			w2.append(y[1])
+			w3.append(y[2])
+
+		gsl_odeiv2_driver_free(d)
+
+	else : 
+
+		while (pow(y[0],2)+pow(y[1],2)+pow(y[2],2) > eta_relative and t < t1 ):
+			status = gsl_odeiv2_evolve_apply (e, c, s, &sys, &t, t1, &h, y)
+
+			if (status != GSL_SUCCESS):
+				break
+
+			time.append(t)
+			w1.append(y[0])
+			w2.append(y[1])
+			w3.append(y[2])
+
+		gsl_odeiv2_evolve_free (e)
+		gsl_odeiv2_control_free (c)
+		gsl_odeiv2_step_free (s)
+
+		
 
 	f = h5py.File(file_name,'w')
 	f.create_dataset("time",data=time)	

@@ -177,7 +177,7 @@ def main (epsI=1.0e-2, epsA=1.0e-3 , omega0=1.0e4, error=1e-5, t1=1.0e6 , eta=0.
 			w3.append(y[2])
 			o1.append(y[3])
 			o2.append(y[4])
-			o3.append(y[6])
+			o3.append(y[5])
 
 		gsl_odeiv2_driver_free(d)
 

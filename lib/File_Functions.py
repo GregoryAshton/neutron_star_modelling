@@ -70,6 +70,7 @@ def Simple_Import(file_name,max_int=-1,d_int=1):
 	x = f['w1'].value
 	y = f['w2'].value
 	z = f['w3'].value
+	f.close()
 
 	return (time,x,y,z)
 
@@ -85,7 +86,8 @@ def Read_File(file_name):
 		else : 
 			print "Program is incompatible with file type {}.".format(file_type)
 			return
-
+	import os
+	print os.getcwd()+"/"+file_name
 	f = h5py.File(file_name,"r")
 
 	return 	f

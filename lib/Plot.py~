@@ -47,7 +47,11 @@ def Simple_Plot(file_name,Option_Dictionary):
 		
 	# Import the data 
 	#(time,x,y,z) = File_Functions.Import_Data(file_name,max_n)
-	[time,x,y,z] = File_Functions.Read_File(file_name)
+	f = File_Functions.Read_File(file_name)
+	time = f['time'].value
+	x = f['time'].value
+	y = f['time'].value
+	z = f['time'].value
 
 	# Handle any additional options which are in the dictionary
 	if Option_Dictionary.has_key('tmax') : tmax = Option_Dictionary['tmax'] 
@@ -184,7 +188,11 @@ def Alpha_Plot(file_name,Option_Dictionary):
 
 	# Import the data in components x,y,z
 	#(time,x,y,z) = File_Functions.Import_Data(file_name,max_n)
-	[time,x,y,z] = File_Functions.Read_File(file_name)
+	f = File_Functions.Read_File(file_name)
+	time = f['time'].value
+	x = f['time'].value
+	y = f['time'].value
+	z = f['time'].value
 
 	# Get the paramters of the run
 	Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
@@ -332,7 +340,11 @@ def Angle_Space_Plot(file_name,Option_Dictionary):
 	else : max_n = -1
 	# Import the data in components x,y,z we use generic x,y,z so as to not confused the EFB
 	#(time,x,y,z) = File_Functions.Import_Data(file_name,max_n)
-	[time,x,y,z] = File_Functions.Read_File(file_name)
+	f = File_Functions.Read_File(file_name)
+	time = f['time'].value
+	x = f['time'].value
+	y = f['time'].value
+	z = f['time'].value
 
 	# Check if we should use the Effective body frame axis
 	if Option_Dictionary.has_key('EBF'):
@@ -498,7 +510,11 @@ def Simple_Plot_Transform(file_name,Option_Dictionary):
 	else : max_n = -1
 	# Import the data in components x,y,z
 	#(time,x,y,z) = File_Functions.Import_Data(file_name,max_n)
-	[time,x,y,z] = File_Functions.Read_File(file_name)
+	f = File_Functions.Read_File(file_name)
+	time = f['time'].value
+	x = f['time'].value
+	y = f['time'].value
+	z = f['time'].value
 
 	# Get the paramters of the run
 	Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
@@ -548,7 +564,11 @@ def Spherical_Plot_Transform(file_name,Option_Dictionary):
 	else : max_n = -1
 	# Import the data in components x,y,z
 	#(time,x,y,z) = File_Functions.Import_Data(file_name,max_n)
-	[time,omega_x,omega_y,omega_z] = File_Functions.Read_File(file_name)
+	f = File_Functions.Read_File(file_name)
+	time = f['time'].value
+	omega_x = f['time'].value
+	omega_y = f['time'].value
+	omega_z = f['time'].value
 
 	# Get the paramters of the run
 	Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)

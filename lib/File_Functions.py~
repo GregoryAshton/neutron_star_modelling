@@ -63,13 +63,14 @@ def Parameter_Dictionary(user_input):
 	return p_d
 
 # This module should be erradicated at some point in favour of the dictionary
-def Import_Data(file_name,max_int=-1,d_int=1):
+def Simple_Import(file_name,max_int=-1,d_int=1):
 	# max_int and d_int are obsolete for now
 	f = Read_File(file_name)
 	time = f['time'].value
 	x = f['w1'].value
 	y = f['w2'].value
 	z = f['w3'].value
+	f.close()
 
 	return (time,x,y,z)
 
@@ -85,8 +86,9 @@ def Read_File(file_name):
 		else : 
 			print "Program is incompatible with file type {}.".format(file_type)
 			return
-
-	f = h5py.File(file_name,"r")
+	import os
+	print os.getcwd()+"/"+file_name
+	f = h5py.File(os.getcwd()+"/"+file_name,"r")
 
 	return 	f
 

@@ -102,11 +102,11 @@ def Spherical_Plot(file_name,Option_Dictionary):
 	else : max_n = -1
 
 	#(time,x,y,z) = File_Functions.Import_Data(file_name,max_n)
-	f = File_Functions.Read_File(file_name)
-	time = f['time'].value
-	omega_x = f['time'].value
-	omega_y = f['time'].value
-	omega_z = f['time'].value
+	(time,omega_x,omega_y,omega_z) = File_Functions.Simple_Import(file_name)
+	#time = f['time'].value
+	#omega_x = f['time'].value
+	#omega_y = f['time'].value
+	#omega_z = f['time'].value
 
 	if Option_Dictionary.has_key('tmax') : tmax = Option_Dictionary['tmax'] 
 	else : tmax = max(time)

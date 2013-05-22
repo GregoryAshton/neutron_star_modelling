@@ -144,7 +144,9 @@ def main (epsI=1.0e-2, epsA=1.0e-3 , omega0=1.0e4, error=1e-5, t1=1.0e6 ,
     # List variables to save to
     time = [] ; w1=[] ; w2=[] ; w3=[] ; o1=[] ; o2=[] ; o3=[]
 
-    # Setup the solver ~ Note not all of these cdefs are always used. It seems cython won't accept a cdef inside an if statement. Check how much this costs
+    # Setup the solver ~ Note not all of these cdefs are always used.
+    #It seems cython won't accept a cdef inside an if statement.
+    #Check how much this costs
 
     # For n
     cdef gsl_odeiv2_driver * d

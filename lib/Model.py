@@ -238,7 +238,7 @@ def Run_Cython_Two_Component(Input_Dictionary):
         aW_int = str(Input_Dictionary['aW_int'])
         file_name_list.append("_aW_int_" + str(Input_Dictionary['aW_int']))
     except KeyError:
-        aw_int = 50.0
+        aW_int = 50.0
         print "ERROR: aW_int not specified using default aW_int={}".format(aw_int)
 
 #   Additional Arguments

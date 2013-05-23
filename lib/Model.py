@@ -199,7 +199,7 @@ def Run_Cython_Two_Component(Input_Dictionary):
     try:
         eta = str(Input_Dictionary['eta'])
         file_name_list.append("_eta_" + str(Input_Dictionary['eta']))
-        eta_relative = str(float(eta) * pow(float(omega0),2))
+        eta_relative = str(float(eta) * pow(float(omega0), 2))
     except KeyError:
         eta = "0.0"
         print "ERROR: You have not yet specified eta, \

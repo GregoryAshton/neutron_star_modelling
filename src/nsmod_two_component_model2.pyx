@@ -4,7 +4,7 @@ import h5py
 import numpy as np
 
 # Functions to solve
-cdef int with_anom_torque (double t, double y[], double f[], void *params) nogil:
+cdef int equations (double t, double y[], double f[], void *params) nogil:
     """ Function defining the ODEs with the anomalous torque """
 
     # Define the variables used in the calculation
@@ -50,48 +50,19 @@ cdef int with_anom_torque (double t, double y[], double f[], void *params) nogil
     return GSL_SUCCESS
 
 
-
-#cdef int no_anom_torque (double t, double y[], double f[], void *params) nogil:
-#    """ Function defining the ODEs with the anomalous torque """
-#    # Define the variables used in the calculation
-#    cdef double wx,wy,wz,w_2,epsI,epsA,chi,Lambda
-
-#    # Import the three time dependant variables from y[]
-#    wx=y[0]
-#    wy=y[1]
-#    wz=y[2]
-#    w_2 = pow(wx,2)+pow(wy,2)+pow(wz,2)
-
-#    # Import the constant variables from params
-#    Lambda = (<double *> params)[0]    #= 2R/3C */
-#    epsI= (<double *> params)[1]
-#    epsA = (<double *> params)[2]
-#    chi = (<double *> params)[3]
-
-#    # Calculate the angular parts of the three equations to avoid repeated calculation
-#    cdef double Cx,Sx
-#    Cx = cos(chi)
-#    Sx = sin(chi)
-
-#    #  Define the three ODEs in f[] as functions of the above variables
-#    f[0] = epsA*(Lambda*w_2*Cx*(wz*Sx-wx*Cx)) - wy*wz*epsI
-
-#    f[1] = epsA*(-Lambda*w_2*wy) + wx*wz*epsI
-
-#    f[2] = epsA*pow(1+epsI,-1) * (Lambda*w_2*Sx*(wx*Cx - wz*Sx))
-#    return GSL_SUCCESS
-
-# Currently jac is unused by the ODE solver so is left empty
 cdef int jac (double t, double y[], double *dfdy, double dfdt[], void *params) nogil:
 
     return GSL_SUCCESS
 
 
 
-def main (epsI=1.0e-2, epsA=1.0e-3 , omega0=1.0e4, error=1e-5, t1=1.0e6 ,
-     eta=0.0, chi_degrees = 30.0 ,anom_torque=True,file_name = "generic.txt",
-      K=0.0, Ishell=1e45, Icore=1e45,n=None,aw_int=50.0,aW_int=50.0):
-    """ Solve the two component model  using gsl_odeiv2_step_rk8pd"""
+def main (epsI=1.0e-2, epsA=1.0e-3 , error=1e-5, t1=1.0e6 ,
+      chi_degrees = 30.0 ,file_name = "generic.txt",
+      K=0.0, Ishell=1e45, Icore=1e45,n=None,shell_int=[0.0,0.0,0.0],core_int=[0.0,0.0,0.0]):
+    """ Solve the two component model  using gsl_odeiv2_step_rk8pd
+
+    Note this 2nd version takes shell_int and core_int as 3-lists.
+    """
 
 
     # Define default variables
@@ -112,29 +83,31 @@ def main (epsI=1.0e-2, epsA=1.0e-3 , omega0=1.0e4, error=1e-5, t1=1.0e6 ,
     params[5] = Ishell
     params[6] = Icore
 
-    # Initial values and calculate eta_relative
+    # Initial values
     cdef int i
-    cdef double t, y[6] ,h, eta_relative
-    eta_relative = eta*pow(omega0,2)
+    cdef double t, y[6] ,h
     h = 1e-15   # Initial step size
     t = 0.0
-    y[0] = omega0*sin(math.pi*aw_int/180)
-    y[1] = 0.0
-    y[2] = omega0*cos(math.pi*aw_int/180)
-    y[3] = omega0*sin(math.pi*aW_int/180)
-    y[4] = 0.0
-    y[5] = omega0*cos(math.pi*aW_int/180)
+
+    if shell_int and core_int:
+        y[0] = shell_int[0]
+        y[1] = shell_int[1]
+        y[2] = shell_int[2]
+        y[3] = core_int[0]
+        y[4] = core_int[1]
+        y[5] = core_int[2]
+
+    else :
+        print " You must specify shell_int and core_int as 3-lists"
+        return
     # Note both vectors lie in the x,z plane initially; this may need to be
     # changes in future
 
     # Inititate the system and define the set of functions
     cdef gsl_odeiv2_system sys
 
-    # Test if the anomalous torque is required or not
-    if anom_torque :
-        sys.function = with_anom_torque
-#    else :
-#        sys.function = no_anom_torque
+    sys.function = equations
+
 
     sys.jacobian = jac
     sys.dimension = 6
@@ -158,57 +131,31 @@ def main (epsI=1.0e-2, epsA=1.0e-3 , omega0=1.0e4, error=1e-5, t1=1.0e6 ,
     cdef gsl_odeiv2_step_type * T
     T = gsl_odeiv2_step_rk8pd
 
-    cdef gsl_odeiv2_step * s
-    s = gsl_odeiv2_step_alloc (T, 6)
-    cdef gsl_odeiv2_control * c
-    c = gsl_odeiv2_control_y_new (error, error)
-    cdef gsl_odeiv2_evolve * e
-    e = gsl_odeiv2_evolve_alloc (6)
 
     cdef int status
     cdef double ti
 
-    if n :
 
-        # Run saving at discrete time values
+    # Run saving at discrete time values ~ only option for now
 
-        for i from 1 <= i <= n:
-            ti = i * t1 / n
-            status = gsl_odeiv2_driver_apply (d, &t, ti, y)
+    for i from 1 <= i <= n:
+        ti = i * t1 / n
+        status = gsl_odeiv2_driver_apply (d, &t, ti, y)
 
-            if (status != GSL_SUCCESS):
-                print("error, return value=%d\n" % status)
-                break
+        if (status != GSL_SUCCESS):
+            print("error, return value=%d\n" % status)
+            break
 
-            time.append(t)
-            w1.append(y[0])
-            w2.append(y[1])
-            w3.append(y[2])
-            o1.append(y[3])
-            o2.append(y[4])
-            o3.append(y[5])
+        time.append(t)
+        w1.append(y[0])
+        w2.append(y[1])
+        w3.append(y[2])
+        o1.append(y[3])
+        o2.append(y[4])
+        o3.append(y[5])
 
-        gsl_odeiv2_driver_free(d)
+    gsl_odeiv2_driver_free(d)
 
-    else :
-
-        while (pow(y[0],2)+pow(y[1],2)+pow(y[2],2) > eta_relative and t < t1 ):
-            status = gsl_odeiv2_evolve_apply (e, c, s, &sys, &t, t1, &h, y)
-
-            if (status != GSL_SUCCESS):
-                break
-
-            time.append(t)
-            w1.append(y[0])
-            w2.append(y[1])
-            w3.append(y[2])
-            o1.append(y[3])
-            o2.append(y[4])
-            o3.append(y[5])
-
-        gsl_odeiv2_evolve_free (e)
-        gsl_odeiv2_control_free (c)
-        gsl_odeiv2_step_free (s)
 
     # Save the data to file
     f = h5py.File(file_name,'w')

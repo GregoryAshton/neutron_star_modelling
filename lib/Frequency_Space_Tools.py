@@ -14,7 +14,7 @@ def FFT(time, data):
     magnitude = [py.norm(a) for a in complex_amplitude]
     phase = [py.arctan(a.imag / a.real) for a in complex_amplitude]
 
-    return (frequency[0:n/2], magnitude[0:n/2], phase[0:n/2])
+    return (frequency[0:n / 2], magnitude[0:n / 2], phase[0:n / 2])
 
 
 def Peak_Find(data, box_size=10):
@@ -28,7 +28,7 @@ def Peak_Find(data, box_size=10):
         fprime_left = data[i] - data[i - box_size]
         fprime_right = data[i + box_size] - data[i]
 
-        if fprime_left * fprime_right < 0.0:
+        if fprime_left * fprime_right < 0.0 and fprime_left > 0.0:
             rough_list.append(i)
 
     for i in rough_list:

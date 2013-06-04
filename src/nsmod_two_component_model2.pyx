@@ -97,6 +97,8 @@ def main (epsI=1.0e-2, epsA=1.0e-3 , error=1e-5, t1=1.0e6 ,
         y[4] = core_int[1]
         y[5] = core_int[2]
 
+        print "y list = "+str(y[0])+" "+str(y[1])+" "+str(y[2])+" "+str(y[3])+" "+str(y[4])+" "+str(y[5])
+
     else :
         print " You must specify shell_int and core_int as 3-lists"
         return

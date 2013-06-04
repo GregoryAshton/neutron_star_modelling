@@ -349,7 +349,6 @@ def Run_Cython_Two_Component2(Input_Dictionary):
         print " ERROR: You need to specify epsA in the input dictionary"
         return
 
-
     try:
         t1 = str(Input_Dictionary['t1'])
         file_name_list.append("_t1_" + str(Input_Dictionary['t1']))
@@ -357,7 +356,6 @@ def Run_Cython_Two_Component2(Input_Dictionary):
         t1 = "1e15"
         print "ERROR: You have not yet specified t1, \
                 using default value t1 = {}".format(t1)
-
 
     try:
         K = str(Input_Dictionary['K'])

@@ -1,72 +1,97 @@
-#!/usr/bin/python 
+#!/usr/bin/python
 
 import numpy as np
-import pylab as py 
+import pylab as py
 from math import pi
 
 
-def Transform_Cartesian_2_Spherical(x,y,z,Angle_Type="Degrees",fix_phi=False):
+def Cartesian_2_Spherical(x, y, z, Angle_Type="Degrees", fix_phi=False):
+    """ Transform x,y,z to radial,polar and azimuthal vectors"""
 
-	if "Degrees" in Angle_Type:
-		""" Transform x,y,z to spherical coordinates returning omega,a,phi in degrees. This is the default"""
-		print "Transform using angle type Degrees"
-		N=len(x)
-		radial=[(x[i]*x[i]+y[i]*y[i]+z[i]*z[i])**0.5 for i in range(N)]
-		polar=[py.arccos(z[i]/radial[i])*180/pi for i in range(N)]
-		azimuth=[py.arctan(y[i]/x[i])*180/pi for i in range(N)]
-		if fix_phi:
-			azimuth = Fix_Phi(azimuth)
-		return (radial,polar,azimuth)
+    N = len(x)
 
-	elif Angle_Type in ["Radians","Radian","Rads"]:
-		""" Transform x,y,z to spherical coordinates returning omega,a,phi in radians"""
-		print "Transform using angle type Radians"
-		N=len(x)
-		radial=[(x[i]*x[i]+y[i]*y[i]+z[i]*z[i])**0.5 for i in range(N)]
-		polar=[py.arccos(z[i]/radial[i]) for i in range(N)]
-		azimuth=[py.arctan(y[i]/x[i]) for i in range(N)]
-		return (radial,polar,azimuth)
+    radial = [(x[i] * x[i] + y[i] * y[i] + z[i] * z[i]) ** 0.5
+                for i in range(N)]
+    polar = [py.arccos(z[i] / radial[i]) for i in range(N)]
+    azimuth = [py.arctan(y[i] / x[i]) for i in range(N)]
 
-def Transform_Cartesian_Body_Frame_2_Effective_Body_Frame(x,y,z,Beta):
-	"""Functions to rotate x,z system by angle Beta w.r.t z axis"""
-	Cb=py.cos(Beta) ; Sb=py.sin(Beta)
-	x_prime=[x[i]*Cb - z[i]*Sb for i in range(len(x))]
-	z_prime=[z[i]*Cb + x[i]*Sb for i in range(len(x))]
-	y_prime = y
-	return (x_prime,y_prime,z_prime)
+    if "Degrees" in Angle_Type:
 
-def Rotational_Kinetic_Energy(Ix,Iy,Iz,omega_x,omega_y,omega_z):
-	return 0.5*(Ix*pow(omega_x,2)+Iy*pow(omega_y,2)+Iz*pow(omega_z,2))
+        polar_degrees = [p * 180 / pi for p in polar]
+        azimuth_degrees = [a * 180 / pi for a in azimuth]
 
-def Fix_Phi(phi,epsilon=170.0,Angle_Type="Degrees"):
-	""" Takes a list of phi values and looks for jumps greater than epsilon, assuming these reflect a full rotation (2pi-0) it adds a correction factor to the subsequent data"""
-	
-	if Angle_Type == "Degrees" :
-		phi_fix=[] ; fix = 0.0 ;  phi_fix.append(phi[0])
-		for i in range(1,len(phi)):
-			if abs(phi[i]-phi[i-1])> epsilon:
-				fix+= -1*py.sign(phi[i]-phi[i-1])*180.0
-			phi_fix.append(phi[i]+fix)
-		phi=phi_fix
-		return phi
+        if fix_phi:
+            azimuth_degrees = Fix_Phi(azimuth_degrees, Angle_Type="Degrees")
 
-	elif Angle_Type in ["Radians","Radian","Rads"] :
-		# Change the default value of epsilon make sure the 1st argument is the default
-		if epsilon==170.0 : epsilon = 1.0 
+        return (radial, polar_degrees, azimuth_degrees)
 
-		phi_fix=[] ; fix = 0.0 ;  phi_fix.append(phi[0])
-		for i in range(1,len(phi)):
-			if abs(phi[i]-phi[i-1])> epsilon:
-				fix+= -1*py.sign(phi[i]-phi[i-1])*pi
-			phi_fix.append(phi[i]+fix)
-		phi=phi_fix
-		return phi
+    elif Angle_Type in ["Radians", "Radian", "Rads"]:
 
-## Beta function
-def Beta_Function(epsI,epsA,chi):
-	if chi>2*pi :
-		print "Assuming chi has been given in degrees rather than radians, we now transform"
-		chi = chi*pi/180
-	a=epsA*epsA+epsI*epsI-2*epsA*epsI*py.cos(2*chi)
-	return py.arctan((epsI-epsA*py.cos(2*chi)-py.sqrt(a))/(2*epsA*py.sin(chi)*py.cos(chi)))
+        if fix_phi:
+            azimuth_degrees = Fix_Phi(azimuth_degrees, Angle_Type="Radians")
+
+        return (radial, polar, azimuth)
+
+
+def Cartesian_2_EBF(x, y, z, beta):
+    """Functions to rotate x,z system by angle beta about the y axis"""
+
+    N = len(x)
+    Cb = py.cos(beta)
+    Sb = py.sin(beta)
+    x_prime = [x[i] * Cb - z[i] * Sb for i in xrange(N)]
+    z_prime = [z[i] * Cb + x[i] * Sb for i in xrange(N)]
+    y_prime = y
+    return (x_prime, y_prime, z_prime)
+
+
+def Rotational_Kinetic_Energy(Ix, Iy, Iz, omega_x, omega_y, omega_z):
+    en_2 = (Ix * pow(omega_x, 2) + Iy * pow(omega_y, 2) + Iz * pow(omega_z, 2))
+    return 0.5 * en_2
+
+
+def Fix_Phi(phi, epsilon=170.0, Angle_Type="Degrees"):
+    """
+
+    Takes a list of phi values and looks for jumps greater than epsilon,
+    assuming these reflect a full rotation (2pi-0) it adds a correction
+    factor to the subsequent data
+
+    """
+
+    if Angle_Type == "Degrees":
+        phi_fix = []
+        fix = 0.0
+        phi_fix.append(phi[0])
+        for i in range(1, len(phi)):
+            if abs(phi[i] - phi[i - 1]) > epsilon:
+                fix += -1 * py.sign(phi[i] - phi[i - 1]) * 180.0
+            phi_fix.append(phi[i] + fix)
+        phi = phi_fix
+        return phi
+
+    elif Angle_Type in ["Radians", "Radian", "Rads"]:
+        if epsilon == 170.0:
+            epsilon = 1.0
+
+        phi_fix = []
+        fix = 0.0
+        phi_fix.append(phi[0])
+        for i in range(1, len(phi)):
+            if abs(phi[i] - phi[i - 1]) > epsilon:
+                fix += -1 * py.sign(phi[i] - phi[i - 1]) * pi
+            phi_fix.append(phi[i] + fix)
+        phi = phi_fix
+        return phi
+
+
+def Beta_Function(epsI, epsA, chi):
+    if chi > 2 * pi:
+        print "Assuming chi has been given in degrees rather than radians"
+        chi = chi * pi / 180
+
+    a = epsA * epsA + epsI * epsI - 2 * epsA * epsI * py.cos(2 * chi)
+    beta = (py.arctan((epsI - epsA * py.cos(2 * chi) - py.sqrt(a)) /
+                        (2 * epsA * py.sin(chi) * py.cos(chi))))
+    return beta
 

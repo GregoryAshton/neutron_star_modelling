@@ -8,7 +8,10 @@ import os
 
 
 def Save_Figure(file_name, type_of_plot, format_type=".png"):
-    plot_file_name = type_of_plot + "_" + file_name.rstrip(".txt") + format_type
+    """ Saves the currently open figure with an appropriate name"""
+    plot_file_name = "{0}_{1}_{2}".format(
+                        type_of_plot, file_name.rstrip(".hdf5"), format_type
+                            )
     py.savefig(plot_file_name)
     print "Saving figure as %s" % plot_file_name
 
@@ -39,7 +42,6 @@ def Parameter_Dictionary(user_input):
         else:
             p_d["no_anom"] = False
 
-
         # Import the rest of the parameters
         f = f.split("_")
         for i in range(0, len(f), 2):
@@ -54,8 +56,8 @@ def Parameter_Dictionary(user_input):
     I0 = 1e45
     # Compute a couple of often used variabes
 
-    # Biaxial case
-    epsI = max(abs(float(p_d["epsI3"])),abs(float(p_d["epsI1"])))
+    # Note these values only make sense in the Biaxial case
+    epsI = max(abs(float(p_d["epsI3"])), abs(float(p_d["epsI1"])))
     omega0 = float(p_d["omega0"])
     epsA = float(p_d["epsA"])
     p_d["tauP"] = str(pow(omega0 * epsI, -1))
@@ -115,7 +117,6 @@ def Read_File(file_name):
     else:
         print "File type {} is ill-formed.".format(file_type)
         return
-
 
     print os.getcwd() + "/" + file_name
     f = h5py.File(file_name, "r")

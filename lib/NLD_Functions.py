@@ -412,3 +412,72 @@ def Dotted_Variable(file_name):
                 )
 
     return (time, omega_dot, a_dot, phi_dot)
+
+def Dotted_Variable2(file_name):
+    """
+
+    Function takes the file imports it and produces
+    the dotted variables as lists
+
+    """
+
+    (time, x, y, z) = File_Functions.One_Component_Import(file_name)
+
+    # Transform to spherical polar coordinates in radians
+    (omega, a, phi) = Physics_Functions.Cartesian_2_Spherical(
+                                    x, y, z, Angle_Type="Radians")
+
+    # Fix phi
+    phi = Physics_Functions.Fix_Phi(phi, Angle_Type="Radians")
+
+    # Import data from params
+    Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
+    epsI = float(Parameter_Dictionary["epsI"])
+    epsA = float(Parameter_Dictionary["epsA"])
+    chi = float(Parameter_Dictionary["chi"]) * py.pi / 180  # radians
+
+    # Calculate some constants
+    epsI_prime = epsI / (1 + epsI)
+    Sx = sin(chi)
+    Cx = cos(chi)
+    Lambda = 2 * 1e6 / (3 * 3e10)  # 2R/3c
+
+    # Calculate the differentials from Goldreich equations
+    omega_dot = []
+    a_dot = []
+    phi_dot = []
+
+    for i in xrange(len(omega)):
+        cosa = cos(a[i])
+        sina = sin(a[i])
+        cosphi = cos(phi[i])
+        sinphi = sin(phi[i])
+        Tsx = Cx * Sx * cosa - Cx * Cx * sina * cosphi
+        Tsy = -1.0 * sina * sinphi
+        Tsz = Sx * Cx * sina * cosphi - Sx * Sx * cosa
+
+        pre = (Sx * sina * cosphi + Cx * cosa)
+        Tax = pre * sina * sinphi * Cx
+        Tay = pre * (cosa * Sx - sina * cosphi * Cx)
+        Taz = pre * (-1.0 * sina * sinphi * Sx)
+
+        Tsdotomega = (2 * Sx * Cx * sina * cosa * cosphi - pow(sina * sinphi, 2)
+                               - pow(Sx * cosa, 2) - pow(Cx * sina * cosphi, 2))
+
+        omega_dot.append(Lambda * epsA * pow(omega[i], 3) *
+                         (Tsdotomega - epsI_prime * Tsz * cosa)
+                         - epsA * epsI_prime * pow(omega[i], 2) * Taz * cosa)
+
+        a_dot.append(Lambda * epsA * pow(omega[i], 2) * pow(sina, -1)
+                * (Tsdotomega * cosa - (1 - epsI_prime * pow(sina, 2)) * Tsz)
+                - epsA * omega[i] * Taz *
+                (1 - epsI_prime * pow(sina, 2)) * pow(sina, -1)
+                )
+
+        phi_dot.append(pow(omega[i], 2) * Lambda * epsA * pow(sina, -1)
+                * (Tsy * cosphi - Tsx * sinphi)
+                + omega[i] * epsA * pow(sina, -1)
+                * (Tay * cosphi - Tax * sinphi)
+                )
+
+    return (time, omega_dot, a_dot, phi_dot)

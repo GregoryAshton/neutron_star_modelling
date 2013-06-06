@@ -13,12 +13,12 @@ import Useful_Tools
 from Physics_Functions import Beta_Function  # ?
 
 
-def Save_Figure(file_name, type_of_plot, format_type=".png"):
-    """ Saves the current figure with a relevant file name"""
-    plot_file_name = type_of_plot + "_" + \
-                    file_name.rstrip(".hdf5") + format_type
-    py.savefig(plot_file_name)
-    print "Saving figure as %s" % plot_file_name
+#def Save_Figure(file_name, type_of_plot, format_type=".png"):
+#    """ Saves the current figure with a relevant file name"""
+#    plot_file_name = type_of_plot + "_" + \
+#                    file_name.rstrip(".hdf5") + format_type
+#    py.savefig(plot_file_name)
+#    print "Saving figure as %s" % plot_file_name
 
 
 def Defaults():
@@ -108,7 +108,6 @@ def Spherical_Plot(file_name, Option_Dictionary={}):
     (time, omega_x, omega_y, omega_z) = \
             File_Functions.One_Component_Import(file_name)
 
-
     if 'tmax' in Option_Dictionary:
         tmax = Option_Dictionary['tmax']
     else:
@@ -176,7 +175,7 @@ def Spherical_Plot(file_name, Option_Dictionary={}):
 
     py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12, hspace=0.0)
     if 'save_fig' in Option_Dictionary and Option_Dictionary['save_fig']:
-        Save_Figure(file_name, "Spherical_Plot")
+        File_Functions.Save_Figure(file_name, "Spherical_Plot")
     else:
         py.show()
 
@@ -229,7 +228,7 @@ def Alpha_Plot(file_name, Option_Dictionary={}):
     ax1.set_xlabel(r"time  [$1\times 10^{{0}}$ s]".format(str(scale_val)))
 
     if 'save_fig' in Option_Dictionary and Option_Dictionary['save_fig']:
-        Save_Figure(file_name, "Alpha")
+        File_FUnctions.Save_Figure(file_name, "Alpha")
     else:
         py.show()
 
@@ -337,7 +336,7 @@ def ThreeD_Plot_Cartesian(file_name, Option_Dictionary={}):
     ax.set_zticklabels([])
 
     if 'save_fig' in Option_Dictionary and Option_Dictionary['save_fig']:
-        Save_Figure(file_name, "ThreeD_Plot_Cartesian")
+        File_FUnctions.Save_Figure(file_name, "ThreeD_Plot_Cartesian")
     else:
         py.show()
 
@@ -419,7 +418,7 @@ def Angle_Space_Plot(file_name, Option_Dictionary={}):
                     pass
 
         if 'save_fig' in Option_Dictionary and Option_Dictionary['save_fig']:
-            Save_Figure(file_name, "Angle_Space_Plot_2D")
+            File_FUnctions.Save_Figure(file_name, "Angle_Space_Plot_2D")
         else:
             py.show()
 
@@ -529,7 +528,7 @@ def Angle_Space_Plot(file_name, Option_Dictionary={}):
         ax.grid(False)
 
         if 'save_fig' in Option_Dictionary and Option_Dictionary['save_fig']:
-            Save_Figure(file_name, "Angle_Space_Plot_3D")
+            File_FUnctions.Save_Figure(file_name, "Angle_Space_Plot_3D")
         else:
             py.show()
 
@@ -768,6 +767,6 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
                        hspace=0.0)
 
     if 'save_fig' in Option_Dictionary:
-        Save_Figure(file_name, 'Spherical_Plot_Transform')
+        File_FUnctions.Save_Figure(file_name, 'Spherical_Plot_Transform')
     else:
         py.show()

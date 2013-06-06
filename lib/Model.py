@@ -9,26 +9,14 @@ import pynotify
 
 
 def Run(Input_Dictionary):
-    """ Create a generic write file, compile and run in C.
+    """
+    Simulation of the one component model using the paramaters
+    defined in Input_Dictionary
 
-    Keyword arguments must be passed as a dictionary
-    chi:float [degrees] -- angle between magnetic dipole and z axis
-    epsI:float []-- elastic deformation
-    epsA :float []-- magnetic deformation
-    omega0 :float [Hz]-- initial spin period
-    either
-        eta :float []-- Threshold for which to stop the simulation.
-             Simulation is initiated using omega**2.0 < eta*omega_0**2.0
-    or
-        t1:float [s] -- Time for which to run simulation for
+    A typical Input_Dictionary:
+    pulsar = {'epsI':'1.0e-9', 'epsA':"5.0e-11", 'omega0':"1.0e4",
+              'eta':"1.0e-4", 'error':"1e-14"}
 
-    Optional arguments
-    err : float[] -- Error argument to pass to the GCC compiler
-
-    For help with the GCC compiler see documentation at
-    http://www.gnu.org/software/gsl/manual/
-    html_node/Ordinary-Differential-Equations.html
-    The generic script is written by Write_File in File_Functions
     """
 
     #  Required paramaters

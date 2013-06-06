@@ -22,3 +22,7 @@ Biaxial case.
 
 1. URGENT: Dotted variables works only the biaxial case, this needs updating
  before we can progress
+
+## Plot.py
+
+1. Sort out raw_code function (in terminal front end)

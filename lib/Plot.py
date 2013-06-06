@@ -21,6 +21,21 @@ from Physics_Functions import Beta_Function  # ?
 #    print "Saving figure as %s" % plot_file_name
 
 
+def Additional_Code(Option_Dictionary):
+    """
+    Allows the user to 'append' python code in to Plot.py for example to change
+    the xlim of a plot without changing the source code.
+
+
+    """
+    try:
+        raw_str_code = Option_Dictionary['raw']
+        exec raw_str_code
+    except SyntaxError:
+        print
+        " SyntaxError: "
+
+
 def Defaults():
     """ Default plotting options """
     # Set the default font for all plots
@@ -84,6 +99,8 @@ def Simple_Plot(file_name, Option_Dictionary={}):
     py.xlim(tmin, tmax)
 
     py.xlabel(r"$t$")
+
+    Additional_Code(Option_Dictionary)
 
     py.show()
 

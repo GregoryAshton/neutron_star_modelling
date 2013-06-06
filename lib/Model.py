@@ -2,6 +2,7 @@
 
 import os
 import nsmod_cython
+import nsmod_one_component_model
 import nsmod_two_component_model
 import nsmod_two_component_model2
 import pynotify
@@ -34,7 +35,6 @@ def Run(Input_Dictionary):
 
     file_name_list = []
 
-    # Check anomalous torque
     if Input_Dictionary.get('no_anom'):
         file_name_list .append("no_anom_")
         anom_torque = False
@@ -48,12 +48,22 @@ def Run(Input_Dictionary):
         print " ERROR: You need to specify chi in the input dictionary"
         return
 
+    # Triaxial test
     try:
-        epsI = str(Input_Dictionary['epsI'])
-        file_name_list.append("_epsI_" + str(Input_Dictionary['epsI']))
+        epsI1 = str(Input_Dictionary['epsI1'])
+        epsI3 = str(Input_Dictionary['epsI3'])
+        file_name_list.append("_epsI1_{}".format(Input_Dictionary['epsI1']))
+        file_name_list.append("_epsI3_{}".format(Input_Dictionary['epsI3']))
     except KeyError:
-        print " ERROR: You need to specify epsI in the input dictionary"
-        return
+        # If not trixial test for biaxial
+        try:
+            epsI1 = str(Input_Dictionary['epsI'])
+            epsI3 = "0"
+            file_name_list.append("_epsI_{}".format(Input_Dictionary['epsI']))
+        except KeyError:
+            print (" ERROR: You need to specify epsI1 and epsI2,"
+                  " or epsI (Biaxial case) in the input dictionary")
+            return
 
     try:
         epsA = str(Input_Dictionary['epsA'])
@@ -104,11 +114,13 @@ def Run(Input_Dictionary):
     if file_name in os.listdir("."):
         os.remove(file_name)
 
-    nsmod_cython.main(chi_degrees=float(chi_degrees),
+    nsmod_one_component_model.main(
+                      chi_degrees=float(chi_degrees),
                       file_name=file_name,
                       n=n,
                       epsA=float(epsA),
-                      epsI=float(epsI),
+                      epsI1=float(epsI1),
+                      epsI3=float(epsI3),
                       omega0=float(omega0),
                       t1=float(t1),
                       anom_torque=anom_torque,
@@ -233,14 +245,16 @@ def Run_Cython_Two_Component(Input_Dictionary):
         file_name_list.append("_aw_int_" + str(Input_Dictionary['aw_int']))
     except KeyError:
         aw_int = "50.0"
-        print "ERROR: aw_int not specified using default aw_int={}".format(aw_int)
+        print ("ERROR: aw_int not specified"
+              " using default aw_int={}".format(aw_int))
 
     try:
         aW_int = str(Input_Dictionary['aW_int'])
         file_name_list.append("_aW_int_" + str(Input_Dictionary['aW_int']))
     except KeyError:
         aW_int = "50.0"
-        print "ERROR: aW_int not specified using default aW_int={}".format(aw_int)
+        print ("ERROR: aW_int not specified"
+              " using default aW_int={}".format(aw_int))
 
 #   Additional Arguments
     try:
@@ -291,6 +305,7 @@ def Run_Cython_Two_Component(Input_Dictionary):
 
     n.show()
     return file_name
+
 
 def Run_Cython_Two_Component2(Input_Dictionary):
     """ Function to run the two component model.
@@ -381,9 +396,12 @@ def Run_Cython_Two_Component2(Input_Dictionary):
 
     # Ugly hack
     core_int_str = Input_Dictionary['core_int']
-    core_int = [float(p) for p in core_int_str.lstrip("[").rstrip("]").split(",")]
+    core_int = [float(p) for p in
+        core_int_str.lstrip("[").rstrip("]").split(",")]
+
     shell_int_str = Input_Dictionary['shell_int']
-    shell_int = [float(p) for p in shell_int_str.lstrip("[").rstrip("]").split(",")]
+    shell_int = [float(p) for p in
+        shell_int_str.lstrip("[").rstrip("]").split(",")]
 
 #   Additional Arguments
     try:

@@ -49,11 +49,9 @@ def Simple_Plot(file_name, Option_Dictionary={}):
 
     # Import the data
     #(time,x,y,z) = File_Functions.Import_Data(file_name,max_n)
-    f = File_Functions.Read_File(file_name)
-    time = f['time'].value
-    x = f['time'].value
-    y = f['time'].value
-    z = f['time'].value
+
+    (time, x, y, z) = \
+            File_Functions.One_Component_Import(file_name)
 
     # Handle any additional options which are in the dictionary
     if 'tmax' in Option_Dictionary:
@@ -109,10 +107,7 @@ def Spherical_Plot(file_name, Option_Dictionary={}):
 
     (time, omega_x, omega_y, omega_z) = \
             File_Functions.One_Component_Import(file_name)
-    #time = f['time'].value
-    #omega_x = f['time'].value
-    #omega_y = f['time'].value
-    #omega_z = f['time'].value
+
 
     if 'tmax' in Option_Dictionary:
         tmax = Option_Dictionary['tmax']
@@ -167,7 +162,7 @@ def Spherical_Plot(file_name, Option_Dictionary={}):
     ax3.yaxis.set_label_coords(labelx, 0.5)
     ax3.set_xlabel(r"time  [$1\times 10^{{0}}$ s]".format(str(scale_val)))
     ax3.set_xlim(tmin * pow(10, -scale_val), tmax * pow(10, -scale_val))
-    if 'end_val' in Option_Dictionary.has_key:
+    if 'end_val' in Option_Dictionary:
         print " Data on the end value of the spherical components of omega"
         omega_end = omega[-100:-1]
         print ("Average of |omega|: {0} s^-1 \n Range of omega : {1}"

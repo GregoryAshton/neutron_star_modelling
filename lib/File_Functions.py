@@ -39,11 +39,6 @@ def Parameter_Dictionary(user_input):
         else:
             p_d["no_anom"] = False
 
-        if "TRIAXIAL" in f:
-            f = f.lstrip("TRIAXIAL_")
-            p_d["TRIAXIAL"] = True
-        else:
-            p_d["TRIAXIAL"] = False
 
         # Import the rest of the parameters
         f = f.split("_")
@@ -58,8 +53,10 @@ def Parameter_Dictionary(user_input):
     R = 1e6
     I0 = 1e45
     # Compute a couple of often used variabes
+
+    # Biaxial case
+    epsI = max(abs(float(p_d["epsI3"])),abs(float(p_d["epsI1"])))
     omega0 = float(p_d["omega0"])
-    epsI = float(p_d["epsI"])
     epsA = float(p_d["epsA"])
     p_d["tauP"] = str(pow(omega0 * epsI, -1))
     p_d["tauA"] = str(pow(omega0 * epsA, -1))

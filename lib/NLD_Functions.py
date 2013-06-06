@@ -231,6 +231,118 @@ def Correlation_Sum(file_name, Option_Dictionary={}, verbose=False):
     else:
         py.show()
 
+# Theiler window
+def Correlation_Sum_W(file_name, Option_Dictionary={}, verbose=False):
+    """ Plots the correlation sum of the input file """
+
+    (time, omega_dot, a_dot, phi_dot) = Dotted_Variable(file_name)
+    N = len(time)
+    w = 100  # Theiler window number
+
+    # If required reduce the data size
+    if "ith" in Option_Dictionary:
+        ith = int(Option_Dictionary['ith'])
+        time = time[0:N:ith]
+        omega_dot = omega_dot[0:N:ith]
+        a_dot = a_dot[0:N:ith]
+        phi_dot = phi_dot[0:N:ith]
+        N = len(time)  # length of data after reduction
+
+    # Second and third options arguments specify the natural exponents
+    # with which R the sphere radius should vary
+    try:
+        R_min = float(Option_Dictionary['R_min'])
+        R_max = float(Option_Dictionary['R_max'])
+        Number = int(Option_Dictionary['Number'])
+    except KeyError:
+        print ("You must specify R_min,R_max "
+               " and Number in the Option_Dictionary")
+        return
+
+    R_list = py.logspace(R_min, R_max, Number)
+
+    def abs_val(x1, y1, z1, x2, y2, z2):
+        return py.sqrt((x1 - x2) ** 2.0 + (y1 - y2) ** 2.0 + (z1 - z2) ** 2.0)
+
+    # Calculate C(R) for each R and record natural log of both.
+    lnC_list = []
+    lnR_list = []
+    lnC_outsiders_list = []
+    lnR_outsiders_list = []
+
+    for R in R_list:
+        sumV = 0.0
+        for i in range(N):
+            for j in range(i + 1 + w, N):
+                if R > abs_val(omega_dot[i], a_dot[i], phi_dot[i],
+                               omega_dot[j], a_dot[j], phi_dot[j]):
+                    sumV += 1.0
+        # Check there is a satisfactory number of points in the sum
+
+        if sumV == 0.0:
+            print ("No points in R={0} consider a larger R_min."
+                  "Ignoring this point".format(R))
+        else:
+            C = 2.0 * sumV / ((float(N) - w) * (float(N) - w - 1.0))
+
+            # Test lower bound
+            if C < 10.0 / float(N):
+                print ("Only {0} points in R={1}  consider a larger Rmin."
+                       " This data will not be used in calculating"
+                       " the best fit".format(sumV, R))
+
+                # Add outsider to seperate lists
+                lnC_outsiders_list.append(py.log(C))
+                lnR_outsiders_list.append(py.log(R))
+
+            # Test upper bound
+            elif C > 0.1:
+                print ("More than 10 percent of all points in the test sphere "
+                       "of radius {}, this data will not be used "
+                       "in calculating"" the best fit".format(R))
+
+                lnC_outsiders_list.append(py.log(C))
+                lnR_outsiders_list.append(py.log(R))
+
+            # Add data to list
+            else:
+                lnC_list.append(py.log(C))
+                lnR_list.append(py.log(R))
+                # Print some data for the user
+                if verbose:
+                    print ("Point added R ={} ln(R)={} C ={} ln(C)={} "
+                    " Sum_total = {}".format(R, py.log(R), C, py.log(C), sumV))
+    # Linear fit
+    (x_fit, y_fit, f_p) = Useful_Tools.Fit_Function(lnR_list, lnC_list, 1)
+
+    # Plot
+    fig = py.figure()
+    ax = fig.add_subplot(111)
+    ax.plot(x_fit, y_fit,
+            color="b", label=("$\ln(c)={0} \ln(R)={1}$"
+                        .format(str(round(f_p[0], 2)), str(round(f_p[1], 2)))))
+    ax.plot(lnR_list, lnC_list,
+            "o", color="r", label="Data used in fit")
+    ax.plot(lnR_outsiders_list, lnC_outsiders_list,
+            "x", color="r", label="Data not used in fit")
+
+    # Give upper and lower bounds on C(R)
+    ax.axhline(py.log(0.1), ls="--", color="k", alpha=0.6)
+    ax.axhline(py.log(10.0 / float(N)),
+        ls="--", color="k", label="Bounds on $\ln(C(R))$", alpha=0.6)
+
+    leg = py.legend(loc=2, fancybox=True)
+    leg.get_frame().set_alpha(0.6)
+    ax.set_ylabel(r"$\ln(C)$")
+    ax.set_xlabel(r"$\ln(R)$")
+
+    #py.title(r"Correlation plot for $\chi = $"+file_name.split("_")[4])
+
+    if 'save_fig' in Option_Dictionary:
+        File_Functions.Save_Figure(file_name, "Correlation_Plot")
+    else:
+        py.show()
+
 
 def Dotted_Variable(file_name):
     """

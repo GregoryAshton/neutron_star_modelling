@@ -32,8 +32,13 @@ def Additional_Code(Option_Dictionary):
         raw_str_code = Option_Dictionary['raw']
         exec raw_str_code
     except SyntaxError:
-        print
-        " SyntaxError: "
+        print (" SyntaxError: Something is wrong with how you"
+               "provided the raw code, I recived \n {}".format(raw_str_code)
+              )
+    except KeyError:
+        # No additional code
+        pass
+
 
 
 def Defaults():
@@ -191,6 +196,9 @@ def Spherical_Plot(file_name, Option_Dictionary={}):
             .format(py.average(phi_end), max(phi_end) - min(phi_end)))
 
     py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12, hspace=0.0)
+
+    Additional_Code(Option_Dictionary)
+
     if 'save_fig' in Option_Dictionary and Option_Dictionary['save_fig']:
         File_Functions.Save_Figure(file_name, "Spherical_Plot")
     else:
@@ -243,6 +251,8 @@ def Alpha_Plot(file_name, Option_Dictionary={}):
     ax1.plot(t_scaled, alpha, lw=2)
     ax1.set_ylabel(r"$\alpha$ [deg]", rotation="vertical")
     ax1.set_xlabel(r"time  [$1\times 10^{{0}}$ s]".format(str(scale_val)))
+
+    Additional_Code(Option_Dictionary)
 
     if 'save_fig' in Option_Dictionary and Option_Dictionary['save_fig']:
         File_FUnctions.Save_Figure(file_name, "Alpha")
@@ -351,6 +361,8 @@ def ThreeD_Plot_Cartesian(file_name, Option_Dictionary={}):
     ax.set_xticklabels([])
     ax.set_yticklabels([])
     ax.set_zticklabels([])
+
+    Additional_Code(Option_Dictionary)
 
     if 'save_fig' in Option_Dictionary and Option_Dictionary['save_fig']:
         File_FUnctions.Save_Figure(file_name, "ThreeD_Plot_Cartesian")
@@ -544,6 +556,8 @@ def Angle_Space_Plot(file_name, Option_Dictionary={}):
 
         ax.grid(False)
 
+        Additional_Code(Option_Dictionary)
+
         if 'save_fig' in Option_Dictionary and Option_Dictionary['save_fig']:
             File_FUnctions.Save_Figure(file_name, "Angle_Space_Plot_3D")
         else:
@@ -591,6 +605,9 @@ def Simple_Plot_Transform(file_name, Option_Dictionary={}):
     py.xlabel(r"$t$", fontsize=20)
     py.ylabel("$\omega_{z}' $", fontsize=20, rotation="horizontal")
     py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12, hspace=0.0)
+
+    Additional_Code(Option_Dictionary)
+
     py.show()
 
 
@@ -782,6 +799,8 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
 
     py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12,
                        hspace=0.0)
+
+    Additional_Code(Option_Dictionary)
 
     if 'save_fig' in Option_Dictionary:
         File_FUnctions.Save_Figure(file_name, 'Spherical_Plot_Transform')

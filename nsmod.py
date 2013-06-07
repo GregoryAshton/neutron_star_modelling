@@ -27,20 +27,18 @@ def Create_Dictionary(opts):
 
     """
 
-    #Option_Dictionary = {}
+    Option_Dictionary = {}
 
-    #
+    # Check first for the raw_code as this will break the "," break
 
-    #for item in opts.split(","):
-        #if ":" in item:
-            #key = item.split(":")[0].replace(" ", "")
-            #val = item.split(":")[1].replace("/",",")
-            #Option_Dictionary[key] = val
-    #else:
-        #Option_Dictionary[item] = 'True'
+    for item in opts.split(" "):
+        if ":" in item:
+            key = item.split(":")[0]
+            val = item.split(":")[1]
+            Option_Dictionary[key] = val
+    else:
+        Option_Dictionary[item] = 'True'
 
-    opts.lstrip("{").rstrip("}")  # Ensure we have only one set
-    ast.literal_eval(format(opts))
     return Option_Dictionary
 
 
@@ -82,7 +80,9 @@ def parse_command_line(argvs):
                         help=NLD_Functions.Parameter_Space_Plot.__doc__)
 
     # Additional arguments are passed to opts
-    parser.add_argument("-o", "--options")
+    parser.add_argument("-o", "--options",
+                        help="Pass options as key:val with deliminating space"
+                        )
 
     # Set the verbose/quite option
     parser.add_argument("-v", action="store_true",

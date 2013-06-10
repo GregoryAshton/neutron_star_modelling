@@ -231,6 +231,7 @@ def Correlation_Sum(file_name, Option_Dictionary={}, verbose=False):
     else:
         py.show()
 
+
 # Theiler window
 def Correlation_Sum_W(file_name, Option_Dictionary={}, verbose=False):
     """ Plots the correlation sum of the input file """
@@ -365,7 +366,8 @@ def Dotted_Variable(file_name):
     Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
     epsI = float(Parameter_Dictionary["epsI"])
     epsA = float(Parameter_Dictionary["epsA"])
-    chi = float(Parameter_Dictionary["chi"]) * py.pi / 180  # radians
+    # Careful with chi
+    chi = float(Parameter_Dictionary["chi"])  #* py.pi / 180  # radians
 
     # Calculate some constants
     epsI_prime = epsI / (1 + epsI)
@@ -470,3 +472,107 @@ def Dotted_Variable_Triaxial_Cartesian(file_name):
         w3_dot.append(w3_d)
 
     return (time, w1_dot, w2_dot, w3_dot)
+
+
+def Torque_over_Io(omega, epsA, chi, anom_torque=True, c=3e10, R=1e6):
+    """ Returns the Goldreich torque for omega=[w1,w2,w3]"""
+
+    # Check that chi is coming in radians
+    if chi > 2 * py.pi:
+        print " Check that chi is imported as radians and not degrees"
+
+    m = [sin(chi), 0.0, cos(chi)]
+    omega_squared = sum(pow(w, 2) for w in omega)
+
+    T1 = (2 * R * pow(3 * c, -1) * epsA * omega_squared *
+                        py.cross(py.cross(omega, m), m))
+
+    T2 = epsA * py.dot(omega, m) * py.cross(omega, m)
+
+    if anom_torque:
+        return T1 + T2
+    else:
+        return T1
+
+
+def Dotted_Variable_Triaxial(file_name, anom_torque=False):
+    """
+
+    Function takes the file, imports it and produces omega in the assuming
+    a triaxial moment of inertia tensor
+
+    """
+
+    (time, x, y, z) = File_Functions.One_Component_Import(file_name)
+
+    # Import data from params
+    Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
+    epsI1 = float(Parameter_Dictionary["epsI1"])
+    epsI3 = float(Parameter_Dictionary["epsI3"])
+    epsA = float(Parameter_Dictionary["epsA"])
+    chi = float(Parameter_Dictionary["chi"]) * py.pi / 180.0
+
+    # Calculate the differentials from Goldreich equations
+    omega_dot = []
+
+    # Note that the torque is T/Io in all of the following
+    for i in xrange(len(time)):
+        omega_vec = [x[i], y[i], z[i]]
+        T = Torque_over_Io(omega_vec, epsA, chi, anom_torque=anom_torque)
+        a = py.dot(T, omega_vec)
+        b = epsI1 * omega_vec[0] * T[0] * pow(1 + epsI1, -1)
+        c = epsI3 * omega_vec[2] * T[2] * pow(1 + epsI3, -1)
+        d = (omega_vec[0] * omega_vec[1] * omega_vec[2] *
+                                            (epsI1 * epsI3 * (epsI3 - epsI1)
+                                           / ((1 + epsI1) * (1 + epsI3))))
+        omega_dot.append(pow(py.norm(omega_vec), -1) * (
+                             a - b - c + d))
+
+    return (time, omega_dot)
+
+
+def Embed(time, x, n, d):
+    """
+
+    Takes 1d signal x and produces a d-dimensional embedding calculating
+    the delay integer to be
+
+    the first minimum in something
+
+    the root of something else
+
+    """
+
+    # Calculate the time delay
+    # Subtract time average of the series
+    xo = x - py.mean(x)
+
+    # dt is fixed by x intervales, looks at n multiples
+    ro = []
+    var = (py.var(xo))
+    for i in xrange(n):
+        p = [xo[j] * xo[j + i] for j in xrange(len(xo) - i)]
+        ro.append(py.mean(p) / var)
+
+    # Find first minimum
+    for i in xrange(1, n):
+        if ro[i] > ro[i - 1]:
+            delay_index = i - 1
+            break
+
+    ax1 = py.subplot(121)
+    one_dt = time[1] - time[0]  # Assume linear spacing
+    dt = py.linspace(0, n * one_dt, n)
+    ax1.axvline(dt[delay_index], label="\tau")
+    ax1.plot(dt, ro)
+    ax1.set_xlabel(r"$\Delta t$")
+    ax1.set_ylabel(r"$\rho $")
+
+    ax2 = py.subplot(122, projection="3d")
+    x_0 = x[0: - 2 * delay_index]
+    x_1 = x[delay_index:-delay_index]
+    x_2 = x[2 * delay_index:]
+    ax2.plot(x_0, x_1, x_2)
+    ax2.set_xlabel(r"$x(t)$")
+    ax2.set_ylabel(r"$x(t+\tau)$")
+    ax2.set_zlabel(r"$x(t+2\tau)$")

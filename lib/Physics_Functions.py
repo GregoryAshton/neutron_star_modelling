@@ -86,6 +86,7 @@ def Fix_Phi(phi, epsilon=170.0, Angle_Type="Degrees"):
 
 
 def Beta_Function(epsI, epsA, chi):
+    """ Returns beta the rotation of the effective MOI tensor """
     if chi > 2 * pi:
         print "Assuming chi has been given in degrees rather than radians"
         chi = chi * pi / 180
@@ -94,4 +95,12 @@ def Beta_Function(epsI, epsA, chi):
     beta = (py.arctan((epsI - epsA * py.cos(2 * chi) - py.sqrt(a)) /
                         (2 * epsA * py.sin(chi) * py.cos(chi))))
     return beta
+
+
+def Inertial_Frame(x,y,z):
+    """
+
+    Transformation from rotating coordinate system x,y,z to inertial frame
+
+    """
 

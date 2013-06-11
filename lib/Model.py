@@ -45,8 +45,8 @@ def Run(Input_Dictionary):
     except KeyError:
         # If not trixial test for biaxial
         try:
-            epsI1 = str(Input_Dictionary['epsI'])
-            epsI3 = "0"
+            epsI1 = "0"
+            epsI3 = str(Input_Dictionary['epsI'])
             file_name_list.append("_epsI_{}".format(Input_Dictionary['epsI']))
         except KeyError:
             print (" ERROR: You need to specify epsI1 and epsI2,"

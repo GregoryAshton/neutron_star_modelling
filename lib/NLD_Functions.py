@@ -482,7 +482,7 @@ def Torque_over_Io(omega, epsA, chi, anom_torque=True, c=3e10, R=1e6):
         print " Check that chi is imported as radians and not degrees"
 
     m = [sin(chi), 0.0, cos(chi)]
-    omega_squared = sum(pow(w, 2) for w in omega)
+    omega_squared = sum([pow(w, 2) for w in omega])
 
     T1 = (2 * R * pow(3 * c, -1) * epsA * omega_squared *
                         py.cross(py.cross(omega, m), m))
@@ -576,3 +576,117 @@ def Embed(time, x, n, d):
     ax2.set_xlabel(r"$x(t)$")
     ax2.set_ylabel(r"$x(t+\tau)$")
     ax2.set_zlabel(r"$x(t+2\tau)$")
+
+
+def Embed_Seymour_Lorimer(x, time, n=500, d=3, frac=8):
+    """
+
+    Takes 1d signal x and produces a d-dimensional embedding calculating
+    the delay integer to be:
+
+    the root of the polynomial given by the autocorrelation coefficients
+    of rho (equation 8 in Seymour and Lorimer)
+
+    Paramaters:
+    -----------
+    x : list
+        1D signal to embed
+    time : list
+         List of times at which x is sampled or the sampling time
+    n : int
+        Specifies the number of delay times to search over, largest delay is
+        given by n*dt
+    d : int
+        Dimension to embed in, for now it is assumed to be 3
+    frac: int
+        The fraction of data between 0 and the first minimum to be used in
+        fitting a polynomial
+    """
+
+    # Generate list of dt delay times to look at the sample, the minimum dt is
+    # the sampling period
+    dt = time[1] - time[0]  # Uniform sampling assumed
+    dt_list = py.linspace(0, n * dt, n)
+
+    # Calculate the time delay
+
+    # Subtract time average of the series
+    xo = x - py.mean(x)
+
+    # Calculate rho for each multiple of dt up to n*dt
+    rho = []
+    var = py.var(xo)
+    for i in xrange(n):
+        p = [xo[j] * xo[j + i] for j in xrange(len(xo) - i)]
+        rho.append(py.mean(p) / var)
+
+    # Find first minimum
+    first_minimum_index = 0
+    for i in xrange(1, n):
+        if rho[i] > rho[i - 1]:
+            first_minimum_index = i - 1
+            break
+
+    if first_minimum_index is 0:
+        print ("ERROR: n was not large enough to find the first minimum,"
+               "or there isn't one")
+        return
+
+    # Fit polynomical between 0 and first_minimum_index/2
+    fit_upper_index = first_minimum_index / frac
+    mat = py.polyfit(dt_list[:fit_upper_index], rho[:fit_upper_index], 2)
+
+    # Find the closest value in dt_list to the positive root of the polynomial
+    (root_index, val) = min(enumerate(dt_list),
+                      key=lambda x: abs(x[1] - max(py.roots(mat))))
+
+    # Take the delay time tau to be half the root of the polynomial
+    delay_index = root_index / 2
+    tau = dt_list[delay_index]
+
+    # Plots
+    fig = py.figure(figsize=(8, 8))
+    ax1 = fig.add_subplot(211)
+
+    # Plot the data used in fitting
+    ax1.plot(dt_list[:fit_upper_index], rho[:fit_upper_index],
+                         "-b", lw=3, label="Data used in fit")
+
+    # Plot the full polynomial
+    t_fit = py.linspace(- dt_list[first_minimum_index],
+                        dt_list[first_minimum_index], 1000)
+    y_fit = [mat[0] * pow(t, 2) + mat[1] * t + mat[2] for t in t_fit]
+    ax1.plot(t_fit, y_fit, "--r", label="Fitted polynomial")
+
+    # Plot rho
+    ax1.plot(dt_list, rho, label=r"$\rho$")
+
+    # Plot options
+    ax1.set_xlabel(r"$\Delta t$")
+    ax1.set_ylabel(r"")
+    ax1.axhline(0, ls="-", color="k", lw=0.5)
+    ax1.axvline(0, ls="-", color="k", lw=0.5)
+    ax1.set_ylim(1.2 * min(- min(rho), min(rho)), 1.2 * max(rho))
+    py.legend(frameon=False)
+
+    # Embedding
+    ax2 = fig.add_subplot(212, projection="3d")
+
+    x_0 = x[0: - 2 * delay_index]
+    x_1 = x[delay_index: - delay_index]
+    x_2 = x[2 * delay_index:]
+
+    ax2.plot(x_0, x_1, x_2, ls="-", color="b", lw=0.5)
+
+    label_size = 15
+    ax2.set_xlabel(r"$x(t)$", size=label_size)
+    ax2.set_ylabel(r"$x(t+\tau)$", size=label_size)
+    ax2.set_zlabel(r"$x(t+2\tau)$", size=label_size)
+
+    ax2.set_xticklabels([])
+    ax2.set_yticklabels([])
+    ax2.set_zticklabels([])
+
+    py.show()
+
+    return tau

@@ -56,8 +56,19 @@ def Parameter_Dictionary(user_input):
     I0 = 1e45
     # Compute a couple of often used variabes
 
-    # Note these values only make sense in the Biaxial case
-    epsI = max(abs(float(p_d["epsI3"])), abs(float(p_d["epsI1"])))
+    # Test Biaxiality, note that the tauP does not make sense in the triaxial
+    # case, need to update this at some point
+    try:
+        epsI3 = float(p_d["epsI3"])
+        epsI1 = float(p_d["epsI1"])
+        epsI = max(abs(epsI3), abs(epsI1))
+    except KeyError:
+        try:
+            epsI = float(p_d["epsI"])
+        except KeyError:
+            print " ERROR: No epsI specified"
+            return
+
     omega0 = float(p_d["omega0"])
     epsA = float(p_d["epsA"])
     p_d["tauP"] = str(pow(omega0 * epsI, -1))

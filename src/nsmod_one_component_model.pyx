@@ -16,149 +16,106 @@ the home directory.
 
 """
 
-from cython_gsl cimport *
+import numpy as np
 import math
-import numnp as np
+from cython_gsl cimport *
 import h5py
 
-# Need to add in anom_torque
+ctypedef struct vector:
+    double one
+    double two
+    double three
 
-cdef Torque_over_Io(double y[], void *params):
-    """ Returns the Goldreich torque for omega=[w1,w2,w3]"""
+cdef double Torque_over_Io (double w[], void *params) nogil:
+    """ Returns the Goldreich torque
 
-    cdef double chi, epsA, anom_torque, R, c, mx, my, mz, wx, wy, wz
+    Note: it is important that chi is given in radians and not degrees,
+    this is not checked.
 
-    R = 1e6
-    c = 3e10
+    """
+
+    cdef double chi, epsA, anom_torque, pre, mx, mz, T_o_I[3]
 
     epsA = (<double *> params)[0]
     chi = (<double *> params)[1]
     anom_torque = (<double *> params)[4]
 
-    # Check that chi is coming in radians
-    if chi > 2 * np.pi:
-        print " Check that chi is imported as radians and not degrees"
-
-    wx = y[0]
-    wy = y[1]
-    wz = y[2]
-
     mx = sin(chi)
-    my = 0.0
     mz = cos(chi)
 
-    omega_squared = sum([pow(w, 2) for w in omega])
+    pre =  ( pow(w[0],2) + pow(w[1],2) + pow(w[2],2) ) * 2.0 * pow(10,6) * pow(9.0 * pow(10,10),-1)
 
-    T1 = (2 * R * pow(3 * c, -1) * epsA * omega_squared *
-                        np.cross(np.cross(omega, m_vec), m_vec))
-
-    T2 = epsA * np.dot(omega, m_vec) * np.cross(omega, m_vec)
-
-    if anom_torque == 1:
-        return T1 + T2
-    elif anom_torque == 0:
-        return T1
-
-#def Torque_over_Io(wx, wy, wz, epsA, chi, anom_torque):
-    #""" Returns the Goldreich torque for omega=[w1,w2,w3]"""
-
-    #R = 1e6
-    #c = 3e10
-
-    ## Check that chi is coming in radians
-    #if chi > 2 * np.pi:
-        #print " Check that chi is imported as radians and not degrees"
-
-    ##cdef double  T1[3], T2[3], omega_squared
-
-    #m_vec = [sin(chi), 0.0, cos(chi)]
-    #omega_squared = pow(wx, 2) + pow(wy, 2) + pow(wz, 2)
-    #omega = [wx, wy, wz]
-
-    #T1 = (2 * R * pow(3 * c, -1) * epsA * omega_squared *
-                        #np.cross(np.cross(omega, m_vec), m_vec))
-
-    #T2 = epsA * np.dot(omega, m_vec) * np.cross(omega, m_vec)
+    Tx_sd = pre * epsA * mz * (w[2] * mx - w[0] * mz)
+    Ty_sd = -pre * epsA * w[2]
+    Tz_sd = pre * epsA * mx * (w[0] * mz - w[2] * mx)
 
     #if anom_torque == 1:
-        #return T1 + T2
-    #elif anom_torque == 0:
-        #return T1
+    Tx_an = epsA * (w[0] * mx + w[2] * mz) * w[1] * mz
+    Ty_an = epsA * (w[0] * mx + w[2] * mz) * (w[2] * mx - w[0] * mz)
+    Tz_an = -epsA * (w[0] * mx + w[2] * mz) * w[1] * mx
 
-#cdef int funcs (double t, double y[], double f[], void *params) nogil:
-    #""" Function defining the ODEs with the anomalous torque """
-    ## Define the variables used in the calculation
-    #cdef double wx,wy,wz,w_2,epsI1,epsI3,epsA,chi
-    ## Import the three time dependant variables from y[]
-    #wx = y[0]
-    #wy = y[1]
-    #wz = y[2]
+    #T_o_I = {Tx_sd + Tx_an, Tx_sd + Tx_an, Tx_sd + Tx_an}
 
-    #omega = [wx, wy, wz]
-    ## Import the constant variables from params
-    #epsA = (<double *> params)[0]
-    #chi = (<double *> params)[1]
+    #T_o_I[1] = Ty_sd + Ty_an
+    #T_o_I[2] = Tz_sd + Tz_an
 
-    #epsI1 = (<double *> params)[2]
-    #epsI3 = (<double *> params)[3]
+    #else
 
-    #anom_torque = (<double *> params)[4]
+    #T_o_I[0] = Tx_sd
+    # T_o_I[1] = Ty_sd
+    #T_o_I[2] = Tz_sd
 
-    #T_o_I = Torque_over_Io(y, params)
+    return Tx_sd
 
 
-    ##  Define the three ODEs in f[] as functions of the above variables
-
-    #f[0] = (T_o_I[0] * pow(1+epsI1,-1)
-            #- wy * wz * epsI3 * pow(1 + epsI1, -1))
-
-    #f[1] = (T_o_I[1]
-            #- wx * wz * (epsI1 - epsI3))
-
-    #f[0] = (T_o_I[2] * pow(1+epsI3,-1)
-            #+ wx * wy * epsI1 * pow(1 + epsI3, -1))
-
-    #return GSL_SUCCESS
-
-cdef int funcs (double t, double y[], double f[], void *params) nogil:
+cdef int funcs (double t, double w[], double f[], void *params) nogil:
     """ Function defining the ODEs with the anomalous torque """
     # Define the variables used in the calculation
-    cdef double wx,wy,wz,w_2,epsI1,epsI3,epsA,chi
-    # Import the three time dependant variables from y[]
-    wx = y[0]
-    wy = y[1]
-    wz = y[2]
+    cdef double epsI1,epsI3
 
     # Import the constant variables from params
     epsA = (<double *> params)[0]
     chi = (<double *> params)[1]
-
     epsI1 = (<double *> params)[2]
     epsI3 = (<double *> params)[3]
-
     anom_torque = (<double *> params)[4]
 
+    # Calculate the torque
+    mx = sin(chi)
+    mz = cos(chi)
 
-    T_o_I = Torque_over_Io(wx, wy, wz, epsA, chi, anom_torque)
+    pre =  ( pow(w[0],2) + pow(w[1],2) + pow(w[2],2) ) * 2.0 * pow(10,6) * pow(9.0 * pow(10,10),-1)
+
+    Tx_sd = pre * epsA * mz * (w[2] * mx - w[0] * mz)
+    Ty_sd = -pre * epsA * w[2]
+    Tz_sd = pre * epsA * mx * (w[0] * mz - w[2] * mx)
+
+    if anom_torque == 1:
+        Tx = Tx_sd + epsA * (w[0] * mx + w[2] * mz) * w[1] * mz
+        Ty = Ty_sd + epsA * (w[0] * mx + w[2] * mz) * (w[2] * mx - w[0] * mz)
+        Tz = Tz_sd -epsA * (w[0] * mx + w[2] * mz) * w[1] * mx
+
+    else:
+        Tx = Tx_sd
+        Ty = Ty_sd
+        Tz = Tz_sd
 
 
     #  Define the three ODEs in f[] as functions of the above variables
 
-    f[0] = (T_o_I[0] * pow(1+epsI1,-1)
-            - wy * wz * epsI3 * pow(1 + epsI1, -1))
+    f[0] = Tx * pow(1 + epsI1,-1) - w[1] * w[2] * epsI3 * pow(1 + epsI1, -1)
 
-    f[1] = (T_o_I[1]
-            - wx * wz * (epsI1 - epsI3))
+    f[1] = Ty - w[0] * w[2] * (epsI1 - epsI3)
 
-    f[0] = (T_o_I[2] * pow(1+epsI3,-1)
-            + wx * wy * epsI1 * pow(1 + epsI3, -1))
+    f[2] = Tz * pow(1 + epsI3,-1) + w[0] * w[1] * epsI1 * pow(1 + epsI3, -1)
 
     return GSL_SUCCESS
+
 
 cdef int no_anom_torque (double t, double y[], double f[], void *params) nogil:
     """ Function defining the ODEs with the anomalous torque """
     # Define the variables used in the calculation
-    cdef double wx,wy,wz,w_2,epsI1,epsI3,epsA,chi,Lambda
+    cdef double wx,wy,wz,w_2,epsI,epsA,chi,Lambda
 
     # Import the three time dependant variables from y[]
     wx=y[0]
@@ -168,10 +125,9 @@ cdef int no_anom_torque (double t, double y[], double f[], void *params) nogil:
 
     # Import the constant variables from params
     Lambda = (<double *> params)[0]    #= 2R/3C */
-    epsA = (<double *> params)[1]
-    chi = (<double *> params)[2]
-    epsI1 = (<double *> params)[3]
-    epsI3 = (<double *> params)[4]
+    epsI= (<double *> params)[1]
+    epsA = (<double *> params)[2]
+    chi = (<double *> params)[3]
 
     # Calculate the angular parts of the three equations to avoid repeated calculation
     cdef double Cx,Sx
@@ -179,18 +135,17 @@ cdef int no_anom_torque (double t, double y[], double f[], void *params) nogil:
     Sx = sin(chi)
 
     #  Define the three ODEs in f[] as functions of the above variables
-    f[0] = epsA * (Lambda * w_2 * Cx * (wz * Sx - wx * Cx)) * pow(1 + epsI1, -1) - wy * wz * epsI3 * pow(1 +epsI1, -1)
+    f[0] = epsA*(Lambda*w_2*Cx*(wz*Sx-wx*Cx)) - wy*wz*epsI
 
-    f[1] = epsA * (- Lambda * w_2 * wy) - wx * wz * (epsI1 - epsI3)
+    f[1] = epsA*(-Lambda*w_2*wy) + wx*wz*epsI
 
-    f[2] = epsA * pow(1 + epsI3, -1) * (Lambda * w_2 * Sx * (wx * Cx - wz * Sx)) + wx * wy * epsI1 * pow(1 + epsI3, -1)
+    f[2] = epsA*pow(1+epsI,-1) * (Lambda*w_2*Sx*(wx*Cx - wz*Sx))
     return GSL_SUCCESS
 
 # Currently jac is unused by the ODE solver so is left empty
 cdef int jac (double t, double y[], double *dfdy, double dfdt[], void *params) nogil:
 
     return GSL_SUCCESS
-
 
 
 def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
@@ -220,25 +175,21 @@ def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
 
     # Initial values and calculate eta_relative
     cdef int i
-    cdef double t , y[3] ,h , eta_relative
+    cdef double t , w[3] ,h , eta_relative
     eta_relative = eta*pow(omega0,2)
     h = 1e-15   # Initial step size
     t = 0.0
-    y[0] = omega0*sin(a_int)
-    y[1] = 0.0
-    y[2] = omega0*cos(a_int)
-    print y[0],y[1],y[2]
+    w[0] = omega0*sin(a_int)
+    w[1] = 0.0
+    w[2] = omega0*cos(a_int)
 
     # Inititate the system and define the set of functions
     cdef gsl_odeiv2_system sys
 
-
     sys.function = funcs
-
     sys.jacobian = jac
     sys.dimension = 3
     sys.params = params
-
 
     # Setup the solver ~ Note not all of these cdefs are always used.
     # It seems cython won't accept a cdef inside an if statement.
@@ -269,42 +220,38 @@ def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
     w3=[]
 
     if n :
-
         # Run saving at discrete time values
-
         for i from 1 <= i <= n:
             ti = i * t1 / n
-            status = gsl_odeiv2_driver_apply (d, &t, ti, y)
+            status = gsl_odeiv2_driver_apply (d, &t, ti, w)
 
             if (status != GSL_SUCCESS):
                 print("error, return value=%d\n" % status)
                 break
 
             time.append(t)
-            w1.append(y[0])
-            w2.append(y[1])
-            w3.append(y[2])
+            w1.append(w[0])
+            w2.append(w[1])
+            w3.append(w[2])
 
         gsl_odeiv2_driver_free(d)
 
     else:
 
-        while (pow(y[0],2)+pow(y[1],2)+pow(y[2],2) > eta_relative and t < t1 ):
-            status = gsl_odeiv2_evolve_apply (e, c, s, &sys, &t, t1, &h, y)
+        while (pow(w[0],2)+pow(w[1],2)+pow(w[2],2) > eta_relative and t < t1 ):
+            status = gsl_odeiv2_evolve_apply (e, c, s, &sys, &t, t1, &h, w)
 
             if (status != GSL_SUCCESS):
                 break
 
             time.append(t)
-            w1.append(y[0])
-            w2.append(y[1])
-            w3.append(y[2])
+            w1.append(w[0])
+            w2.append(w[1])
+            w3.append(w[2])
 
         gsl_odeiv2_evolve_free (e)
         gsl_odeiv2_control_free (c)
         gsl_odeiv2_step_free (s)
-
-
 
     f = h5py.File(file_name,'w')
     f.create_dataset("time",data=time)
@@ -312,4 +259,3 @@ def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
     f.create_dataset("w2",data=w2)
     f.create_dataset("w3",data=w3)
     return file_name
-

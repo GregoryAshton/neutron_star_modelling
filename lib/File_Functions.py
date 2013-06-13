@@ -129,7 +129,6 @@ def Read_File(file_name):
         print "File type {} is ill-formed.".format(file_type)
         return
 
-    print os.getcwd() + "/" + file_name
     f = h5py.File(file_name, "r")
 
     return f

@@ -40,7 +40,6 @@ def Additional_Code(Option_Dictionary):
         pass
 
 
-
 def Defaults():
     """ Default plotting options """
     # Set the default font for all plots
@@ -50,9 +49,9 @@ def Defaults():
     rc('text', usetex=True)
 
     # Set the defaults for axis
-    py.rcParams['axes.color_cycle'] = ['k', 'r', 'cyan']
-    py.rcParams['font.size'] = 18
-    py.rcParams['axes.labelsize'] = 30
+    py.rcParams['axes.color_cycle'] = ['b', 'r', 'g']
+    py.rcParams['font.size'] = 15
+    py.rcParams['axes.labelsize'] = 20
     py.rcParams['lines.linewidth'] = 2
     py.rcParams['axes.grid'] = True
     py.rcParams['figure.figsize'] = (10.0, 8.0)

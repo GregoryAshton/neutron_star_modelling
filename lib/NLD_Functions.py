@@ -61,6 +61,7 @@ def Attractor_Plot(file_name, elev=15., azim=150., save_fig=False, close=False):
     ax.set_xlabel(r"$\dot{\omega}(t)$", size=15)
     ax.set_ylabel(r"$\dot{\omega}(t+\tau)$", size=15)
     ax.set_zlabel(r"$\dot{\omega}(t+2\tau)$", size=15)
+
     ax.set_xticks([])  # ax.get_xticks()[1:-2:3])   # Reduce the # of ticks
     ax.set_yticks([])
     ax.set_zticks([])
@@ -265,12 +266,12 @@ def Embed_Seymour_Lorimer(time, x, n=False, frac=8, plot=False):
     tau = dt_list[delay_index]
 
     if plot:
-        fig = py.figure(figsize=(8, 8))
-        ax1 = fig.add_subplot(211)
+        fig = py.figure(figsize=(12, 5))
+        ax1 = fig.add_subplot(121)
 
         # Plot the data used in fitting
         ax1.plot(dt_list[:fit_upper_index], rho[:fit_upper_index],
-                             "-b", lw=3, label="Data used in fit")
+                             "-b", lw=6, label="Data used in fit", alpha=0.5)
 
         # Plot the full polynomial
         t_fit = py.linspace(- dt_list[first_minimum_index],
@@ -279,7 +280,7 @@ def Embed_Seymour_Lorimer(time, x, n=False, frac=8, plot=False):
         ax1.plot(t_fit, y_fit, "--r", label="Fitted polynomial")
 
         # Plot rho
-        ax1.plot(dt_list, rho, label=r"$\rho$")
+        ax1.plot(dt_list, rho, color="k", label=r"$\rho$")
 
         # Plot options
         ax1.set_xlabel(r"$\Delta t$")
@@ -295,7 +296,7 @@ def Embed_Seymour_Lorimer(time, x, n=False, frac=8, plot=False):
     x_2 = x[2 * delay_index:]
 
     if plot:
-        ax2 = fig.add_subplot(212, projection="3d")
+        ax2 = fig.add_subplot(122, projection="3d")
         ax2.plot(x_0, x_1, x_2, ls="-", color="b", lw=0.5)
 
         label_size = 15
@@ -308,8 +309,8 @@ def Embed_Seymour_Lorimer(time, x, n=False, frac=8, plot=False):
         ax2.set_zticklabels([])
 
         py.show()
-    else:
-        return (x_0, x_1, x_2, tau)
+
+    return (x_0, x_1, x_2, tau)
 
 
 def Parameter_Space_Plot(file_name, Option_Dictionary={}, biaxial=False):

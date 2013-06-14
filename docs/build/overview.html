@@ -1,0 +1,157 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Overview &mdash; nsmod 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="nsmod 0.1 documentation" href="index.html" />
+    <link rel="next" title="Nonlinear dynamics" href="NLD_Functions.html" />
+    <link rel="prev" title="nsmod Documentation" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="NLD_Functions.html" title="Nonlinear dynamics"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="nsmod Documentation"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">nsmod 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="overview">
+<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+<p>nsmod is an attempt to bring a messy collection of code used in my PhD studies
+into a usable format, the primary aim being to remind me what does what. I am
+studying timing noise in neutron stars, <cite>nsmod</cite> contains code to:</p>
+<div class="section" id="model-a-neutron-star">
+<h2>Model a neutron star<a class="headerlink" href="#model-a-neutron-star" title="Permalink to this headline">¶</a></h2>
+<p>We provide <cite>nsmod.Model</cite> which collects together models including</p>
+<ul class="simple">
+<li>A simple elastic ellipsoid acted on by an electromagnetic torque</li>
+<li>A two component model which contains a spherical core that couples to the
+outer ellisoid (acted on by the EM torque)</li>
+</ul>
+<p>There will output files saved in the <cite>hdf5py</cite> format, this removes the need
+to define our own file structure.</p>
+<div class="section" id="plotting">
+<h3>Plotting<a class="headerlink" href="#plotting" title="Permalink to this headline">¶</a></h3>
+<p>The results of these models are often plotted in a similar manner, as such a
+collection of functions is available in the <cite>nsmod.Plot</cite> module</p>
+</div>
+</div>
+<div class="section" id="nonlinear-dynamics">
+<h2>Nonlinear dynamics<a class="headerlink" href="#nonlinear-dynamics" title="Permalink to this headline">¶</a></h2>
+<p>In the progress of the work an effort was made to understand the results from
+the models mentioned above in the context of chaos and attractors (see Duncan
+&amp; Lorimer 2010). We provide a module <cite>nsmod.NLD_Functions</cite> including the
+associated functions</p>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Overview</a><ul>
+<li><a class="reference internal" href="#model-a-neutron-star">Model a neutron star</a><ul>
+<li><a class="reference internal" href="#plotting">Plotting</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#nonlinear-dynamics">Nonlinear dynamics</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">nsmod Documentation</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="NLD_Functions.html"
+                        title="next chapter">Nonlinear dynamics</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/overview.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="NLD_Functions.html" title="Nonlinear dynamics"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="nsmod Documentation"
+             >previous</a> |</li>
+        <li><a href="index.html">nsmod 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Gregory Ashton.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

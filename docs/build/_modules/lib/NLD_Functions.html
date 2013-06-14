@@ -1,0 +1,910 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>lib.NLD_Functions &mdash; nsmod 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="nsmod 0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Module code" href="../index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">nsmod 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" accesskey="U">Module code</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <h1>Source code for lib.NLD_Functions</h1><div class="highlight"><pre>
+<span class="c">#!/usr/bin/python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">Contains the functions associated with Non-Linear dynamics</span>
+<span class="sd">such as Paramater space plot and Correlation dimension</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">pylab</span> <span class="kn">as</span> <span class="nn">py</span>
+<span class="kn">from</span> <span class="nn">pylab</span> <span class="kn">import</span> <span class="n">sin</span><span class="p">,</span> <span class="n">cos</span>
+<span class="kn">import</span> <span class="nn">Physics_Functions</span>
+<span class="kn">import</span> <span class="nn">File_Functions</span>
+<span class="kn">import</span> <span class="nn">Plot</span>
+<span class="kn">import</span> <span class="nn">Useful_Tools</span>
+
+<span class="c"># Import defaults for plotting</span>
+<span class="n">Plot</span><span class="o">.</span><span class="n">Defaults</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="Attractor_Plot"><a class="viewcode-back" href="../../NLD_Functions.html#lib.NLD_Functions.Attractor_Plot">[docs]</a><span class="k">def</span> <span class="nf">Attractor_Plot</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">elev</span><span class="o">=</span><span class="mf">15.</span><span class="p">,</span> <span class="n">azim</span><span class="o">=</span><span class="mf">150.</span><span class="p">,</span> <span class="n">save_fig</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">close</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Plots the attractor associated with the data in file_name, essentially the</span>
+<span class="sd">    same as `Embed_Seymour_Lorimer` but with additions. This function should be</span>
+<span class="sd">    used in creating publication images then we can change the embedding if</span>
+<span class="sd">    required.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    elev : float</span>
+<span class="sd">        View elevation</span>
+<span class="sd">    azim : float</span>
+<span class="sd">        View azimuth</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># Calculate \dot{|w|} as a function of time, this imports the data and</span>
+    <span class="c">#  makes use of `Torque_over_Io` defined below</span>
+
+    <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">omega_dot</span><span class="p">)</span> <span class="o">=</span> <span class="n">Dotted_Variable_Triaxial</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+
+    <span class="p">(</span><span class="n">x_0</span><span class="p">,</span> <span class="n">x_1</span><span class="p">,</span> <span class="n">x_2</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span> <span class="o">=</span> <span class="n">Embed_Seymour_Lorimer</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">omega_dot</span><span class="p">,</span>
+                                        <span class="n">n</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+                                        <span class="n">frac</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                                        <span class="n">plot</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="c"># Plot the data in 3d</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s">&#39;3d&#39;</span><span class="p">)</span>
+
+    <span class="c"># Set the view angle</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="n">elev</span><span class="p">,</span> <span class="n">azim</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_0</span><span class="p">,</span> <span class="n">x_1</span><span class="p">,</span> <span class="n">x_2</span><span class="p">,</span> <span class="s">&quot;-&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;b&quot;</span><span class="p">)</span>
+
+    <span class="c"># Plot the &#39;shadows&#39;</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_0</span><span class="p">,</span> <span class="n">x_1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">x_2</span><span class="p">),</span>
+        <span class="n">zdir</span><span class="o">=</span><span class="s">&#39;z&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;k&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+    <span class="c">#ax.plot(x_0, x_1, min(x_2),zdir=&#39;x&#39;, color=&quot;k&quot;, alpha=0.2, lw=0.8)</span>
+    <span class="c">#ax.plot(x_0, phi_dot,max(x_1), zdir=&#39;y&#39;, color=&quot;k&quot;, alpha=0.2, lw=0.8)</span>
+
+    <span class="c"># Plotting options, remove ticks and add labels</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">r&quot;$\dot{\omega}(t)$&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">r&quot;$\dot{\omega}(t+\tau)$&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s">r&quot;$\dot{\omega}(t+2\tau)$&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="mi">15</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>  <span class="c"># ax.get_xticks()[1:-2:3])   # Reduce the # of ticks</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_zticks</span><span class="p">([])</span>
+
+    <span class="k">if</span> <span class="n">save_fig</span><span class="p">:</span>
+        <span class="n">File_Functions</span><span class="o">.</span><span class="n">Save_Figure</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&quot;Attractor_Plot&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">py</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="c"># Additional plot may be made if required</span>
+    <span class="k">if</span> <span class="n">close</span><span class="p">:</span>
+        <span class="n">axis_label_list</span> <span class="o">=</span> <span class="p">[</span><span class="s">r&quot;$\dot{\omega}$&quot;</span><span class="p">,</span> <span class="s">r&quot;$\dot{a}$&quot;</span><span class="p">,</span> <span class="s">r&quot;$\dot{\phi}$&quot;</span><span class="p">]</span>
+        <span class="n">axis_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x_0</span><span class="p">,</span> <span class="n">x_1</span><span class="p">,</span> <span class="n">x_2</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span> <span class="o">=</span> <span class="n">close</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">print</span> <span class="p">(</span><span class="s">&quot;ERROR: close should be a tuple&quot;</span>
+                   <span class="s">&quot; (axis, xmin, max, ymin, ymax)&quot;</span>
+                   <span class="s">&quot;no plot will be produced&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="c"># Remove the axis</span>
+        <span class="n">axis_label_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">axis</span><span class="p">))</span>
+        <span class="n">axis_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">axis</span><span class="p">))</span>
+
+        <span class="n">fig2</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">ax2</span> <span class="o">=</span> <span class="n">fig2</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">axis_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis_list</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">xmin</span><span class="p">)</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">xmax</span><span class="p">)</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">ymin</span><span class="p">)</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">ymax</span><span class="p">)</span>
+
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">xmin</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmax</span><span class="p">))</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">ymin</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">ymax</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">print</span> <span class="p">(</span><span class="s">&quot;x and y lims are not properly defined&quot;</span>
+                    <span class="s">&quot;these should be floats. Using full range instead&quot;</span><span class="p">)</span>
+
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">axis_label_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">axis_label_list</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">save_fig</span><span class="p">:</span>
+            <span class="n">File_Functions</span><span class="o">.</span><span class="n">Save_Figure</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&quot;Attractor_Plot_close&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">py</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="Torque_over_Io"><a class="viewcode-back" href="../../NLD_Functions.html#lib.NLD_Functions.Torque_over_Io">[docs]</a><span class="k">def</span> <span class="nf">Torque_over_Io</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">epsA</span><span class="p">,</span> <span class="n">chi</span><span class="p">,</span> <span class="n">anom_torque</span><span class="o">=</span><span class="bp">True</span><span class="p">,</span> <span class="n">c</span><span class="o">=</span><span class="mf">3e10</span><span class="p">,</span> <span class="n">R</span><span class="o">=</span><span class="mf">1e6</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Returns the Goldreich torque for omega=[w1,w2,w3]&quot;&quot;&quot;</span>
+
+    <span class="c"># Check that chi is coming in radians</span>
+    <span class="k">if</span> <span class="n">chi</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">py</span><span class="o">.</span><span class="n">pi</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&quot; Check that chi is imported as radians and not degrees&quot;</span>
+
+    <span class="n">m</span> <span class="o">=</span> <span class="p">[</span><span class="n">sin</span><span class="p">(</span><span class="n">chi</span><span class="p">),</span> <span class="mf">0.0</span><span class="p">,</span> <span class="n">cos</span><span class="p">(</span><span class="n">chi</span><span class="p">)]</span>
+    <span class="n">omega_squared</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">([</span><span class="nb">pow</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">omega</span><span class="p">])</span>
+
+    <span class="n">T1</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">R</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="n">c</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">epsA</span> <span class="o">*</span> <span class="n">omega_squared</span> <span class="o">*</span>
+                        <span class="n">py</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">m</span><span class="p">),</span> <span class="n">m</span><span class="p">))</span>
+
+    <span class="n">T2</span> <span class="o">=</span> <span class="n">epsA</span> <span class="o">*</span> <span class="n">py</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span> <span class="o">*</span> <span class="n">py</span><span class="o">.</span><span class="n">cross</span><span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">m</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">anom_torque</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">T1</span> <span class="o">+</span> <span class="n">T2</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">T1</span>
+
+</div>
+<div class="viewcode-block" id="Dotted_Variable_Triaxial"><a class="viewcode-back" href="../../NLD_Functions.html#lib.NLD_Functions.Dotted_Variable_Triaxial">[docs]</a><span class="k">def</span> <span class="nf">Dotted_Variable_Triaxial</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">anom_torque</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Function takes the file, imports it and produces omega in the assuming</span>
+<span class="sd">    a triaxial moment of inertia tensor</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">=</span> <span class="n">File_Functions</span><span class="o">.</span><span class="n">One_Component_Import</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+
+    <span class="c"># Import data from params</span>
+    <span class="n">Parameter_Dictionary</span> <span class="o">=</span> <span class="n">File_Functions</span><span class="o">.</span><span class="n">Parameter_Dictionary</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="n">epsI1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Parameter_Dictionary</span><span class="p">[</span><span class="s">&quot;epsI1&quot;</span><span class="p">])</span>
+    <span class="n">epsI3</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Parameter_Dictionary</span><span class="p">[</span><span class="s">&quot;epsI3&quot;</span><span class="p">])</span>
+    <span class="n">epsA</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Parameter_Dictionary</span><span class="p">[</span><span class="s">&quot;epsA&quot;</span><span class="p">])</span>
+    <span class="n">chi</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Parameter_Dictionary</span><span class="p">[</span><span class="s">&quot;chi&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="n">py</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mf">180.0</span>
+
+    <span class="c"># Calculate the differentials from Goldreich equations</span>
+    <span class="n">omega_dot</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c"># Note that the torque is T/Io in all of the following</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">)):</span>
+        <span class="n">omega_vec</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">]]</span>
+        <span class="n">T</span> <span class="o">=</span> <span class="n">Torque_over_Io</span><span class="p">(</span><span class="n">omega_vec</span><span class="p">,</span> <span class="n">epsA</span><span class="p">,</span> <span class="n">chi</span><span class="p">,</span> <span class="n">anom_torque</span><span class="o">=</span><span class="n">anom_torque</span><span class="p">)</span>
+        <span class="n">a</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">T</span><span class="p">,</span> <span class="n">omega_vec</span><span class="p">)</span>
+        <span class="n">b</span> <span class="o">=</span> <span class="n">epsI1</span> <span class="o">*</span> <span class="n">omega_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">T</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">epsI1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">c</span> <span class="o">=</span> <span class="n">epsI3</span> <span class="o">*</span> <span class="n">omega_vec</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="n">T</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">epsI3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">d</span> <span class="o">=</span> <span class="p">(</span><span class="n">omega_vec</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">omega_vec</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">omega_vec</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">*</span>
+                                            <span class="p">(</span><span class="n">epsI1</span> <span class="o">*</span> <span class="n">epsI3</span> <span class="o">*</span> <span class="p">(</span><span class="n">epsI3</span> <span class="o">-</span> <span class="n">epsI1</span><span class="p">)</span>
+                                           <span class="o">/</span> <span class="p">((</span><span class="mi">1</span> <span class="o">+</span> <span class="n">epsI1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">epsI3</span><span class="p">))))</span>
+        <span class="n">omega_dot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">omega_vec</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span>
+                             <span class="n">a</span> <span class="o">-</span> <span class="n">b</span> <span class="o">-</span> <span class="n">c</span> <span class="o">+</span> <span class="n">d</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">omega_dot</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Embed_Seymour_Lorimer"><a class="viewcode-back" href="../../NLD_Functions.html#lib.NLD_Functions.Embed_Seymour_Lorimer">[docs]</a><span class="k">def</span> <span class="nf">Embed_Seymour_Lorimer</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">frac</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Takes 1d signal x and produces a 3-dimensional embedding calculating</span>
+<span class="sd">    the delay integer to be:</span>
+
+<span class="sd">    the root of the polynomial given by the autocorrelation coefficients</span>
+<span class="sd">    of rho (equation 8 in Seymour and Lorimer)</span>
+
+<span class="sd">    Paramaters:</span>
+<span class="sd">    -----------</span>
+<span class="sd">    x : list</span>
+<span class="sd">        1D signal to embed</span>
+<span class="sd">    time : list</span>
+<span class="sd">         List of times at which x is sampled or the sampling time</span>
+<span class="sd">    n : int</span>
+<span class="sd">        Specifies the number of delay times to search over, largest delay is</span>
+<span class="sd">        given by n*dt</span>
+<span class="sd">    frac: int</span>
+<span class="sd">        The fraction of data between 0 and the first minimum to be used in</span>
+<span class="sd">        fitting a polynomial</span>
+<span class="sd">    plot: bool</span>
+<span class="sd">        If true this will return two subplots showing the time delay estimation</span>
+<span class="sd">        and the embedding</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    --------</span>
+<span class="sd">    (x_o, x_1, x_2) : Tuple of lists of the embedded data</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># Generate list of dt delay times to look at the sample, the minimum dt is</span>
+    <span class="c"># the sampling period</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c"># Uniform sampling assumed</span>
+
+    <span class="c"># Calculate the time delay</span>
+
+    <span class="c"># Subtract time average of the series</span>
+    <span class="n">xo</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">py</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c"># Calculate rho for each multiple of dt up to n*dt</span>
+    <span class="n">rho</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">var</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">xo</span><span class="p">)</span>
+
+    <span class="c"># We provide to cutoffs for the largest deltaT either n*dt or twice the</span>
+    <span class="c"># first minimum</span>
+    <span class="k">if</span> <span class="n">n</span><span class="p">:</span>
+
+        <span class="n">dt_list</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="p">[</span><span class="n">xo</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">xo</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xo</span><span class="p">)</span> <span class="o">-</span> <span class="n">i</span><span class="p">)]</span>
+            <span class="n">rho</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">/</span> <span class="n">var</span><span class="p">)</span>
+
+        <span class="c"># Find first minimum</span>
+        <span class="n">first_minimum_index</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">rho</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">rho</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span>
+                <span class="n">first_minimum_index</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="k">break</span>
+
+        <span class="k">if</span> <span class="n">first_minimum_index</span> <span class="ow">is</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">print</span> <span class="p">(</span><span class="s">&quot;ERROR: n was not large enough to find the first minimum,&quot;</span>
+                   <span class="s">&quot;or there isn&#39;t one&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">cond</span> <span class="o">=</span> <span class="bp">True</span>
+        <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">cond</span><span class="p">:</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="p">[</span><span class="n">xo</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">xo</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xo</span><span class="p">)</span> <span class="o">-</span> <span class="n">i</span><span class="p">)]</span>
+            <span class="n">rho</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">/</span> <span class="n">var</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">rho</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">rho</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">first_minimum_index</span> <span class="o">=</span> <span class="n">i</span>
+                    <span class="n">cond</span> <span class="o">=</span> <span class="bp">False</span>
+            <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">first_minimum_index</span><span class="p">,</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">first_minimum_index</span><span class="p">):</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="p">[</span><span class="n">xo</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">xo</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xo</span><span class="p">)</span> <span class="o">-</span> <span class="n">i</span><span class="p">)]</span>
+            <span class="n">rho</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">/</span> <span class="n">var</span><span class="p">)</span>
+
+        <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rho</span><span class="p">)</span>
+        <span class="n">dt_list</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span> <span class="o">*</span> <span class="n">dt</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+
+    <span class="c"># Fit polynomical between 0 and first_minimum_index/2</span>
+    <span class="n">fit_upper_index</span> <span class="o">=</span> <span class="n">first_minimum_index</span> <span class="o">/</span> <span class="n">frac</span>
+    <span class="n">mat</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">polyfit</span><span class="p">(</span><span class="n">dt_list</span><span class="p">[:</span><span class="n">fit_upper_index</span><span class="p">],</span> <span class="n">rho</span><span class="p">[:</span><span class="n">fit_upper_index</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span>
+
+    <span class="c"># Find the closest value in dt_list to the positive root of the polynomial</span>
+    <span class="p">(</span><span class="n">root_index</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">dt_list</span><span class="p">),</span>
+                      <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">abs</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="nb">max</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">roots</span><span class="p">(</span><span class="n">mat</span><span class="p">))))</span>
+
+    <span class="c"># Take the delay time tau to be half the root of the polynomial</span>
+    <span class="n">delay_index</span> <span class="o">=</span> <span class="n">root_index</span> <span class="o">/</span> <span class="mi">2</span>
+    <span class="n">tau</span> <span class="o">=</span> <span class="n">dt_list</span><span class="p">[</span><span class="n">delay_index</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">fig</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+        <span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
+
+        <span class="c"># Plot the data used in fitting</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dt_list</span><span class="p">[:</span><span class="n">fit_upper_index</span><span class="p">],</span> <span class="n">rho</span><span class="p">[:</span><span class="n">fit_upper_index</span><span class="p">],</span>
+                             <span class="s">&quot;-b&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;Data used in fit&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+        <span class="c"># Plot the full polynomial</span>
+        <span class="n">t_fit</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="o">-</span> <span class="n">dt_list</span><span class="p">[</span><span class="n">first_minimum_index</span><span class="p">],</span>
+                            <span class="n">dt_list</span><span class="p">[</span><span class="n">first_minimum_index</span><span class="p">],</span> <span class="mi">1000</span><span class="p">)</span>
+        <span class="n">y_fit</span> <span class="o">=</span> <span class="p">[</span><span class="n">mat</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="n">mat</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">t</span> <span class="o">+</span> <span class="n">mat</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">t_fit</span><span class="p">]</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">t_fit</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">,</span> <span class="s">&quot;--r&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;Fitted polynomial&quot;</span><span class="p">)</span>
+
+        <span class="c"># Plot rho</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dt_list</span><span class="p">,</span> <span class="n">rho</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;k&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">r&quot;$\rho$&quot;</span><span class="p">)</span>
+
+        <span class="c"># Plot options</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">r&quot;$\Delta t$&quot;</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">r&quot;&quot;</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s">&quot;-&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;k&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s">&quot;-&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;k&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+        <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">1.2</span> <span class="o">*</span> <span class="nb">min</span><span class="p">(</span><span class="o">-</span> <span class="nb">min</span><span class="p">(</span><span class="n">rho</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">rho</span><span class="p">)),</span> <span class="mf">1.2</span> <span class="o">*</span> <span class="nb">max</span><span class="p">(</span><span class="n">rho</span><span class="p">))</span>
+        <span class="n">py</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">frameon</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
+
+    <span class="c"># Embedding</span>
+    <span class="n">x_0</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">delay_index</span><span class="p">]</span>
+    <span class="n">x_1</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">delay_index</span><span class="p">:</span> <span class="o">-</span> <span class="n">delay_index</span><span class="p">]</span>
+    <span class="n">x_2</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">delay_index</span><span class="p">:]</span>
+
+    <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+        <span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s">&quot;3d&quot;</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_0</span><span class="p">,</span> <span class="n">x_1</span><span class="p">,</span> <span class="n">x_2</span><span class="p">,</span> <span class="n">ls</span><span class="o">=</span><span class="s">&quot;-&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;b&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.5</span><span class="p">)</span>
+
+        <span class="n">label_size</span> <span class="o">=</span> <span class="mi">15</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">r&quot;$x(t)$&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">label_size</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">r&quot;$x(t+\tau)$&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">label_size</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s">r&quot;$x(t+2\tau)$&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">label_size</span><span class="p">)</span>
+
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">([])</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_yticklabels</span><span class="p">([])</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_zticklabels</span><span class="p">([])</span>
+
+        <span class="n">py</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">x_0</span><span class="p">,</span> <span class="n">x_1</span><span class="p">,</span> <span class="n">x_2</span><span class="p">,</span> <span class="n">tau</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Parameter_Space_Plot"><a class="viewcode-back" href="../../NLD_Functions.html#lib.NLD_Functions.Parameter_Space_Plot">[docs]</a><span class="k">def</span> <span class="nf">Parameter_Space_Plot</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">Option_Dictionary</span><span class="o">=</span><span class="p">{},</span> <span class="n">biaxial</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Plots the paramaters omega_dot,a_dot and phi_dot in a 3D projection</span>
+
+<span class="sd">    Option Dictionary takes</span>
+<span class="sd">    azim:float [degs] ~ Default is 15.0</span>
+<span class="sd">    elev:float [degs] ~ Default is 150.0</span>
+
+<span class="sd">    Additonal close up plot takes string &quot;axis/xmin/max/ymin/ymax &quot;</span>
+<span class="sd">    where the axis is the projection of &quot;z&quot; along which the 2D plot is made:</span>
+<span class="sd">    axis = 0 ~ omega_dot axis</span>
+<span class="sd">           1 ~ a_dot axis</span>
+<span class="sd">           2 ~ phi_dot axis</span>
+<span class="sd">    if you wish to view the entire range simply leave xmin etc empty e.g 1////</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># Handle any additional options which are in the dictionary</span>
+
+    <span class="k">if</span> <span class="s">&quot;elev&quot;</span> <span class="ow">in</span> <span class="n">Option_Dictionary</span><span class="p">:</span>
+        <span class="n">elev</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Option_Dictionary</span><span class="p">[</span><span class="s">&#39;elev&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">elev</span> <span class="o">=</span> <span class="mf">15.0</span>
+    <span class="k">if</span> <span class="s">&quot;azim&quot;</span> <span class="ow">in</span> <span class="n">Option_Dictionary</span><span class="p">:</span>
+        <span class="n">azim</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Option_Dictionary</span><span class="p">[</span><span class="s">&#39;azim&#39;</span><span class="p">])</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">azim</span> <span class="o">=</span> <span class="mi">150</span>
+
+    <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">omega_dot</span><span class="p">,</span> <span class="n">a_dot</span><span class="p">,</span> <span class="n">phi_dot</span><span class="p">)</span> <span class="o">=</span> <span class="n">Dotted_Variable</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+
+    <span class="c"># Plot the data in 3d</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s">&#39;3d&#39;</span><span class="p">)</span>
+
+    <span class="c"># Set the view angle</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="n">elev</span><span class="p">,</span> <span class="n">azim</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">omega_dot</span><span class="p">,</span> <span class="n">a_dot</span><span class="p">,</span> <span class="n">phi_dot</span><span class="p">,</span> <span class="s">&quot;-&quot;</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;b&quot;</span><span class="p">)</span>
+
+
+    <span class="c"># Plot the &#39;shadows&#39;</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">omega_dot</span><span class="p">,</span> <span class="n">a_dot</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">phi_dot</span><span class="p">),</span>
+        <span class="n">zdir</span><span class="o">=</span><span class="s">&#39;z&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;k&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span> <span class="n">lw</span><span class="o">=</span><span class="mf">0.8</span><span class="p">)</span>
+    <span class="c">#ax.plot(a_dot, phi_dot,min(omega_dot),zdir=&#39;x&#39;,color=&quot;k&quot;,alpha=0.2,lw=0.8)</span>
+    <span class="c">#ax.plot(omega_dot,phi_dot,max(a_dot),zdir=&#39;y&#39;,color=&quot;k&quot;,alpha=0.2,lw=0.8)</span>
+
+    <span class="c"># Plotting options, remove ticks and add labels</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">r&quot;$\dot{\omega}$&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">r&quot;$\dot{a}$&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s">r&quot;$\dot{\phi}$&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">([])</span>  <span class="c"># ax.get_xticks()[1:-2:3])   # Reduce the # of ticks</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_yticks</span><span class="p">([])</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_zticks</span><span class="p">([])</span>
+
+    <span class="k">if</span> <span class="s">&#39;save_fig&#39;</span> <span class="ow">in</span> <span class="n">Option_Dictionary</span><span class="p">:</span>
+        <span class="n">File_Functions</span><span class="o">.</span><span class="n">Save_Figure</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&quot;Parameter_Space_Plot&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">py</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="c"># Additional plot may be made if required</span>
+    <span class="k">if</span> <span class="s">&quot;close&quot;</span> <span class="ow">in</span> <span class="n">Option_Dictionary</span><span class="p">:</span>
+        <span class="n">axis_label_list</span> <span class="o">=</span> <span class="p">[</span><span class="s">r&quot;$\dot{\omega}$&quot;</span><span class="p">,</span> <span class="s">r&quot;$\dot{a}$&quot;</span><span class="p">,</span> <span class="s">r&quot;$\dot{\phi}$&quot;</span><span class="p">]</span>
+        <span class="n">axis_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">omega_dot</span><span class="p">,</span> <span class="n">a_dot</span><span class="p">,</span> <span class="n">phi_dot</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="p">(</span><span class="n">axis</span><span class="p">,</span> <span class="n">xmin</span><span class="p">,</span> <span class="n">xmax</span><span class="p">,</span> <span class="n">ymin</span><span class="p">,</span> <span class="n">ymax</span><span class="p">)</span> <span class="o">=</span> \
+                <span class="n">Option_Dictionary</span><span class="p">[</span><span class="s">&#39;close&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s">&quot;/&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">print</span> <span class="p">(</span><span class="s">&quot; ERROR: close should have value &#39;axis/xmin/max/ymin/ymax&#39;&quot;</span>
+                   <span class="s">&quot;no plot will be produced&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
+        <span class="c"># Remove the axis</span>
+        <span class="n">axis_label_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">axis</span><span class="p">))</span>
+        <span class="n">axis_list</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">axis</span><span class="p">))</span>
+
+        <span class="n">fig2</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+        <span class="n">ax2</span> <span class="o">=</span> <span class="n">fig2</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">axis_list</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">axis_list</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">xmin</span><span class="p">)</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">xmax</span><span class="p">)</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">ymin</span><span class="p">)</span>
+            <span class="nb">float</span><span class="p">(</span><span class="n">ymax</span><span class="p">)</span>
+
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlim</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">xmin</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">xmax</span><span class="p">))</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">ymin</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">ymax</span><span class="p">))</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">print</span> <span class="p">(</span><span class="s">&quot;x and y lims are not properly defined&quot;</span>
+                    <span class="s">&quot;these should be floats. Using full range instead&quot;</span><span class="p">)</span>
+
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="n">axis_label_list</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">axis_label_list</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="s">&#39;save_fig&#39;</span> <span class="ow">in</span> <span class="n">Option_Dictionary</span><span class="p">:</span>
+            <span class="n">File_Functions</span><span class="o">.</span><span class="n">Save_Figure</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&quot;Parameter_Space_Plot_Close&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">py</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="Correlation_Sum"><a class="viewcode-back" href="../../NLD_Functions.html#lib.NLD_Functions.Correlation_Sum">[docs]</a><span class="k">def</span> <span class="nf">Correlation_Sum</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">Option_Dictionary</span><span class="o">=</span><span class="p">{},</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Plots the correlation sum of the input file &quot;&quot;&quot;</span>
+
+    <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">omega_dot</span><span class="p">,</span> <span class="n">a_dot</span><span class="p">,</span> <span class="n">phi_dot</span><span class="p">)</span> <span class="o">=</span> <span class="n">Dotted_Variable</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+
+    <span class="c"># If required reduce the data size</span>
+    <span class="k">if</span> <span class="s">&quot;ith&quot;</span> <span class="ow">in</span> <span class="n">Option_Dictionary</span><span class="p">:</span>
+        <span class="n">ith</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">Option_Dictionary</span><span class="p">[</span><span class="s">&#39;ith&#39;</span><span class="p">])</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">N</span><span class="p">:</span><span class="n">ith</span><span class="p">]</span>
+        <span class="n">omega_dot</span> <span class="o">=</span> <span class="n">omega_dot</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">N</span><span class="p">:</span><span class="n">ith</span><span class="p">]</span>
+        <span class="n">a_dot</span> <span class="o">=</span> <span class="n">a_dot</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">N</span><span class="p">:</span><span class="n">ith</span><span class="p">]</span>
+        <span class="n">phi_dot</span> <span class="o">=</span> <span class="n">phi_dot</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">N</span><span class="p">:</span><span class="n">ith</span><span class="p">]</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>  <span class="c"># length of data after reduction</span>
+
+    <span class="c"># Second and third options arguments specify the natural exponents</span>
+    <span class="c"># with which R the sphere radius should vary</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">R_min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Option_Dictionary</span><span class="p">[</span><span class="s">&#39;R_min&#39;</span><span class="p">])</span>
+        <span class="n">R_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Option_Dictionary</span><span class="p">[</span><span class="s">&#39;R_max&#39;</span><span class="p">])</span>
+        <span class="n">Number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">Option_Dictionary</span><span class="p">[</span><span class="s">&#39;Number&#39;</span><span class="p">])</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">print</span> <span class="p">(</span><span class="s">&quot;You must specify R_min,R_max &quot;</span>
+               <span class="s">&quot; and Number in the Option_Dictionary&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">R_list</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">R_min</span><span class="p">,</span> <span class="n">R_max</span><span class="p">,</span> <span class="n">Number</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">abs_val</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">z1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z2</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">py</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="p">(</span><span class="n">z1</span> <span class="o">-</span> <span class="n">z2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">)</span>
+
+    <span class="c"># Calculate C(R) for each R and record natural log of both.</span>
+    <span class="n">lnC_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">lnR_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">lnC_outsiders_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">lnR_outsiders_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">R</span> <span class="ow">in</span> <span class="n">R_list</span><span class="p">:</span>
+        <span class="n">sumV</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">R</span> <span class="o">&gt;</span> <span class="n">abs_val</span><span class="p">(</span><span class="n">omega_dot</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">a_dot</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">phi_dot</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                               <span class="n">omega_dot</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">a_dot</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">phi_dot</span><span class="p">[</span><span class="n">j</span><span class="p">]):</span>
+                    <span class="n">sumV</span> <span class="o">+=</span> <span class="mf">1.0</span>
+        <span class="c"># Check there is a satisfactory number of points in the sum</span>
+
+        <span class="k">if</span> <span class="n">sumV</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">print</span> <span class="p">(</span><span class="s">&quot;No points in R={0} consider a larger R_min.&quot;</span>
+                  <span class="s">&quot;Ignoring this point&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">C</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">sumV</span> <span class="o">/</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">))</span>
+
+            <span class="c"># Test lower bound</span>
+            <span class="k">if</span> <span class="n">C</span> <span class="o">&lt;</span> <span class="mf">10.0</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+                <span class="k">print</span> <span class="p">(</span><span class="s">&quot;Only {0} points in R={1}  consider a larger Rmin.&quot;</span>
+                       <span class="s">&quot; This data will not be used in calculating&quot;</span>
+                       <span class="s">&quot; the best fit&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sumV</span><span class="p">,</span> <span class="n">R</span><span class="p">))</span>
+
+                <span class="c"># Add outsider to seperate lists</span>
+                <span class="n">lnC_outsiders_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">C</span><span class="p">))</span>
+                <span class="n">lnR_outsiders_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
+
+            <span class="c"># Test upper bound</span>
+            <span class="k">elif</span> <span class="n">C</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">:</span>
+                <span class="k">print</span> <span class="p">(</span><span class="s">&quot;More than 10 percent of all points in the test sphere &quot;</span>
+                       <span class="s">&quot;of radius {}, this data will not be used &quot;</span>
+                       <span class="s">&quot;in calculating&quot;&quot; the best fit&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
+
+                <span class="n">lnC_outsiders_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">C</span><span class="p">))</span>
+                <span class="n">lnR_outsiders_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
+
+            <span class="c"># Add data to list</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lnC_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">C</span><span class="p">))</span>
+                <span class="n">lnR_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
+                <span class="c"># Print some data for the user</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="p">(</span><span class="s">&quot;Point added R ={} ln(R)={} C ={} ln(C)={} &quot;</span>
+                    <span class="s">&quot; Sum_total = {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">R</span><span class="p">),</span> <span class="n">C</span><span class="p">,</span> <span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">C</span><span class="p">),</span> <span class="n">sumV</span><span class="p">))</span>
+    <span class="c"># Linear fit</span>
+    <span class="p">(</span><span class="n">x_fit</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">,</span> <span class="n">f_p</span><span class="p">)</span> <span class="o">=</span> <span class="n">Useful_Tools</span><span class="o">.</span><span class="n">Fit_Function</span><span class="p">(</span><span class="n">lnR_list</span><span class="p">,</span> <span class="n">lnC_list</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c"># Plot</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_fit</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s">&quot;b&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;$\ln(c)={0} \ln(R)={1}$&quot;</span>
+                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">f_p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">2</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">f_p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">)))))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lnR_list</span><span class="p">,</span> <span class="n">lnC_list</span><span class="p">,</span>
+            <span class="s">&quot;o&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;r&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;Data used in fit&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lnR_outsiders_list</span><span class="p">,</span> <span class="n">lnC_outsiders_list</span><span class="p">,</span>
+            <span class="s">&quot;x&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;r&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;Data not used in fit&quot;</span><span class="p">)</span>
+
+    <span class="c"># Give upper and lower bounds on C(R)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">0.1</span><span class="p">),</span> <span class="n">ls</span><span class="o">=</span><span class="s">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;k&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10.0</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)),</span>
+        <span class="n">ls</span><span class="o">=</span><span class="s">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;k&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;Bounds on $\ln(C(R))$&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+
+    <span class="n">leg</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fancybox</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">leg</span><span class="o">.</span><span class="n">get_frame</span><span class="p">()</span><span class="o">.</span><span class="n">set_alpha</span><span class="p">(</span><span class="mf">0.6</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">r&quot;$\ln(C)$&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">r&quot;$\ln(R)$&quot;</span><span class="p">)</span>
+
+    <span class="c">#py.title(r&quot;Correlation plot for $\chi = $&quot;+file_name.split(&quot;_&quot;)[4])</span>
+
+    <span class="k">if</span> <span class="s">&#39;save_fig&#39;</span> <span class="ow">in</span> <span class="n">Option_Dictionary</span><span class="p">:</span>
+        <span class="n">File_Functions</span><span class="o">.</span><span class="n">Save_Figure</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&quot;Correlation_Plot&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">py</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="c"># Theiler window</span></div>
+<div class="viewcode-block" id="Correlation_Sum_W"><a class="viewcode-back" href="../../NLD_Functions.html#lib.NLD_Functions.Correlation_Sum_W">[docs]</a><span class="k">def</span> <span class="nf">Correlation_Sum_W</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="n">Option_Dictionary</span><span class="o">=</span><span class="p">{},</span> <span class="n">verbose</span><span class="o">=</span><span class="bp">False</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot; Plots the correlation sum of the input file &quot;&quot;&quot;</span>
+
+    <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">omega_dot</span><span class="p">,</span> <span class="n">a_dot</span><span class="p">,</span> <span class="n">phi_dot</span><span class="p">)</span> <span class="o">=</span> <span class="n">Dotted_Variable</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>
+    <span class="n">w</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c"># Theiler window number</span>
+
+    <span class="c"># If required reduce the data size</span>
+    <span class="k">if</span> <span class="s">&quot;ith&quot;</span> <span class="ow">in</span> <span class="n">Option_Dictionary</span><span class="p">:</span>
+        <span class="n">ith</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">Option_Dictionary</span><span class="p">[</span><span class="s">&#39;ith&#39;</span><span class="p">])</span>
+        <span class="n">time</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">N</span><span class="p">:</span><span class="n">ith</span><span class="p">]</span>
+        <span class="n">omega_dot</span> <span class="o">=</span> <span class="n">omega_dot</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">N</span><span class="p">:</span><span class="n">ith</span><span class="p">]</span>
+        <span class="n">a_dot</span> <span class="o">=</span> <span class="n">a_dot</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">N</span><span class="p">:</span><span class="n">ith</span><span class="p">]</span>
+        <span class="n">phi_dot</span> <span class="o">=</span> <span class="n">phi_dot</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="n">N</span><span class="p">:</span><span class="n">ith</span><span class="p">]</span>
+        <span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">)</span>  <span class="c"># length of data after reduction</span>
+
+    <span class="c"># Second and third options arguments specify the natural exponents</span>
+    <span class="c"># with which R the sphere radius should vary</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">R_min</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Option_Dictionary</span><span class="p">[</span><span class="s">&#39;R_min&#39;</span><span class="p">])</span>
+        <span class="n">R_max</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Option_Dictionary</span><span class="p">[</span><span class="s">&#39;R_max&#39;</span><span class="p">])</span>
+        <span class="n">Number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">Option_Dictionary</span><span class="p">[</span><span class="s">&#39;Number&#39;</span><span class="p">])</span>
+    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="k">print</span> <span class="p">(</span><span class="s">&quot;You must specify R_min,R_max &quot;</span>
+               <span class="s">&quot; and Number in the Option_Dictionary&quot;</span><span class="p">)</span>
+        <span class="k">return</span>
+
+    <span class="n">R_list</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">R_min</span><span class="p">,</span> <span class="n">R_max</span><span class="p">,</span> <span class="n">Number</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">abs_val</span><span class="p">(</span><span class="n">x1</span><span class="p">,</span> <span class="n">y1</span><span class="p">,</span> <span class="n">z1</span><span class="p">,</span> <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z2</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">py</span><span class="o">.</span><span class="n">sqrt</span><span class="p">((</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span> <span class="o">+</span> <span class="p">(</span><span class="n">z1</span> <span class="o">-</span> <span class="n">z2</span><span class="p">)</span> <span class="o">**</span> <span class="mf">2.0</span><span class="p">)</span>
+
+    <span class="c"># Calculate C(R) for each R and record natural log of both.</span>
+    <span class="n">lnC_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">lnR_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">lnC_outsiders_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">lnR_outsiders_list</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">R</span> <span class="ow">in</span> <span class="n">R_list</span><span class="p">:</span>
+        <span class="n">sumV</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">w</span><span class="p">,</span> <span class="n">N</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">R</span> <span class="o">&gt;</span> <span class="n">abs_val</span><span class="p">(</span><span class="n">omega_dot</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">a_dot</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">phi_dot</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                               <span class="n">omega_dot</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">a_dot</span><span class="p">[</span><span class="n">j</span><span class="p">],</span> <span class="n">phi_dot</span><span class="p">[</span><span class="n">j</span><span class="p">]):</span>
+                    <span class="n">sumV</span> <span class="o">+=</span> <span class="mf">1.0</span>
+        <span class="c"># Check there is a satisfactory number of points in the sum</span>
+
+        <span class="k">if</span> <span class="n">sumV</span> <span class="o">==</span> <span class="mf">0.0</span><span class="p">:</span>
+            <span class="k">print</span> <span class="p">(</span><span class="s">&quot;No points in R={0} consider a larger R_min.&quot;</span>
+                  <span class="s">&quot;Ignoring this point&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">C</span> <span class="o">=</span> <span class="mf">2.0</span> <span class="o">*</span> <span class="n">sumV</span> <span class="o">/</span> <span class="p">((</span><span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="o">-</span> <span class="n">w</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)</span> <span class="o">-</span> <span class="n">w</span> <span class="o">-</span> <span class="mf">1.0</span><span class="p">))</span>
+
+            <span class="c"># Test lower bound</span>
+            <span class="k">if</span> <span class="n">C</span> <span class="o">&lt;</span> <span class="mf">10.0</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+                <span class="k">print</span> <span class="p">(</span><span class="s">&quot;Only {0} points in R={1}  consider a larger Rmin.&quot;</span>
+                       <span class="s">&quot; This data will not be used in calculating&quot;</span>
+                       <span class="s">&quot; the best fit&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">sumV</span><span class="p">,</span> <span class="n">R</span><span class="p">))</span>
+
+                <span class="c"># Add outsider to seperate lists</span>
+                <span class="n">lnC_outsiders_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">C</span><span class="p">))</span>
+                <span class="n">lnR_outsiders_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
+
+            <span class="c"># Test upper bound</span>
+            <span class="k">elif</span> <span class="n">C</span> <span class="o">&gt;</span> <span class="mf">0.1</span><span class="p">:</span>
+                <span class="k">print</span> <span class="p">(</span><span class="s">&quot;More than 10 percent of all points in the test sphere &quot;</span>
+                       <span class="s">&quot;of radius {}, this data will not be used &quot;</span>
+                       <span class="s">&quot;in calculating&quot;&quot; the best fit&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
+
+                <span class="n">lnC_outsiders_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">C</span><span class="p">))</span>
+                <span class="n">lnR_outsiders_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
+
+            <span class="c"># Add data to list</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">lnC_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">C</span><span class="p">))</span>
+                <span class="n">lnR_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">R</span><span class="p">))</span>
+                <span class="c"># Print some data for the user</span>
+                <span class="k">if</span> <span class="n">verbose</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="p">(</span><span class="s">&quot;Point added R ={} ln(R)={} C ={} ln(C)={} &quot;</span>
+                    <span class="s">&quot; Sum_total = {}&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">R</span><span class="p">,</span> <span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">R</span><span class="p">),</span> <span class="n">C</span><span class="p">,</span> <span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">C</span><span class="p">),</span> <span class="n">sumV</span><span class="p">))</span>
+    <span class="c"># Linear fit</span>
+    <span class="p">(</span><span class="n">x_fit</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">,</span> <span class="n">f_p</span><span class="p">)</span> <span class="o">=</span> <span class="n">Useful_Tools</span><span class="o">.</span><span class="n">Fit_Function</span><span class="p">(</span><span class="n">lnR_list</span><span class="p">,</span> <span class="n">lnC_list</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="c"># Plot</span>
+    <span class="n">fig</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">111</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_fit</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">,</span>
+            <span class="n">color</span><span class="o">=</span><span class="s">&quot;b&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="p">(</span><span class="s">&quot;$\ln(c)={0} \ln(R)={1}$&quot;</span>
+                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">f_p</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">2</span><span class="p">)),</span> <span class="nb">str</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">f_p</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="mi">2</span><span class="p">)))))</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lnR_list</span><span class="p">,</span> <span class="n">lnC_list</span><span class="p">,</span>
+            <span class="s">&quot;o&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;r&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;Data used in fit&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">lnR_outsiders_list</span><span class="p">,</span> <span class="n">lnC_outsiders_list</span><span class="p">,</span>
+            <span class="s">&quot;x&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;r&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;Data not used in fit&quot;</span><span class="p">)</span>
+
+    <span class="c"># Give upper and lower bounds on C(R)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">0.1</span><span class="p">),</span> <span class="n">ls</span><span class="o">=</span><span class="s">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;k&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="mf">10.0</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">N</span><span class="p">)),</span>
+        <span class="n">ls</span><span class="o">=</span><span class="s">&quot;--&quot;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s">&quot;k&quot;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;Bounds on $\ln(C(R))$&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>
+
+    <span class="n">leg</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">loc</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">fancybox</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="n">leg</span><span class="o">.</span><span class="n">get_frame</span><span class="p">()</span><span class="o">.</span><span class="n">set_alpha</span><span class="p">(</span><span class="mf">0.6</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">r&quot;$\ln(C)$&quot;</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">r&quot;$\ln(R)$&quot;</span><span class="p">)</span>
+
+    <span class="c">#py.title(r&quot;Correlation plot for $\chi = $&quot;+file_name.split(&quot;_&quot;)[4])</span>
+
+    <span class="k">if</span> <span class="s">&#39;save_fig&#39;</span> <span class="ow">in</span> <span class="n">Option_Dictionary</span><span class="p">:</span>
+        <span class="n">File_Functions</span><span class="o">.</span><span class="n">Save_Figure</span><span class="p">(</span><span class="n">file_name</span><span class="p">,</span> <span class="s">&quot;Correlation_Plot&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">py</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+</div>
+<div class="viewcode-block" id="Dotted_Variable"><a class="viewcode-back" href="../../NLD_Functions.html#lib.NLD_Functions.Dotted_Variable">[docs]</a><span class="k">def</span> <span class="nf">Dotted_Variable</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Function takes the file imports it and produces</span>
+<span class="sd">    the dotted variables as lists</span>
+
+<span class="sd">    Note this returns the dotted spherical components in the biaxial case</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">=</span> <span class="n">File_Functions</span><span class="o">.</span><span class="n">One_Component_Import</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+
+    <span class="c"># Transform to spherical polar coordinates in radians</span>
+    <span class="p">(</span><span class="n">omega</span><span class="p">,</span> <span class="n">a</span><span class="p">,</span> <span class="n">phi</span><span class="p">)</span> <span class="o">=</span> <span class="n">Physics_Functions</span><span class="o">.</span><span class="n">Cartesian_2_Spherical</span><span class="p">(</span>
+                                    <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">,</span> <span class="n">Angle_Type</span><span class="o">=</span><span class="s">&quot;Radians&quot;</span><span class="p">)</span>
+
+    <span class="c"># Fix phi</span>
+    <span class="n">phi</span> <span class="o">=</span> <span class="n">Physics_Functions</span><span class="o">.</span><span class="n">Fix_Phi</span><span class="p">(</span><span class="n">phi</span><span class="p">,</span> <span class="n">Angle_Type</span><span class="o">=</span><span class="s">&quot;Radians&quot;</span><span class="p">)</span>
+
+    <span class="c"># Import data from params</span>
+    <span class="n">Parameter_Dictionary</span> <span class="o">=</span> <span class="n">File_Functions</span><span class="o">.</span><span class="n">Parameter_Dictionary</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="n">epsI</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Parameter_Dictionary</span><span class="p">[</span><span class="s">&quot;epsI&quot;</span><span class="p">])</span>
+    <span class="n">epsA</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Parameter_Dictionary</span><span class="p">[</span><span class="s">&quot;epsA&quot;</span><span class="p">])</span>
+    <span class="c"># Careful with chi</span>
+    <span class="n">chi</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Parameter_Dictionary</span><span class="p">[</span><span class="s">&quot;chi&quot;</span><span class="p">])</span>  <span class="c"># * py.pi / 180  # radians</span>
+
+    <span class="c"># Calculate some constants</span>
+    <span class="n">epsI_prime</span> <span class="o">=</span> <span class="n">epsI</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">epsI</span><span class="p">)</span>
+    <span class="n">Sx</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">chi</span><span class="p">)</span>
+    <span class="n">Cx</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">chi</span><span class="p">)</span>
+    <span class="n">Lambda</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="mf">1e6</span> <span class="o">/</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="mf">3e10</span><span class="p">)</span>  <span class="c"># 2R/3c</span>
+
+    <span class="c"># Calculate the differentials from Goldreich equations</span>
+    <span class="n">omega_dot</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">a_dot</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">phi_dot</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">omega</span><span class="p">)):</span>
+        <span class="n">cosa</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">sina</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">a</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">cosphi</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">sinphi</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">phi</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="n">Tsx</span> <span class="o">=</span> <span class="n">Cx</span> <span class="o">*</span> <span class="n">Sx</span> <span class="o">*</span> <span class="n">cosa</span> <span class="o">-</span> <span class="n">Cx</span> <span class="o">*</span> <span class="n">Cx</span> <span class="o">*</span> <span class="n">sina</span> <span class="o">*</span> <span class="n">cosphi</span>
+        <span class="n">Tsy</span> <span class="o">=</span> <span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">sina</span> <span class="o">*</span> <span class="n">sinphi</span>
+        <span class="n">Tsz</span> <span class="o">=</span> <span class="n">Sx</span> <span class="o">*</span> <span class="n">Cx</span> <span class="o">*</span> <span class="n">sina</span> <span class="o">*</span> <span class="n">cosphi</span> <span class="o">-</span> <span class="n">Sx</span> <span class="o">*</span> <span class="n">Sx</span> <span class="o">*</span> <span class="n">cosa</span>
+
+        <span class="n">pre</span> <span class="o">=</span> <span class="p">(</span><span class="n">Sx</span> <span class="o">*</span> <span class="n">sina</span> <span class="o">*</span> <span class="n">cosphi</span> <span class="o">+</span> <span class="n">Cx</span> <span class="o">*</span> <span class="n">cosa</span><span class="p">)</span>
+        <span class="n">Tax</span> <span class="o">=</span> <span class="n">pre</span> <span class="o">*</span> <span class="n">sina</span> <span class="o">*</span> <span class="n">sinphi</span> <span class="o">*</span> <span class="n">Cx</span>
+        <span class="n">Tay</span> <span class="o">=</span> <span class="n">pre</span> <span class="o">*</span> <span class="p">(</span><span class="n">cosa</span> <span class="o">*</span> <span class="n">Sx</span> <span class="o">-</span> <span class="n">sina</span> <span class="o">*</span> <span class="n">cosphi</span> <span class="o">*</span> <span class="n">Cx</span><span class="p">)</span>
+        <span class="n">Taz</span> <span class="o">=</span> <span class="n">pre</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span><span class="mf">1.0</span> <span class="o">*</span> <span class="n">sina</span> <span class="o">*</span> <span class="n">sinphi</span> <span class="o">*</span> <span class="n">Sx</span><span class="p">)</span>
+
+        <span class="n">Tsdotomega</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">Sx</span> <span class="o">*</span> <span class="n">Cx</span> <span class="o">*</span> <span class="n">sina</span> <span class="o">*</span> <span class="n">cosa</span> <span class="o">*</span> <span class="n">cosphi</span> <span class="o">-</span> <span class="nb">pow</span><span class="p">(</span><span class="n">sina</span> <span class="o">*</span> <span class="n">sinphi</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+                               <span class="o">-</span> <span class="nb">pow</span><span class="p">(</span><span class="n">Sx</span> <span class="o">*</span> <span class="n">cosa</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="nb">pow</span><span class="p">(</span><span class="n">Cx</span> <span class="o">*</span> <span class="n">sina</span> <span class="o">*</span> <span class="n">cosphi</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+
+        <span class="n">omega_dot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Lambda</span> <span class="o">*</span> <span class="n">epsA</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">omega</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mi">3</span><span class="p">)</span> <span class="o">*</span>
+                         <span class="p">(</span><span class="n">Tsdotomega</span> <span class="o">-</span> <span class="n">epsI_prime</span> <span class="o">*</span> <span class="n">Tsz</span> <span class="o">*</span> <span class="n">cosa</span><span class="p">)</span>
+                         <span class="o">-</span> <span class="n">epsA</span> <span class="o">*</span> <span class="n">epsI_prime</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">omega</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">Taz</span> <span class="o">*</span> <span class="n">cosa</span><span class="p">)</span>
+
+        <span class="n">a_dot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Lambda</span> <span class="o">*</span> <span class="n">epsA</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">omega</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">sina</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="o">*</span> <span class="p">(</span><span class="n">Tsdotomega</span> <span class="o">*</span> <span class="n">cosa</span> <span class="o">-</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">epsI_prime</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">sina</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="n">Tsz</span><span class="p">)</span>
+                <span class="o">-</span> <span class="n">epsA</span> <span class="o">*</span> <span class="n">omega</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">Taz</span> <span class="o">*</span>
+                <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">epsI_prime</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">sina</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">sina</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="p">)</span>
+
+        <span class="n">phi_dot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">pow</span><span class="p">(</span><span class="n">omega</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">Lambda</span> <span class="o">*</span> <span class="n">epsA</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">sina</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="o">*</span> <span class="p">(</span><span class="n">Tsy</span> <span class="o">*</span> <span class="n">cosphi</span> <span class="o">-</span> <span class="n">Tsx</span> <span class="o">*</span> <span class="n">sinphi</span><span class="p">)</span>
+                <span class="o">+</span> <span class="n">omega</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">*</span> <span class="n">epsA</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="n">sina</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+                <span class="o">*</span> <span class="p">(</span><span class="n">Tay</span> <span class="o">*</span> <span class="n">cosphi</span> <span class="o">-</span> <span class="n">Tax</span> <span class="o">*</span> <span class="n">sinphi</span><span class="p">)</span>
+                <span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">omega_dot</span><span class="p">,</span> <span class="n">a_dot</span><span class="p">,</span> <span class="n">phi_dot</span><span class="p">)</span>
+
+</div>
+<div class="viewcode-block" id="Dotted_Variable_Triaxial_Cartesian"><a class="viewcode-back" href="../../NLD_Functions.html#lib.NLD_Functions.Dotted_Variable_Triaxial_Cartesian">[docs]</a><span class="k">def</span> <span class="nf">Dotted_Variable_Triaxial_Cartesian</span><span class="p">(</span><span class="n">file_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Function takes the file imports it and produces</span>
+<span class="sd">    the dotted variables as lists</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">z</span><span class="p">)</span> <span class="o">=</span> <span class="n">File_Functions</span><span class="o">.</span><span class="n">One_Component_Import</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+
+    <span class="c"># Transform to spherical polar coordinates in radians</span>
+    <span class="c">#(omega, a, phi) = Physics_Functions.Cartesian_2_Spherical(</span>
+     <span class="c">#                               x, y, z, Angle_Type=&quot;Radians&quot;)</span>
+
+    <span class="c"># Fix phi</span>
+    <span class="c">#phi = Physics_Functions.Fix_Phi(phi, Angle_Type=&quot;Radians&quot;)</span>
+
+    <span class="c"># Import data from params</span>
+    <span class="n">Parameter_Dictionary</span> <span class="o">=</span> <span class="n">File_Functions</span><span class="o">.</span><span class="n">Parameter_Dictionary</span><span class="p">(</span><span class="n">file_name</span><span class="p">)</span>
+    <span class="n">epsI1</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Parameter_Dictionary</span><span class="p">[</span><span class="s">&quot;epsI1&quot;</span><span class="p">])</span>
+    <span class="n">epsI3</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Parameter_Dictionary</span><span class="p">[</span><span class="s">&quot;epsI3&quot;</span><span class="p">])</span>
+    <span class="n">epsA</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Parameter_Dictionary</span><span class="p">[</span><span class="s">&quot;epsA&quot;</span><span class="p">])</span>
+    <span class="n">chi</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">Parameter_Dictionary</span><span class="p">[</span><span class="s">&quot;chi&quot;</span><span class="p">])</span> <span class="o">*</span> <span class="n">py</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span>  <span class="c"># radians</span>
+
+    <span class="c"># Calculate some constants</span>
+    <span class="n">Sx</span> <span class="o">=</span> <span class="n">sin</span><span class="p">(</span><span class="n">chi</span><span class="p">)</span>
+    <span class="n">Cx</span> <span class="o">=</span> <span class="n">cos</span><span class="p">(</span><span class="n">chi</span><span class="p">)</span>
+    <span class="n">Lambda</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="mf">1e6</span> <span class="o">/</span> <span class="p">(</span><span class="mi">3</span> <span class="o">*</span> <span class="mf">3e10</span><span class="p">)</span>  <span class="c"># 2R/3c</span>
+
+    <span class="c"># Calculate the differentials from Goldreich equations</span>
+    <span class="n">w1_dot</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">w2_dot</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">w3_dot</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">time</span><span class="p">)):</span>
+        <span class="n">wx</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">wy</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">wz</span> <span class="o">=</span> <span class="n">z</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">w_2</span> <span class="o">=</span> <span class="nb">pow</span><span class="p">(</span><span class="n">wx</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="nb">pow</span><span class="p">(</span><span class="n">wy</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="nb">pow</span><span class="p">(</span><span class="n">wz</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+
+        <span class="n">w1_d</span> <span class="o">=</span> <span class="p">(</span><span class="n">epsA</span> <span class="o">*</span> <span class="p">(</span><span class="n">Lambda</span> <span class="o">*</span> <span class="n">w_2</span> <span class="o">*</span> <span class="n">Cx</span> <span class="o">*</span> <span class="p">(</span><span class="n">wz</span> <span class="o">*</span> <span class="n">Sx</span> <span class="o">-</span> <span class="n">wx</span> <span class="o">*</span> <span class="n">Cx</span><span class="p">))</span>
+                <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">epsI1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">-</span> <span class="n">wy</span> <span class="o">*</span> <span class="n">wz</span> <span class="o">*</span> <span class="n">epsI3</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">epsI1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">w2_d</span> <span class="o">=</span> <span class="n">epsA</span> <span class="o">*</span> <span class="p">(</span><span class="o">-</span> <span class="n">Lambda</span> <span class="o">*</span> <span class="n">w_2</span> <span class="o">*</span> <span class="n">wy</span><span class="p">)</span> <span class="o">-</span> <span class="n">wx</span> <span class="o">*</span> <span class="n">wz</span> <span class="o">*</span> <span class="p">(</span><span class="n">epsI1</span> <span class="o">-</span> <span class="n">epsI3</span><span class="p">)</span>
+
+        <span class="n">w3_d</span> <span class="o">=</span> <span class="p">(</span><span class="n">epsA</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">epsI3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span>
+                <span class="p">(</span><span class="n">Lambda</span> <span class="o">*</span> <span class="n">w_2</span> <span class="o">*</span> <span class="n">Sx</span> <span class="o">*</span> <span class="p">(</span><span class="n">wx</span> <span class="o">*</span> <span class="n">Cx</span> <span class="o">-</span> <span class="n">wz</span> <span class="o">*</span> <span class="n">Sx</span><span class="p">))</span>
+                <span class="o">+</span> <span class="n">wx</span> <span class="o">*</span> <span class="n">wy</span> <span class="o">*</span> <span class="n">epsI1</span> <span class="o">*</span> <span class="nb">pow</span><span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">epsI3</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="n">w1_dot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w1_d</span><span class="p">)</span>
+
+        <span class="n">w2_dot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w2_d</span><span class="p">)</span>
+
+        <span class="n">w3_dot</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w3_d</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">w1_dot</span><span class="p">,</span> <span class="n">w2_dot</span><span class="p">,</span> <span class="n">w3_dot</span><span class="p">)</span>
+
+
+</div>
+<div class="viewcode-block" id="Embed"><a class="viewcode-back" href="../../NLD_Functions.html#lib.NLD_Functions.Embed">[docs]</a><span class="k">def</span> <span class="nf">Embed</span><span class="p">(</span><span class="n">time</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">n</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Takes 1d signal x and produces a d-dimensional embedding calculating</span>
+<span class="sd">    the delay integer to be</span>
+
+<span class="sd">    the first minimum in something</span>
+
+<span class="sd">    the root of something else</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c"># Calculate the time delay</span>
+    <span class="c"># Subtract time average of the series</span>
+    <span class="n">xo</span> <span class="o">=</span> <span class="n">x</span> <span class="o">-</span> <span class="n">py</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+    <span class="c"># dt is fixed by x intervales, looks at n multiples</span>
+    <span class="n">ro</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">var</span> <span class="o">=</span> <span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">var</span><span class="p">(</span><span class="n">xo</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="p">[</span><span class="n">xo</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">*</span> <span class="n">xo</span><span class="p">[</span><span class="n">j</span> <span class="o">+</span> <span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">xo</span><span class="p">)</span> <span class="o">-</span> <span class="n">i</span><span class="p">)]</span>
+        <span class="n">ro</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">py</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="o">/</span> <span class="n">var</span><span class="p">)</span>
+
+    <span class="c"># Find first minimum</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">ro</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">ro</span><span class="p">[</span><span class="n">i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]:</span>
+            <span class="n">delay_index</span> <span class="o">=</span> <span class="n">i</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">break</span>
+
+    <span class="n">ax1</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">)</span>
+    <span class="n">one_dt</span> <span class="o">=</span> <span class="n">time</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">time</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c"># Assume linear spacing</span>
+    <span class="n">dt</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">n</span> <span class="o">*</span> <span class="n">one_dt</span><span class="p">,</span> <span class="n">n</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">axvline</span><span class="p">(</span><span class="n">dt</span><span class="p">[</span><span class="n">delay_index</span><span class="p">],</span> <span class="n">label</span><span class="o">=</span><span class="s">&quot;</span><span class="se">\t</span><span class="s">au&quot;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">ro</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">r&quot;$\Delta t$&quot;</span><span class="p">)</span>
+    <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">r&quot;$\rho $&quot;</span><span class="p">)</span>
+
+    <span class="n">ax2</span> <span class="o">=</span> <span class="n">py</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s">&quot;3d&quot;</span><span class="p">)</span>
+    <span class="n">x_0</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">delay_index</span><span class="p">]</span>
+    <span class="n">x_1</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="n">delay_index</span><span class="p">:</span><span class="o">-</span><span class="n">delay_index</span><span class="p">]</span>
+    <span class="n">x_2</span> <span class="o">=</span> <span class="n">x</span><span class="p">[</span><span class="mi">2</span> <span class="o">*</span> <span class="n">delay_index</span><span class="p">:]</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">x_0</span><span class="p">,</span> <span class="n">x_1</span><span class="p">,</span> <span class="n">x_2</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s">r&quot;$x(t)$&quot;</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s">r&quot;$x(t+\tau)$&quot;</span><span class="p">)</span>
+    <span class="n">ax2</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s">r&quot;$x(t+2\tau)$&quot;</span><span class="p">)</span>
+</pre></div></div>
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li><a href="../../index.html">nsmod 0.1 documentation</a> &raquo;</li>
+          <li><a href="../index.html" >Module code</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2013, Gregory Ashton.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

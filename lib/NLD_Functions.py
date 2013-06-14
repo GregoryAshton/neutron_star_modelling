@@ -1,8 +1,7 @@
 #!/usr/bin/python
 """
 
-Contains the functions associated with Non-Linear dynamics
-such as Paramater space plot and Correlation dimension
+Functions used for nonlinear dynamics.
 
 """
 
@@ -17,19 +16,21 @@ import Useful_Tools
 Plot.Defaults()
 
 
-def Attractor_Plot(file_name, elev=15., azim=150., save_fig=False, close=False):
+def Attractor_Plot(file_name, elev=15., azim=150, save_fig=False, close=False):
     """
+
     Plots the attractor associated with the data in file_name, essentially the
     same as `Embed_Seymour_Lorimer` but with additions. This function should be
     used in creating publication images then we can change the embedding if
     required.
 
-    Parameters:
-    -----------
-    elev : float
-        View elevation
-    azim : float
-        View azimuth
+    :param elev: view elevation
+    :type elev: float
+    :param azim: view azimuth
+    :type azim: float
+
+    :returns: A 3D plot of the attractor
+
     """
 
     # Calculate \dot{|w|} as a function of time, this imports the data and

@@ -17,7 +17,8 @@ import Useful_Tools
 Plot.Defaults()
 
 
-def Attractor_Plot(file_name, elev=15., azim=150., save_fig=False, close=False):
+def Attractor_Plot(file_name, elev=15., azim=150.,
+                    save_fig=False, close=False):
     """
     Plots the attractor associated with the data in file_name, essentially the
     same as `Embed_Seymour_Lorimer` but with additions. This function should be
@@ -54,17 +55,19 @@ def Attractor_Plot(file_name, elev=15., azim=150., save_fig=False, close=False):
     # Plot the 'shadows'
     ax.plot(x_0, x_1, min(x_2),
         zdir='z', color="k", alpha=0.2, lw=0.8)
-    #ax.plot(x_0, x_1, min(x_2),zdir='x', color="k", alpha=0.2, lw=0.8)
-    #ax.plot(x_0, phi_dot,max(x_1), zdir='y', color="k", alpha=0.2, lw=0.8)
+    #ax.plot(x_0, x_2, max(x_1), zdir='x', color="k", alpha=0.2, lw=0.8)
+    #ax.plot(x_0, x_1, max(x_2), zdir='y', color="k", alpha=0.2, lw=0.8)
 
     # Plotting options, remove ticks and add labels
     ax.set_xlabel(r"$\dot{\omega}(t)$", size=15)
     ax.set_ylabel(r"$\dot{\omega}(t+\tau)$", size=15)
     ax.set_zlabel(r"$\dot{\omega}(t+2\tau)$", size=15)
 
-    ax.set_xticks([])  # ax.get_xticks()[1:-2:3])   # Reduce the # of ticks
-    ax.set_yticks([])
-    ax.set_zticks([])
+    ax.set_xticklabels([])  # ax.get_xticks()[1:-2:3])
+    ax.set_yticklabels([])
+    ax.set_zticklabels([])
+
+    #py.rcParams['axes.grid'] = True
 
     if save_fig:
         File_Functions.Save_Figure(file_name, "Attractor_Plot")

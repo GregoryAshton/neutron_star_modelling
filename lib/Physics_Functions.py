@@ -97,7 +97,7 @@ def Beta_Function(epsI, epsA, chi):
     return beta
 
 
-def Inertial_Frame(x,y,z):
+def Inertial_Frame(w_1, w_2, w_3):
     """
 
     Transformation from rotating coordinate system x,y,z to inertial frame

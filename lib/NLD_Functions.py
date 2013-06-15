@@ -63,9 +63,9 @@ def Attractor_Plot(file_name, elev=15., azim=150, save_fig=False, close=False):
     ax.set_ylabel(r"$\dot{\omega}(t+\tau)$", size=15)
     ax.set_zlabel(r"$\dot{\omega}(t+2\tau)$", size=15)
 
-    ax.set_xticks([])  # ax.get_xticks()[1:-2:3])   # Reduce the # of ticks
-    ax.set_yticks([])
-    ax.set_zticks([])
+    ax.set_xtick_labels([])  # ax.get_xticks()[1:-2:3])
+    ax.set_ytick_labels([])
+    ax.set_ztick_labels([])
 
     if save_fig:
         File_Functions.Save_Figure(file_name, "Attractor_Plot")
@@ -256,6 +256,11 @@ def Embed_Seymour_Lorimer(time, x, n=False, frac=8, plot=False):
 
     # Fit polynomical between 0 and first_minimum_index/2
     fit_upper_index = first_minimum_index / frac
+
+    if fit_upper_index < 500:
+        print ("WARNING: The polynomial is being fitted to"
+               " only {} points".format(fit_upper_index))
+
     mat = py.polyfit(dt_list[:fit_upper_index], rho[:fit_upper_index], 2)
 
     # Find the closest value in dt_list to the positive root of the polynomial

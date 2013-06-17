@@ -65,6 +65,8 @@ def Parameter_Dictionary(user_input):
     except KeyError:
         try:
             epsI = float(p_d["epsI"])
+            p_d["epsI1"] = "0.0"
+            p_d["epsI3"] = str(epsI)
         except KeyError:
             print " ERROR: No epsI specified"
             return
@@ -72,14 +74,19 @@ def Parameter_Dictionary(user_input):
     omega0 = float(p_d["omega0"])
     epsA = float(p_d["epsA"])
     p_d["tauP"] = str(pow(omega0 * epsI, -1))
-    p_d["tauA"] = str(pow(omega0 * epsA, -1))
-    p_d["tauS"] = str(pow(omega0 ** 2.0 * epsA, -1) * 3 * c / (2 * R))
-    p_d["Bs"] = str(2 * np.sqrt(epsA * I0 * R * pow(c, 2)) / pow(R, 3))
+    if epsA == 0.0:
+        pass
+        #p_d["tauA"] = float("inf")
+    else:
+        p_d["tauA"] = str(pow(omega0 * epsA, -1))
+        p_d["tauS"] = str(pow(omega0 ** 2.0 * epsA, -1) * 3 * c / (2 * R))
+        p_d["Bs"] = str(2 * np.sqrt(epsA * I0 * R * pow(c, 2)) / pow(R, 3))
 
-    # Need to import the beta function
-    from Physics_Functions import Beta_Function
-    p_d["beta30"] = str(Beta_Function(epsI, epsA, 30 * pi / 180) * 180 / pi)
-    p_d["beta75"] = str(Beta_Function(epsI, epsA, 75 * pi / 180) * 180 / pi)
+        # Need to import the beta function
+        from Physics_Functions import Beta_Function
+        p_d["beta30"] = str(Beta_Function(epsI, epsA, 30 * pi / 180) * 180 / pi)
+        p_d["beta75"] = str(Beta_Function(epsI, epsA, 75 * pi / 180) * 180 / pi)
+
     return p_d
 
 

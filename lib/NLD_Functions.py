@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """
 
-Functions used for nonlinear dynamics.
+Functions used for nonlinear dynamics calculations
 
 """
 
@@ -37,11 +37,11 @@ def Attractor_Plot(file_name, elev=15., azim=150, save_fig=False, close=False):
     #  makes use of `Torque_over_Io` defined below
 
     (time, omega_dot) = Dotted_Variable_Triaxial(file_name)
-
+    print len(time), len(omega_dot)
     (x_0, x_1, x_2, tau) = Embed_Seymour_Lorimer(time, omega_dot,
-                                        n=False,
-                                        frac=2,
-                                        plot=False)
+                                                            n=False,
+                                                            frac=4,
+                                                            plot=False)
 
     # Plot the data in 3d
     fig = py.figure(figsize=(8, 8))
@@ -63,9 +63,9 @@ def Attractor_Plot(file_name, elev=15., azim=150, save_fig=False, close=False):
     ax.set_ylabel(r"$\dot{\omega}(t+\tau)$", size=15)
     ax.set_zlabel(r"$\dot{\omega}(t+2\tau)$", size=15)
 
-    ax.set_xtick_labels([])  # ax.get_xticks()[1:-2:3])
-    ax.set_ytick_labels([])
-    ax.set_ztick_labels([])
+    ax.set_xticklabels([])  # ax.get_xticks()[1:-2:3])
+    ax.set_yticklabels([])
+    ax.set_zticklabels([])
 
     if save_fig:
         File_Functions.Save_Figure(file_name, "Attractor_Plot")
@@ -173,30 +173,24 @@ def Embed_Seymour_Lorimer(time, x, n=False, frac=8, plot=False):
     """
 
     Takes 1d signal x and produces a 3-dimensional embedding calculating
-    the delay integer to be:
+    the delay integer using the method of Seymour and Lorimer 2010.
 
-    the root of the polynomial given by the autocorrelation coefficients
-    of rho (equation 8 in Seymour and Lorimer)
+    :param x: 1D signal to embed
+    :type x: list
+    :param time: List of times at which x is sampled or the sampling time
+    :type time: list
+    :param n: Specifies the number of delay times to search over, largest
+              delay is given by :math:`n \times dt` where :math:`dt`
+              is the uniform sampling rate
+    :type n: int
+    :param frac: The fraction of data between 0 and the first minimum to
+                 be used in fitting a polynomial
+    :type frac: int
+    :param plot: If true this will return two subplots showing the estimation
+                 of delay time :math:`\tau` and the embedding
 
-    Paramaters:
-    -----------
-    x : list
-        1D signal to embed
-    time : list
-         List of times at which x is sampled or the sampling time
-    n : int
-        Specifies the number of delay times to search over, largest delay is
-        given by n*dt
-    frac: int
-        The fraction of data between 0 and the first minimum to be used in
-        fitting a polynomial
-    plot: bool
-        If true this will return two subplots showing the time delay estimation
-        and the embedding
-
-    Returns:
-    --------
-    (x_o, x_1, x_2) : Tuple of lists of the embedded data
+    :returns: Embedded data
+    :rtype: Three lists
 
     """
 
@@ -238,7 +232,7 @@ def Embed_Seymour_Lorimer(time, x, n=False, frac=8, plot=False):
     else:
         cond = True
         i = 0
-        while cond:
+        while cond and (i < len(xo)):
             p = [xo[j] * xo[j + i] for j in xrange(len(xo) - i)]
             rho.append(py.mean(p) / var)
             if i > 2:
@@ -246,6 +240,10 @@ def Embed_Seymour_Lorimer(time, x, n=False, frac=8, plot=False):
                     first_minimum_index = i
                     cond = False
             i += 1
+
+        if i == len(xo):
+            print "Not enough data to find first minima"
+            return
 
         for i in xrange(first_minimum_index, 2 * first_minimum_index):
             p = [xo[j] * xo[j + i] for j in xrange(len(xo) - i)]

@@ -10,13 +10,30 @@ import pynotify
 
 def Run(Input_Dictionary):
     """
-    Simulation of the one component model using the paramaters
+
+    Run a simulation of the one component model using the paramaters
     defined in Input_Dictionary
 
     A typical Input_Dictionary:
     pulsar = {'epsI':'1.0e-9', 'epsA':"5.0e-11", 'omega0':"1.0e4",
-              'eta':"1.0e-4", 'error':"1e-14"}
+    'eta':"1.0e-4", 'error':"1e-14"}
 
+    :param epsI: Value of the deformation to the moment of inertia along the
+                 3 - axis e.g :math:`I_{zz} = I_{0}(1+\epsilon_{I})`
+    :type epsI: float
+    :param epsA: Magnetic deformation defined by
+    :type epsA: float
+    :param omega0: Initial rotational speed in :math:`Hz/rad`
+    :type omega0: float
+    :param t1: End time of simulation, if eta is defined then the simulation
+               will halt once either eta is satisfied or at t1
+    :type t1: float
+    :param n: Number of points to save, superseeds eta parameter
+    :type n: int
+    :param eta: A small value for which the simulation will stop EDIT
+    :type eta: float
+
+    :returns: file name of a .hdf5 file containing the saved data
     """
 
     #  Required paramaters

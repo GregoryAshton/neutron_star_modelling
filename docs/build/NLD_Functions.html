@@ -1,0 +1,127 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Nonlinear dynamics &mdash; nsmod 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/theme_extras.js"></script>
+    <link rel="top" title="nsmod 0.1 documentation" href="index.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="index.html">
+          <span>nsmod 0.1 documentation</span></a></h1>
+        <h2 class="heading"><span>Nonlinear dynamics</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="nonlinear-dynamics">
+<h1>Nonlinear dynamics<a class="headerlink" href="#nonlinear-dynamics" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-lib.NLD_Functions">
+<span id="spin-down"></span><h2>Spin down<a class="headerlink" href="#module-lib.NLD_Functions" title="Permalink to this headline">¶</a></h2>
+<p>Functions used for nonlinear dynamics calculations</p>
+<dl class="function">
+<dt id="lib.NLD_Functions.Attractor_Plot">
+<tt class="descclassname">lib.NLD_Functions.</tt><tt class="descname">Attractor_Plot</tt><big>(</big><em>file_name</em>, <em>elev=15.0</em>, <em>azim=150</em>, <em>save_fig=False</em>, <em>close=False</em><big>)</big><a class="reference internal" href="_modules/lib/NLD_Functions.html#Attractor_Plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.NLD_Functions.Attractor_Plot" title="Permalink to this definition">¶</a></dt>
+<dd><p>Plots the attractor associated with the data in file_name, essentially the
+same as <cite>Embed_Seymour_Lorimer</cite> but with additions. This function should be
+used in creating publication images then we can change the embedding if
+required.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>elev</strong> (<em>float</em>) &#8211; view elevation</li>
+<li><strong>azim</strong> (<em>float</em>) &#8211; view azimuth</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">A 3D plot of the attractor</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="lib.NLD_Functions.Embed_Seymour_Lorimer">
+<tt class="descclassname">lib.NLD_Functions.</tt><tt class="descname">Embed_Seymour_Lorimer</tt><big>(</big><em>time</em>, <em>x</em>, <em>n=False</em>, <em>frac=8</em>, <em>plot=False</em><big>)</big><a class="reference internal" href="_modules/lib/NLD_Functions.html#Embed_Seymour_Lorimer"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.NLD_Functions.Embed_Seymour_Lorimer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Takes 1d signal x and produces a 3-dimensional embedding calculating
+the delay integer using the method of Seymour and Lorimer 2010.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>x</strong> (<em>list</em>) &#8211; 1D signal to embed</li>
+<li><strong>time</strong> (<em>list</em>) &#8211; List of times at which x is sampled or the sampling time</li>
+<li><strong>n</strong> (<em>int</em>) &#8211; Specifies the number of delay times to search over, largest
+delay is given by <span class="math">\(n        imes dt\)</span> where <span class="math">\(dt\)</span>
+is the uniform sampling rate</li>
+<li><strong>frac</strong> (<em>int</em>) &#8211; The fraction of data between 0 and the first minimum to
+be used in fitting a polynomial</li>
+<li><strong>plot</strong> &#8211; If true this will return two subplots showing the estimation
+of delay time :math:`  au` and the embedding</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Embedded data</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Three lists</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        <a class="uplink" href="index.html">Contents</a>
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2013, Gregory Ashton.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

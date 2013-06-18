@@ -1,0 +1,111 @@
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Model &mdash; nsmod 0.1 documentation</title>
+    
+    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" href="_static/print.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '',
+        VERSION:     '0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <script type="text/javascript" src="_static/theme_extras.js"></script>
+    <link rel="top" title="nsmod 0.1 documentation" href="index.html" />
+    <link rel="next" title="Nonlinear dynamics" href="NLD_Functions.html" />
+    <link rel="prev" title="Overview" href="overview.html" /> 
+  </head>
+  <body>
+      <div class="header"><h1 class="heading"><a href="index.html">
+          <span>nsmod 0.1 documentation</span></a></h1>
+        <h2 class="heading"><span>Model</span></h2>
+      </div>
+      <div class="topnav">
+      
+        <p>
+        «&#160;&#160;<a href="overview.html">Overview</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="NLD_Functions.html">Nonlinear dynamics</a>&#160;&#160;»
+        </p>
+
+      </div>
+      <div class="content">
+        
+        
+  <div class="section" id="model">
+<h1>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-lib.Model">
+<span id="title"></span><h2>Title<a class="headerlink" href="#module-lib.Model" title="Permalink to this headline">¶</a></h2>
+<dl class="function">
+<dt id="lib.Model.Run">
+<tt class="descclassname">lib.Model.</tt><tt class="descname">Run</tt><big>(</big><em>Input_Dictionary</em><big>)</big><a class="reference internal" href="_modules/lib/Model.html#Run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.Model.Run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run a simulation of the one component model using the paramaters
+defined in Input_Dictionary</p>
+<p>A typical Input_Dictionary:
+pulsar = {&#8216;epsI&#8217;:&#8216;1.0e-9&#8217;, &#8216;epsA&#8217;:&#8221;5.0e-11&#8221;, &#8216;omega0&#8217;:&#8221;1.0e4&#8221;,
+&#8216;eta&#8217;:&#8221;1.0e-4&#8221;, &#8216;error&#8217;:&#8221;1e-14&#8221;}</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>epsI</strong> (<em>float</em>) &#8211; Value of the deformation to the moment of inertia along the
+3 - axis e.g <span class="math">\(I_{zz} = I_{0}(1+\epsilon_{I})\)</span></li>
+<li><strong>epsA</strong> (<em>float</em>) &#8211; Magnetic deformation defined by</li>
+<li><strong>omega0</strong> (<em>float</em>) &#8211; Initial rotational speed in <span class="math">\(Hz/rad\)</span></li>
+<li><strong>t1</strong> (<em>float</em>) &#8211; End time of simulation, if eta is defined then the simulation
+will halt once either eta is satisfied or at t1</li>
+<li><strong>n</strong> (<em>int</em>) &#8211; Number of points to save, superseeds eta parameter</li>
+<li><strong>eta</strong> (<em>float</em>) &#8211; A small value for which the simulation will stop EDIT</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last">file name of a .hdf5 file containing the saved data</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+</div>
+
+
+      </div>
+      <div class="bottomnav">
+      
+        <p>
+        «&#160;&#160;<a href="overview.html">Overview</a>
+        &#160;&#160;::&#160;&#160;
+        <a class="uplink" href="index.html">Contents</a>
+        &#160;&#160;::&#160;&#160;
+        <a href="NLD_Functions.html">Nonlinear dynamics</a>&#160;&#160;»
+        </p>
+
+      </div>
+
+    <div class="footer">
+        &copy; Copyright 2013, Gregory Ashton.
+      Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.
+    </div>
+  </body>
+</html>

@@ -96,7 +96,7 @@ def Run(Input_Dictionary):
         file_name_list.append("_t1_" + str(Input_Dictionary['t1']))
     except KeyError:
         print "ERROR: t1 not specified using a default "
-        t1 = 1e15
+        t1 = 1e12
 
 #   Additional Arguments
     try:
@@ -128,6 +128,7 @@ def Run(Input_Dictionary):
                       epsI3=float(epsI3),
                       omega0=float(omega0),
                       t1=float(t1),
+                      eta=float(eta),
                       anom_torque=anom_torque,
                       error=float(error)
                       )

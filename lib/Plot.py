@@ -49,7 +49,7 @@ def Defaults():
     rc('text', usetex=True)
 
     # Set the defaults for axis
-    py.rcParams['axes.color_cycle'] = ['b', 'r', 'g']
+    py.rcParams['axes.color_cycle'] = ['k', 'b', 'r', 'g']
     py.rcParams['font.size'] = 15
     py.rcParams['axes.labelsize'] = 20
     py.rcParams['lines.linewidth'] = 2
@@ -276,9 +276,9 @@ def ThreeD_Plot_Cartesian(file_name, Option_Dictionary={}):
 
     f = File_Functions.Read_File(file_name)
     time = f['time'].value
-    x = f['time'].value
-    y = f['time'].value
-    z = f['time'].value
+    x = f['w1'].value
+    y = f['w2'].value
+    z = f['w3'].value
 
     # Set the defaults and then overide if they exist in Option_Dictionary
     start = 0
@@ -388,11 +388,12 @@ def Angle_Space_Plot(file_name, Option_Dictionary={}):
     # Import the data in components x,y,z we use generic x,y,z
     # so as to not confused the EFB
 
-    f = File_Functions.Read_File(file_name)
-    time = f['time'].value
-    x = f['time'].value
-    y = f['time'].value
-    z = f['time'].value
+    if "nmax" in Option_Dictionary:
+        nmax = Option_Dictionary['nmax']
+    else:
+        nmax = None
+
+    (time, x, y, z) = File_Functions.One_Component_Import(file_name, nmax)
 
     # Check if we should use the Effective body frame axis
     if 'EBF' in Option_Dictionary:
@@ -446,7 +447,7 @@ def Angle_Space_Plot(file_name, Option_Dictionary={}):
                     pass
 
         if 'save_fig' in Option_Dictionary and Option_Dictionary['save_fig']:
-            File_FUnctions.Save_Figure(file_name, "Angle_Space_Plot_2D")
+            File_Functions.Save_Figure(file_name, "Angle_Space_Plot_2D")
         else:
             py.show()
 
@@ -558,7 +559,7 @@ def Angle_Space_Plot(file_name, Option_Dictionary={}):
         Additional_Code(Option_Dictionary)
 
         if 'save_fig' in Option_Dictionary and Option_Dictionary['save_fig']:
-            File_FUnctions.Save_Figure(file_name, "Angle_Space_Plot_3D")
+            File_Functions.Save_Figure(file_name, "Angle_Space_Plot_3D")
         else:
             py.show()
 

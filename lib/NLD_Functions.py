@@ -16,12 +16,7 @@ import Useful_Tools
 Plot.Defaults()
 
 
-<<<<<<< HEAD
-def Attractor_Plot(file_name, elev=15., azim=150.,
-                    save_fig=False, close=False):
-=======
 def Attractor_Plot(file_name, elev=15., azim=150, save_fig=False, close=False):
->>>>>>> d174016a456800d72ed03ea7d095c945069668bf
     """
 
     Plots the attractor associated with the data in file_name, essentially the
@@ -71,11 +66,8 @@ def Attractor_Plot(file_name, elev=15., azim=150, save_fig=False, close=False):
     ax.set_xticklabels([])  # ax.get_xticks()[1:-2:3])
     ax.set_yticklabels([])
     ax.set_zticklabels([])
-<<<<<<< HEAD
 
     #py.rcParams['axes.grid'] = True
-=======
->>>>>>> d174016a456800d72ed03ea7d095c945069668bf
 
     if save_fig:
         File_Functions.Save_Figure(file_name, "Attractor_Plot")

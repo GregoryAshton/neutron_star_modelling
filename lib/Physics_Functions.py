@@ -28,7 +28,7 @@ def Cartesian_2_Spherical(x, y, z, Angle_Type="Degrees", fix_phi=False):
     elif Angle_Type in ["Radians", "Radian", "Rads"]:
 
         if fix_phi:
-            azimuth_degrees = Fix_Phi(azimuth_degrees, Angle_Type="Radians")
+            azimuth = Fix_Phi(azimuth, Angle_Type="Radians")
 
         return (radial, polar, azimuth)
 

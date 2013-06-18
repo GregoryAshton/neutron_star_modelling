@@ -9,7 +9,7 @@ import os
 
 def Save_Figure(file_name, type_of_plot, format_type=".png"):
     """ Saves the currently open figure with an appropriate name"""
-    plot_file_name = "{0}_{1}_{2}".format(
+    plot_file_name = "{0}_{1}{2}".format(
                         type_of_plot, file_name.rstrip(".hdf5"), format_type
                             )
     py.savefig(plot_file_name)
@@ -90,7 +90,7 @@ def Parameter_Dictionary(user_input):
     return p_d
 
 
-def One_Component_Import(file_name):
+def One_Component_Import(file_name, nmax):
     """ Imports time and w1,w2,w3 from file_name """
     # max_int and d_int are obsolete for now
     f = Read_File(file_name)
@@ -99,8 +99,10 @@ def One_Component_Import(file_name):
     w2 = f['w2'].value
     w3 = f['w3'].value
     f.close()
-
-    return (time, w1, w2, w3)
+    if nmax:
+        return (time[0:nmax], w1[0:nmax], w2[0:nmax], w3[0:nmax])
+    else:
+        return (time, w1, w2, w3)
 
 
 def Two_Component_Import(file_name):

@@ -73,13 +73,14 @@ def Parameter_Dictionary(user_input):
 
     omega0 = float(p_d["omega0"])
     epsA = float(p_d["epsA"])
-    p_d["tauP"] = str(pow(omega0 * epsI, -1))
+    p_d["tauP"] = str(2 * pi * pow(omega0 * epsI, -1))
     if epsA == 0.0:
         pass
         #p_d["tauA"] = float("inf")
     else:
-        p_d["tauA"] = str(pow(omega0 * epsA, -1))
-        p_d["tauS"] = str(pow(omega0 ** 2.0 * epsA, -1) * 3 * c / (2 * R))
+        p_d["tauA"] = str(2 * pi * pow(omega0 * epsA, -1))
+        p_d["tauS"] = str(pow(2 * pi, 2) * pow(omega0 ** 2.0 * epsA, -1)
+                                                        * 3 * c / (2 * R))
         p_d["Bs"] = str(2 * np.sqrt(epsA * I0 * R * pow(c, 2)) / pow(R, 3))
 
         # Need to import the beta function

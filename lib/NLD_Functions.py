@@ -6,6 +6,7 @@ Functions used for nonlinear dynamics calculations
 """
 
 import pylab as py
+import numpy as np
 from pylab import sin, cos
 import Physics_Functions
 import File_Functions
@@ -425,15 +426,27 @@ def Correlation_Sum2(x, y, z, R_min, R_max, number, ith=None,
     lnC_outsiders_list = []
     lnR_outsiders_list = []
 
+    X = py.array([[x[i], y[i], z[i]] for i in xrange(N)]) # haven't tried with just for loops
+
+    def H(x):
+        if x > 0.0:
+            return 1.0
+        else :
+            return 0.0
+
     for R in R_list:
         sumV = 0.0
         then = time.time()
-        for i in range(N):
-            for j in range(i + w + 1, N):
-                if R > abs_val_diff(x[i], y[i], z[i],
-                                    x[j], y[j], z[j]):
-                    sumV += 1.0
+        #for i in xrange(N):
+        #    for j in xrange(i + w + 1, N):
+        #        if R > abs_val_diff(x[i], y[i], z[i],
+        #                            x[j], y[j], z[j]):
+        #            sumV += 1.0
 
+        print "time = ", time.time() - then, "s"
+        dx = np.matrix([[H(py.norm(X[i] - X[j]) - R) for j in xrange(1,N)] for i in xrange(1,N)])
+        sumV = sum(sum(sum(dx)))
+        print sumV
         print "time = ", time.time() - then, "s"
 
         # Check there is a satisfactory number of points in the sum

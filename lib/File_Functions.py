@@ -144,9 +144,9 @@ def Read_File(file_name):
     return f
 
 
-def verboseprint(verbose, *args):
+def vprint(verbose, *args):
     """ Function to verbose print """
-    if verbose in args:
+    if verbose:
         # Print each argument separately so caller doesn't need to
         # stuff everything to be printed into a single string
         for arg in args:

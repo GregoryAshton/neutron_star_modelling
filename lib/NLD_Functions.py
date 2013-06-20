@@ -12,6 +12,8 @@ import File_Functions
 import Plot
 import Useful_Tools
 
+from File_Functions import vprint
+
 # Import defaults for plotting
 Plot.Defaults()
 
@@ -115,7 +117,25 @@ def Attractor_Plot(file_name, elev=15., azim=150, save_fig=False, close=False):
 
 
 def Torque_over_Io(omega, epsA, chi, anom_torque=True, c=3e10, R=1e6):
-    """ Returns the Goldreich torque for omega=[w1,w2,w3]"""
+    """
+
+    Computes the Goldreich torque for omega=[w1,w2,w3] and magnetic dipole
+    at an angle of chi to the z axis
+
+    :param omega: Spin vector in cartesian coordinates
+    :type omega: list
+    :param epsA: Magnetic deformations
+    :type epsA: float
+    :param chi: Angle between magnetic dipole and the z axis in radians
+    :type chi: float
+    :param anom_torque: Whether to include the anomalous torque or not
+    :type anom_torque: bool
+    :param c: Speed of light in CGS default is :math:`c=3 \times 10^{10}`cm/s
+    :type c: float
+    :param R: Neutron star radius default value :math:`R=1 \times 10^{6}`cm
+    :type R: float
+
+    """
 
     # Check that chi is coming in radians
     if chi > 2 * py.pi:
@@ -135,7 +155,7 @@ def Torque_over_Io(omega, epsA, chi, anom_torque=True, c=3e10, R=1e6):
         return T1
 
 
-def Dotted_Variable_Triaxial(file_name, no_anom=None):
+def Dotted_Variable_Triaxial(file_name, anom_torque=None):
     """
 
     Produces :math:`\dot{\omega}` from `file_name`
@@ -147,8 +167,8 @@ def Dotted_Variable_Triaxial(file_name, no_anom=None):
                         name
     :type anom_torque: bool
 
-    :returns: :math:`\dot{\omega}`
-    :rtype: list
+    :returns: Time of each measurement and value of :math:`\dot{\omega}`
+    :rtype: (list,list)
 
     ..:note:: The equation to calculate the spin down is given by
 
@@ -174,7 +194,8 @@ def Dotted_Variable_Triaxial(file_name, no_anom=None):
     chi = float(Parameter_Dictionary["chi"]) * py.pi / 180.0
 
     if anom_torque is None:
-        anom_torque = Parameter_Dictionary
+        # Only check the dictionary if the user has not specified anom_torque
+        anom_torque = Parameter_Dictionary["anom_torque"]
 
     # Calculate the differentials from Goldreich equations
     omega_dot = []
@@ -343,45 +364,60 @@ def Embed_Seymour_Lorimer(time, x, n=False, frac=8, plot=False):
 
     return (x_0, x_1, x_2, tau)
 
+import time
 
-def Correlation_Sum2(file_name, , verbose=False):
+def Correlation_Sum2(x, y, z, R_min, R_max, number, ith=None,
+                     plot=True, verbose=True, save_fig=False,
+                     Theiler_window=None):
     """
 
-    Finds the correlation sum of data in file_name
+    Finds the correlation sum of an attractor in 3D
 
-    ..note:: This makes use of equation (10) from Seymour and Lorimer.
+    :param time:
+    :type time: list
+    :param x,y,z: Attractor data
+    :param lnR_min: Natural log of the radius of the smallest test sphere
+    :type lnR_min: float
+    :param R_max: Natural log of the radius of the largest test sphere
+    :type R_max: float
+    :type number: Number of points to test between R_min and R_max
+    :param ith: reduce the number of points by a factor of `ith`. This is
+                implemented as x = x[0:len(x):ith]
+    :type ith: int
+    :param plot: If true this plots ln(C) against ln(R) showing how the
+                 correlation dimension is calculated
+    :type plot: true
+    :param Theiler_window: Option to use the Thieler window
+    :type Theiler_window: int
+
+    ..note:: If you are unfamiliar with how this correlation dimension is
+             calculated please refer to equation (10) from Seymour and Lorimer.
              The Thieler window is not used.
 
 
     """
 
-    (time, omega_dot, a_dot, phi_dot) = Dotted_Variable(file_name)
-    N = len(time)
+    N = len(x)
 
     # If required reduce the data size
-    if "ith" in Option_Dictionary:
-        ith = int(Option_Dictionary['ith'])
-        time = time[0:N:ith]
-        omega_dot = omega_dot[0:N:ith]
-        a_dot = a_dot[0:N:ith]
-        phi_dot = phi_dot[0:N:ith]
-        N = len(time)  # length of data after reduction
+    if ith:
+        x = x[0:N:ith]
+        y = y[0:N:ith]
+        z = z[0:N:ith]
+        N = len(x)
 
-    # Second and third options arguments specify the natural exponents
-    # with which R the sphere radius should vary
-    try:
-        R_min = float(Option_Dictionary['R_min'])
-        R_max = float(Option_Dictionary['R_max'])
-        Number = int(Option_Dictionary['Number'])
-    except KeyError:
-        print ("You must specify R_min,R_max "
-               " and Number in the Option_Dictionary")
-        return
+    # Check the Theiler window and report
+    if Theiler_window:
+        w = Theiler_window
+        vprint(verbose, "Using a Theiler window of w={}".format(w))
+    else:
+        w = 0
 
-    R_list = py.logspace(R_min, R_max, Number)
+    R_list = py.logspace(R_min, R_max, number, base=py.e)
 
-    def abs_val(x1, y1, z1, x2, y2, z2):
-        return py.sqrt((x1 - x2) ** 2.0 + (y1 - y2) ** 2.0 + (z1 - z2) ** 2.0)
+    def abs_val_diff(x1, x2, x3, y1, y2, y3):
+        """ Find the absolute value of the difference between x and y """
+        return py.sqrt((x1 - y1) ** 2.0 + (x2 - y2) ** 2.0 + (x3 - y3) ** 2.0)
 
     # Calculate C(R) for each R and record natural log of both.
     lnC_list = []
@@ -391,23 +427,30 @@ def Correlation_Sum2(file_name, , verbose=False):
 
     for R in R_list:
         sumV = 0.0
+        then = time.time()
         for i in range(N):
-            for j in range(i + 1, N):
-                if R > abs_val(omega_dot[i], a_dot[i], phi_dot[i],
-                               omega_dot[j], a_dot[j], phi_dot[j]):
+            for j in range(i + w + 1, N):
+                if R > abs_val_diff(x[i], y[i], z[i],
+                                    x[j], y[j], z[j]):
                     sumV += 1.0
+
+        print "time = ", time.time() - then, "s"
+
         # Check there is a satisfactory number of points in the sum
 
         if sumV == 0.0:
-            print ("No points in R={0} consider a larger R_min."
+
+            vprint(verbose, "No points inside test sphere R_min."
                   "Ignoring this point".format(R))
         else:
-            C = 2.0 * sumV / (float(N) * (float(N) - 1.0))
+
+            C = 2.0 * sumV / ((float(N) - w) * (float(N) - w - 1.0))
 
             # Test lower bound
             if C < 10.0 / float(N):
-                print ("Only {0} points in R={1}  consider a larger Rmin."
-                       " This data will not be used in calculating"
+
+                vprint(verbose, "Only {0} points in R={1}  consider a larger "
+                       "Rmin. This data will not be used in calculating"
                        " the best fit".format(sumV, R))
 
                 # Add outsider to seperate lists
@@ -416,8 +459,9 @@ def Correlation_Sum2(file_name, , verbose=False):
 
             # Test upper bound
             elif C > 0.1:
-                print ("More than 10 percent of all points in the test sphere "
-                       "of radius {}, this data will not be used "
+
+                vprint(verbose, "More than 10 percent of all points in the "
+                       "test sphere of radius {}, this data will not be used "
                        "in calculating"" the best fit".format(R))
 
                 lnC_outsiders_list.append(py.log(C))
@@ -425,42 +469,56 @@ def Correlation_Sum2(file_name, , verbose=False):
 
             # Add data to list
             else:
+
                 lnC_list.append(py.log(C))
-                lnR_list.append(py.log(R))
+                lnR_list.append(py.log(R))  # Is this correct?
                 # Print some data for the user
-                if verbose:
-                    print ("Point added R ={} ln(R)={} C ={} ln(C)={} "
-                    " Sum_total = {}".format(R, py.log(R), C, py.log(C), sumV))
+                vprint(verbose, "Point added R ={} ln(R)={} C ={} ln(C)={} "
+                " Sum_total = {}".format(R, py.log(R), C, py.log(C), sumV))
+
+    if len(lnC_list) < 3:
+        print("\n WARNING: Too few points in usable range the correlation "
+              " dimension cannot be calculated from this run, better luck"
+              " next time")
+        return
+
     # Linear fit
     (x_fit, y_fit, f_p) = Useful_Tools.Fit_Function(lnR_list, lnC_list, 1)
 
-    # Plot
-    fig = py.figure()
-    ax = fig.add_subplot(111)
-    ax.plot(x_fit, y_fit,
-            color="b", label=("$\ln(c)={0} \ln(R)={1}$"
-                        .format(str(round(f_p[0], 2)), str(round(f_p[1], 2)))))
-    ax.plot(lnR_list, lnC_list,
-            "o", color="r", label="Data used in fit")
-    ax.plot(lnR_outsiders_list, lnC_outsiders_list,
-            "x", color="r", label="Data not used in fit")
+    # Correlation dimension
+    D = f_p[0]
 
-    # Give upper and lower bounds on C(R)
-    ax.axhline(py.log(0.1), ls="--", color="k", alpha=0.6)
-    ax.axhline(py.log(10.0 / float(N)),
-        ls="--", color="k", label="Bounds on $\ln(C(R))$", alpha=0.6)
+    if plot:
+        # Plot
+        fig = py.figure()
+        ax = fig.add_subplot(111)
+        ax.plot(x_fit, y_fit,
+                color="b", label=("$\ln(c)={0} \ln(R) + {1}$"
+                .format(str(round(f_p[0], 2)), str(round(f_p[1], 2)))))
+        ax.plot(lnR_list, lnC_list,
+                "o", color="r", label="Data used in fit")
+        ax.plot(lnR_outsiders_list, lnC_outsiders_list,
+                "x", color="r", label="Data not used in fit")
 
-    leg = py.legend(loc=2, fancybox=True)
-    leg.get_frame().set_alpha(0.6)
-    ax.set_ylabel(r"$\ln(C)$")
-    ax.set_xlabel(r"$\ln(R)$")
+        # Give upper and lower bounds on C(R)
+        ax.axhline(py.log(0.1), ls="--", color="k", alpha=0.6)
+        ax.axhline(py.log(10.0 / float(N)),
+            ls="--", color="k", label="Bounds on $\ln(C(R))$", alpha=0.6)
 
-    #py.title(r"Correlation plot for $\chi = $"+file_name.split("_")[4])
+        leg = py.legend(loc=2, fancybox=True)
+        leg.get_frame().set_alpha(0.6)
+        ax.set_ylabel(r"$\ln(C)$")
+        ax.set_xlabel(r"$\ln(R)$")
 
-    if 'save_fig' in Option_Dictionary:
-        File_Functions.Save_Figure(file_name, "Correlation_Plot")
-    else:
-        py.show()
+        #py.title(r"Correlation plot for $\chi = $"+file_name.split("_")[4])
+
+        if save_fig:
+            File_Functions.Save_Figure(save_fig, "Correlation_Plot")
+        else:
+            py.show()
+
+    return D
+
 
 
 def Parameter_Space_Plot(file_name, Option_Dictionary={}, biaxial=False):

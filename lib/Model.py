@@ -41,15 +41,16 @@ def Run(Input_Dictionary):
     file_name_list = []
 
     # Errors may come out of this..
-    if Input_Dictionary.get('anom_torque'):
-        anom_torque = True
-    elif Input_Dictionary.get('no_anom'):
-        file_name_list .append("no_anom_")
-        anom_torque = False
-        print "no_anom in Input_Dictionary should be replaces by anom_torque"
+    if 'anom_torque' in Input_Dictionary:
+        anom_torque = Input_Dictionary['anom_torque']
+        if Input_Dictionary['anom_torque'] is False:
+            file_name_list .append("no_anom_")
     else:
-        file_name_list .append("no_anom_")
-        anom_torque = False
+        anom_torque = True
+
+    if Input_Dictionary.get('no_anom'):
+        print ("no_anom in Input_Dictionary is no longer supported, please"
+              " use anom_torque instead")
 
     try:
         chi_degrees = Input_Dictionary['chi']

@@ -419,7 +419,7 @@ def Correlation_Sum2(x, y, z, R_min, R_max, number, ith=None,
 
     def abs_val_diff(x1, x2, x3, y1, y2, y3):
         """ Find the absolute value of the difference between x and y """
-        return py.sqrt((x1 - y1) ** 2.0 + (x2 - y2) ** 2.0 + (x3 - y3) ** 2.0)
+        return (x1 - y1) ** 2.0 + (x2 - y2) ** 2.0 + (x3 - y3) ** 2.0
 
     # Calculate C(R) for each R and record natural log of both.
     lnC_list = []
@@ -427,13 +427,23 @@ def Correlation_Sum2(x, y, z, R_min, R_max, number, ith=None,
     lnC_outsiders_list = []
     lnR_outsiders_list = []
 
+    #X = np.array([x,y,z])
+
+    x = np.array(x)
+    y = np.array(y)
+    z = np.array(z)
+
     for R in R_list:
         sumV = 0.0
+        #for i in xrange(N):
+            #for j in xrange(i + w + 1, N):
+                #if pow(R, 2.0) > abs_val_diff(x[i], y[i], z[i],
+                                    #x[j], y[j], z[j]):
+                    #sumV += 1.0
+
         for i in xrange(N):
-            for j in xrange(i + w + 1, N):
-                if R > abs_val_diff(x[i], y[i], z[i],
-                                    x[j], y[j], z[j]):
-                    sumV += 1.0
+            res = abs_val_diff(x[i], y[i], z[i], x[1:], y[1:], z[1:])
+            sumV += len(res[pow(R, 2.0) > res])
 
         # Check there is a satisfactory number of points in the sum
         if sumV == 0.0:

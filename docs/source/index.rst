@@ -2,15 +2,6 @@
  Documentation for nsmod
 =================================
 
-Contents:
-=========
-
-.. toctree::
-   :maxdepth: 1
-   Model
-   NLD_Functions
-
-
 ============
 Overview
 ============
@@ -45,6 +36,16 @@ In the progress of the work an effort was made to understand the results from
 the models mentioned above in the context of chaos and attractors (see Duncan
 & Lorimer 2010). We provide a module `nsmod.NLD_Functions` including the
 associated functions
+
+
+Contents:
+=========
+
+.. toctree::
+   :maxdepth: 2
+
+   Model
+   NLD_Functions
 
 
 

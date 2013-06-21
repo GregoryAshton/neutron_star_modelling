@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """
 
-Functions used for nonlinear dynamics calculations
+Functions used for nonlinear dynamics calculations. This
 
 """
 
@@ -19,7 +19,8 @@ from File_Functions import vprint
 Plot.Defaults()
 
 
-def Attractor_Plot(file_name, elev=15., azim=150, save_fig=False, close=False):
+def Attractor_Plot(file_name, elev=15., azim=150,
+                   return_vals=False, save_fig=False, close=False):
     """
 
     Plots the attractor associated with the data in file_name, essentially the
@@ -116,6 +117,9 @@ def Attractor_Plot(file_name, elev=15., azim=150, save_fig=False, close=False):
         else:
             py.show()
 
+    if return_vals:
+        return (time, x_0, x_1, x_2)
+
 
 def Torque_over_Io(omega, epsA, chi, anom_torque=True, c=3e10, R=1e6):
     """
@@ -131,9 +135,9 @@ def Torque_over_Io(omega, epsA, chi, anom_torque=True, c=3e10, R=1e6):
     :type chi: float
     :param anom_torque: Whether to include the anomalous torque or not
     :type anom_torque: bool
-    :param c: Speed of light in CGS default is :math:`c=3 \times 10^{10}`cm/s
+    :param c: Speed of light in CGS default is :math:`c=3 \times 10^{10}` cm/s
     :type c: float
-    :param R: Neutron star radius default value :math:`R=1 \times 10^{6}`cm
+    :param R: Neutron star radius default value :math:`R=1 \times 10^{6}` cm
     :type R: float
 
     """
@@ -157,7 +161,7 @@ def Torque_over_Io(omega, epsA, chi, anom_torque=True, c=3e10, R=1e6):
 
 
 def Dotted_Variable_Triaxial(file_name, anom_torque=None):
-    """
+    r"""
 
     Produces :math:`\dot{\omega}` from `file_name`
 
@@ -171,17 +175,16 @@ def Dotted_Variable_Triaxial(file_name, anom_torque=None):
     :returns: Time of each measurement and value of :math:`\dot{\omega}`
     :rtype: (list,list)
 
-    ..:note:: The equation to calculate the spin down is given by
+    .. note::
+        The equation to calculate the spin down is given by:
+            .. math::
 
-    .. math::
-
-        \dot{\omega}(t) = \frac{1}{\omega}\left[ \frac{\boldsymbol{T}
-        \cdot \boldsymbol{\omega}}{I_{0}}
-        - \frac{\epsilon_{I1} \omega_{x}T_{x}}{I_{0}(1+\epsilon_{I1})}
-        - \frac{\epsilon_{I3} \omega_{z}T_{z}}{I_{0}(1+\epsilon_{I3})}
-        + \omega_{x}\omega_{y}\omega_{z} \epsilon_{I1}\epsilon_{I3}
-        \frac{\epsilon_{I3} - \epsilon_{I1}}{(1+\epsilon_{I1})
-        (1+\epsilon_{I3})}\right].
+                \dot{\omega}(t) = \frac{1}{\omega}\left[ \frac{\boldsymbol{T}
+                \cdot \boldsymbol{\omega}}{I_{0}} - \frac{\epsilon_{I1}
+                \omega_{x}T_{x}}{I_{0}(1+\epsilon_{I1})} - \frac{\epsilon_{I3}
+                \omega_{z}T_{z}}{I_{0}(1+\epsilon_{I3})}+ \omega_{x}\omega_{y}
+                \omega_{z} \epsilon_{I1}\epsilon_{I3} \frac{\epsilon_{I3} -
+                \epsilon_{I1}}{(1+\epsilon_{I1}) (1+\epsilon_{I3})}\right]
 
     """
 
@@ -365,7 +368,6 @@ def Embed_Seymour_Lorimer(time, x, n=False, frac=8, plot=False):
 
     return (x_0, x_1, x_2, tau)
 
-import time
 
 def Correlation_Sum2(x, y, z, R_min, R_max, number, ith=None,
                      plot=True, verbose=True, save_fig=False,
@@ -394,7 +396,6 @@ def Correlation_Sum2(x, y, z, R_min, R_max, number, ith=None,
     ..note:: If you are unfamiliar with how this correlation dimension is
              calculated please refer to equation (10) from Seymour and Lorimer.
              The Thieler window is not used.
-
 
     """
 
@@ -426,31 +427,15 @@ def Correlation_Sum2(x, y, z, R_min, R_max, number, ith=None,
     lnC_outsiders_list = []
     lnR_outsiders_list = []
 
-    X = py.array([[x[i], y[i], z[i]] for i in xrange(N)]) # haven't tried with just for loops
-
-    def H(x):
-        if x > 0.0:
-            return 1.0
-        else :
-            return 0.0
-
     for R in R_list:
         sumV = 0.0
-        then = time.time()
-        #for i in xrange(N):
-        #    for j in xrange(i + w + 1, N):
-        #        if R > abs_val_diff(x[i], y[i], z[i],
-        #                            x[j], y[j], z[j]):
-        #            sumV += 1.0
-
-        print "time = ", time.time() - then, "s"
-        dx = np.matrix([[H(py.norm(X[i] - X[j]) - R) for j in xrange(1,N)] for i in xrange(1,N)])
-        sumV = sum(sum(sum(dx)))
-        print sumV
-        print "time = ", time.time() - then, "s"
+        for i in xrange(N):
+            for j in xrange(i + w + 1, N):
+                if R > abs_val_diff(x[i], y[i], z[i],
+                                    x[j], y[j], z[j]):
+                    sumV += 1.0
 
         # Check there is a satisfactory number of points in the sum
-
         if sumV == 0.0:
 
             vprint(verbose, "No points inside test sphere R_min."

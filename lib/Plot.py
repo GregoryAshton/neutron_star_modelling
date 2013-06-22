@@ -803,6 +803,6 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
     Additional_Code(Option_Dictionary)
 
     if 'save_fig' in Option_Dictionary:
-        File_FUnctions.Save_Figure(file_name, 'Spherical_Plot_Transform')
+        File_Functions.Save_Figure(file_name, 'Spherical_Plot_Transform')
     else:
         py.show()

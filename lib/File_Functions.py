@@ -91,7 +91,7 @@ def Parameter_Dictionary(user_input):
     return p_d
 
 
-def One_Component_Import(file_name, nmax):
+def One_Component_Import(file_name, nmax=None):
     """ Imports time and w1,w2,w3 from file_name """
     # max_int and d_int are obsolete for now
     f = Read_File(file_name)

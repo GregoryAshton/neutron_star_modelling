@@ -38,9 +38,9 @@ def Parameter_Dictionary(user_input):
         # Check if the anomalous torque was used or not
         if "no_anom" in f:
             f = f.lstrip("no_anom_")
-            p_d["no_anom"] = True
+            p_d["anom_torque"] = False
         else:
-            p_d["no_anom"] = False
+            p_d["anom_torque"] = True
 
         # Import the rest of the parameters
         f = f.split("_")
@@ -142,3 +142,15 @@ def Read_File(file_name):
     f = h5py.File(file_name, "r")
 
     return f
+
+
+def vprint(verbose, *args):
+    """ Function to verbose print """
+    if verbose:
+        # Print each argument separately so caller doesn't need to
+        # stuff everything to be printed into a single string
+        for arg in args:
+            print arg,
+        print
+    else:
+        vprint = lambda *a: None      # do-nothing function

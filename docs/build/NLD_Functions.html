@@ -10,9 +10,8 @@
     
     <title>Nonlinear dynamics &mdash; nsmod 0.1 documentation</title>
     
-    <link rel="stylesheet" href="_static/haiku.css" type="text/css" />
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-    <link rel="stylesheet" href="_static/print.css" type="text/css" />
     
     <script type="text/javascript">
       var DOCUMENTATION_OPTIONS = {
@@ -27,32 +26,39 @@
     <script type="text/javascript" src="_static/underscore.js"></script>
     <script type="text/javascript" src="_static/doctools.js"></script>
     <script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
-    <script type="text/javascript" src="_static/theme_extras.js"></script>
-    <link rel="top" title="nsmod 0.1 documentation" href="index.html" /> 
+    <link rel="top" title="nsmod 0.1 documentation" href="index.html" />
+    <link rel="prev" title="Model" href="Model.html" /> 
   </head>
   <body>
-      <div class="header"><h1 class="heading"><a href="index.html">
-          <span>nsmod 0.1 documentation</span></a></h1>
-        <h2 class="heading"><span>Nonlinear dynamics</span></h2>
-      </div>
-      <div class="topnav">
-      
-        <p>
-        <a class="uplink" href="index.html">Contents</a>
-        </p>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Model.html" title="Model"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">nsmod 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
 
-      </div>
-      <div class="content">
-        
-        
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
   <div class="section" id="nonlinear-dynamics">
 <h1>Nonlinear dynamics<a class="headerlink" href="#nonlinear-dynamics" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="module-lib.NLD_Functions">
 <span id="spin-down"></span><h2>Spin down<a class="headerlink" href="#module-lib.NLD_Functions" title="Permalink to this headline">¶</a></h2>
-<p>Functions used for nonlinear dynamics calculations</p>
+<p>Functions used for nonlinear dynamics calculations. This</p>
 <dl class="function">
 <dt id="lib.NLD_Functions.Attractor_Plot">
-<tt class="descclassname">lib.NLD_Functions.</tt><tt class="descname">Attractor_Plot</tt><big>(</big><em>file_name</em>, <em>elev=15.0</em>, <em>azim=150</em>, <em>save_fig=False</em>, <em>close=False</em><big>)</big><a class="reference internal" href="_modules/lib/NLD_Functions.html#Attractor_Plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.NLD_Functions.Attractor_Plot" title="Permalink to this definition">¶</a></dt>
+<tt class="descclassname">lib.NLD_Functions.</tt><tt class="descname">Attractor_Plot</tt><big>(</big><em>file_name</em>, <em>elev=15.0</em>, <em>azim=150</em>, <em>return_vals=False</em>, <em>save_fig=False</em>, <em>close=False</em><big>)</big><a class="reference internal" href="_modules/lib/NLD_Functions.html#Attractor_Plot"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.NLD_Functions.Attractor_Plot" title="Permalink to this definition">¶</a></dt>
 <dd><p>Plots the attractor associated with the data in file_name, essentially the
 same as <cite>Embed_Seymour_Lorimer</cite> but with additions. This function should be
 used in creating publication images then we can change the embedding if
@@ -106,19 +112,155 @@ of delay time :math:`  au` and the embedding</li>
 </table>
 </dd></dl>
 
+<dl class="function">
+<dt id="lib.NLD_Functions.Torque_over_Io">
+<tt class="descclassname">lib.NLD_Functions.</tt><tt class="descname">Torque_over_Io</tt><big>(</big><em>omega</em>, <em>epsA</em>, <em>chi</em>, <em>anom_torque=True</em>, <em>c=30000000000.0</em>, <em>R=1000000.0</em><big>)</big><a class="reference internal" href="_modules/lib/NLD_Functions.html#Torque_over_Io"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.NLD_Functions.Torque_over_Io" title="Permalink to this definition">¶</a></dt>
+<dd><p>Computes the Goldreich torque for omega=[w1,w2,w3] and magnetic dipole
+at an angle of chi to the z axis</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>omega</strong> (<em>list</em>) &#8211; Spin vector in cartesian coordinates</li>
+<li><strong>epsA</strong> (<em>float</em>) &#8211; Magnetic deformations</li>
+<li><strong>chi</strong> (<em>float</em>) &#8211; Angle between magnetic dipole and the z axis in radians</li>
+<li><strong>anom_torque</strong> (<em>bool</em>) &#8211; Whether to include the anomalous torque or not</li>
+<li><strong>c</strong> (<em>float</em>) &#8211; Speed of light in CGS default is <span class="math">\(c=3       imes 10^{10}\)</span> cm/s</li>
+<li><strong>R</strong> (<em>float</em>) &#8211; Neutron star radius default value <span class="math">\(R=1      imes 10^{6}\)</span> cm</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="lib.NLD_Functions.Dotted_Variable_Triaxial">
+<tt class="descclassname">lib.NLD_Functions.</tt><tt class="descname">Dotted_Variable_Triaxial</tt><big>(</big><em>file_name</em>, <em>anom_torque=None</em><big>)</big><a class="reference internal" href="_modules/lib/NLD_Functions.html#Dotted_Variable_Triaxial"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#lib.NLD_Functions.Dotted_Variable_Triaxial" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produces <span class="math">\(\dot{\omega}\)</span> from <cite>file_name</cite></p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>file_name</strong> (<em>str</em>) &#8211; </li>
+<li><strong>anom_torque</strong> (<em>bool</em>) &#8211; Overides the anom_torque flag defined in the file
+name</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first">Time of each measurement and value of <span class="math">\(\dot{\omega}\)</span></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">(list,list)</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition note">
+<p class="first admonition-title">Note</p>
+<dl class="last docutils">
+<dt>The equation to calculate the spin down is given by:</dt>
+<dd><div class="first last math">
+\[\dot{\omega}(t) = \frac{1}{\omega}\left[ \frac{\boldsymbol{T}
+\cdot \boldsymbol{\omega}}{I_{0}} - \frac{\epsilon_{I1}
+\omega_{x}T_{x}}{I_{0}(1+\epsilon_{I1})} - \frac{\epsilon_{I3}
+\omega_{z}T_{z}}{I_{0}(1+\epsilon_{I3})}+ \omega_{x}\omega_{y}
+\omega_{z} \epsilon_{I1}\epsilon_{I3} \frac{\epsilon_{I3} -
+\epsilon_{I1}}{(1+\epsilon_{I1}) (1+\epsilon_{I3})}\right]\]</div>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="lib.NLD_Functions.Correlation_Sum2">
+<tt class="descclassname">lib.NLD_Functions.</tt><tt class="descname">Correlation_Sum2</tt><big>(</big><em>x</em>, <em>y</em>, <em>z</em>, <em>R_min</em>, <em>R_max</em>, <em>number</em>, <em>ith=None</em>, <em>plot=True</em>, <em>verbose=True</em>, <em>save_fig=False</em>, <em>Theiler_window=None</em><big>)</big><a class="headerlink" href="#lib.NLD_Functions.Correlation_Sum2" title="Permalink to this definition">¶</a></dt>
+<dd><p>Finds the correlation sum of an attractor in 3D</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>time</strong> (<em>list</em>) &#8211; </li>
+<li><strong>x,y,z</strong> &#8211; Attractor data</li>
+<li><strong>lnR_min</strong> (<em>float</em>) &#8211; Natural log of the radius of the smallest test sphere</li>
+<li><strong>R_max</strong> (<em>float</em>) &#8211; Natural log of the radius of the largest test sphere</li>
+<li><strong>ith</strong> (<em>int</em>) &#8211; reduce the number of points by a factor of <cite>ith</cite>. This is
+implemented as x = x[0:len(x):ith]</li>
+<li><strong>plot</strong> (<em>true</em>) &#8211; If true this plots ln(C) against ln(R) showing how the
+correlation dimension is calculated</li>
+<li><strong>Theiler_window</strong> (<em>int</em>) &#8211; Option to use the Thieler window</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<dl class="docutils">
+<dt>..note:: If you are unfamiliar with how this correlation dimension is</dt>
+<dd>calculated please refer to equation (10) from Seymour and Lorimer.
+The Thieler window is not used.</dd>
+</dl>
+</dd></dl>
+
 </div>
 </div>
 
 
+          </div>
+        </div>
       </div>
-      <div class="bottomnav">
-      
-        <p>
-        <a class="uplink" href="index.html">Contents</a>
-        </p>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">Nonlinear dynamics</a><ul>
+<li><a class="reference internal" href="#module-lib.NLD_Functions">Spin down</a></li>
+</ul>
+</li>
+</ul>
 
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="Model.html"
+                        title="previous chapter">Model</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/NLD_Functions.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
       </div>
-
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="py-modindex.html" title="Python Module Index"
+             >modules</a> |</li>
+        <li class="right" >
+          <a href="Model.html" title="Model"
+             >previous</a> |</li>
+        <li><a href="index.html">nsmod 0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
     <div class="footer">
         &copy; Copyright 2013, Gregory Ashton.
       Created using <a href="http://sphinx.pocoo.org/">Sphinx</a> 1.1.3.

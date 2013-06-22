@@ -1,22 +1,26 @@
 #!/usr/bin/python
 """
 
-Functions used for nonlinear dynamics calculations
+Functions used for nonlinear dynamics calculations. This
 
 """
 
 import pylab as py
+import numpy as np
 from pylab import sin, cos
 import Physics_Functions
 import File_Functions
 import Plot
 import Useful_Tools
 
+from File_Functions import vprint
+
 # Import defaults for plotting
 Plot.Defaults()
 
 
-def Attractor_Plot(file_name, elev=15., azim=150, save_fig=False, close=False):
+def Attractor_Plot(file_name, elev=15., azim=150,
+                   return_vals=False, save_fig=False, close=False):
     """
 
     Plots the attractor associated with the data in file_name, essentially the
@@ -37,7 +41,7 @@ def Attractor_Plot(file_name, elev=15., azim=150, save_fig=False, close=False):
     #  makes use of `Torque_over_Io` defined below
 
     (time, omega_dot) = Dotted_Variable_Triaxial(file_name)
-    print len(time), len(omega_dot)
+
     (x_0, x_1, x_2, tau) = Embed_Seymour_Lorimer(time, omega_dot,
                                                             n=False,
                                                             frac=4,
@@ -113,9 +117,30 @@ def Attractor_Plot(file_name, elev=15., azim=150, save_fig=False, close=False):
         else:
             py.show()
 
+    if return_vals:
+        return (time, x_0, x_1, x_2)
+
 
 def Torque_over_Io(omega, epsA, chi, anom_torque=True, c=3e10, R=1e6):
-    """ Returns the Goldreich torque for omega=[w1,w2,w3]"""
+    """
+
+    Computes the Goldreich torque for omega=[w1,w2,w3] and magnetic dipole
+    at an angle of chi to the z axis
+
+    :param omega: Spin vector in cartesian coordinates
+    :type omega: list
+    :param epsA: Magnetic deformations
+    :type epsA: float
+    :param chi: Angle between magnetic dipole and the z axis in radians
+    :type chi: float
+    :param anom_torque: Whether to include the anomalous torque or not
+    :type anom_torque: bool
+    :param c: Speed of light in CGS default is :math:`c=3 \times 10^{10}` cm/s
+    :type c: float
+    :param R: Neutron star radius default value :math:`R=1 \times 10^{6}` cm
+    :type R: float
+
+    """
 
     # Check that chi is coming in radians
     if chi > 2 * py.pi:
@@ -135,11 +160,31 @@ def Torque_over_Io(omega, epsA, chi, anom_torque=True, c=3e10, R=1e6):
         return T1
 
 
-def Dotted_Variable_Triaxial(file_name, anom_torque=False):
-    """
+def Dotted_Variable_Triaxial(file_name, anom_torque=None):
+    r"""
 
-    Function takes the file, imports it and produces omega in the assuming
-    a triaxial moment of inertia tensor
+    Produces :math:`\dot{\omega}` from `file_name`
+
+    :param file_name:
+    :type file_name: str
+
+    :param anom_torque: Overides the anom_torque flag defined in the file
+                        name
+    :type anom_torque: bool
+
+    :returns: Time of each measurement and value of :math:`\dot{\omega}`
+    :rtype: (list,list)
+
+    .. note::
+        The equation to calculate the spin down is given by:
+            .. math::
+
+                \dot{\omega}(t) = \frac{1}{\omega}\left[ \frac{\boldsymbol{T}
+                \cdot \boldsymbol{\omega}}{I_{0}} - \frac{\epsilon_{I1}
+                \omega_{x}T_{x}}{I_{0}(1+\epsilon_{I1})} - \frac{\epsilon_{I3}
+                \omega_{z}T_{z}}{I_{0}(1+\epsilon_{I3})}+ \omega_{x}\omega_{y}
+                \omega_{z} \epsilon_{I1}\epsilon_{I3} \frac{\epsilon_{I3} -
+                \epsilon_{I1}}{(1+\epsilon_{I1}) (1+\epsilon_{I3})}\right]
 
     """
 
@@ -151,6 +196,10 @@ def Dotted_Variable_Triaxial(file_name, anom_torque=False):
     epsI3 = float(Parameter_Dictionary["epsI3"])
     epsA = float(Parameter_Dictionary["epsA"])
     chi = float(Parameter_Dictionary["chi"]) * py.pi / 180.0
+
+    if anom_torque is None:
+        # Only check the dictionary if the user has not specified anom_torque
+        anom_torque = Parameter_Dictionary["anom_torque"]
 
     # Calculate the differentials from Goldreich equations
     omega_dot = []
@@ -244,8 +293,9 @@ def Embed_Seymour_Lorimer(time, x, n=False, frac=8, plot=False):
             i += 1
 
         if i == len(xo):
-            print "Not enough data to find first minima"
-            return
+            print ("ERROR: n was not large enough to find the first minimum,"
+                   "or there isn't one")
+            raise
 
         for i in xrange(first_minimum_index, 2 * first_minimum_index):
             p = [xo[j] * xo[j + i] for j in xrange(len(xo) - i)]
@@ -319,6 +369,166 @@ def Embed_Seymour_Lorimer(time, x, n=False, frac=8, plot=False):
     return (x_0, x_1, x_2, tau)
 
 
+def Correlation_Sum2(x, y, z, R_min, R_max, number, ith=None,
+                     plot=True, verbose=True, save_fig=False,
+                     Theiler_window=None):
+    """
+
+    Finds the correlation sum of an attractor in 3D
+
+    :param time:
+    :type time: list
+    :param x,y,z: Attractor data
+    :param lnR_min: Natural log of the radius of the smallest test sphere
+    :type lnR_min: float
+    :param R_max: Natural log of the radius of the largest test sphere
+    :type R_max: float
+    :type number: Number of points to test between R_min and R_max
+    :param ith: reduce the number of points by a factor of `ith`. This is
+                implemented as x = x[0:len(x):ith]
+    :type ith: int
+    :param plot: If true this plots ln(C) against ln(R) showing how the
+                 correlation dimension is calculated
+    :type plot: true
+    :param Theiler_window: Option to use the Thieler window
+    :type Theiler_window: int
+
+    ..note:: If you are unfamiliar with how this correlation dimension is
+             calculated please refer to equation (10) from Seymour and Lorimer.
+             The Thieler window is not used.
+
+    """
+
+    N = len(x)
+
+    # If required reduce the data size
+    if ith:
+        x = x[0:N:ith]
+        y = y[0:N:ith]
+        z = z[0:N:ith]
+        N = len(x)
+
+    # Check the Theiler window and report
+    if Theiler_window:
+        w = Theiler_window
+        vprint(verbose, "Using a Theiler window of w={}".format(w))
+    else:
+        w = 0
+
+    R_list = py.logspace(R_min, R_max, number, base=py.e)
+
+    def abs_val_diff(x1, x2, x3, y1, y2, y3):
+        """ Find the absolute value of the difference between x and y """
+        return (x1 - y1) ** 2.0 + (x2 - y2) ** 2.0 + (x3 - y3) ** 2.0
+
+    # Calculate C(R) for each R and record natural log of both.
+    lnC_list = []
+    lnR_list = []
+    lnC_outsiders_list = []
+    lnR_outsiders_list = []
+
+    #X = np.array([x,y,z])
+
+    x = np.array(x)
+    y = np.array(y)
+    z = np.array(z)
+
+    for R in R_list:
+        sumV = 0.0
+        #for i in xrange(N):
+            #for j in xrange(i + w + 1, N):
+                #if pow(R, 2.0) > abs_val_diff(x[i], y[i], z[i],
+                                    #x[j], y[j], z[j]):
+                    #sumV += 1.0
+
+        for i in xrange(N):
+            res = abs_val_diff(x[i], y[i], z[i], x[1:], y[1:], z[1:])
+            sumV += len(res[pow(R, 2.0) > res])
+
+        # Check there is a satisfactory number of points in the sum
+        if sumV == 0.0:
+
+            vprint(verbose, "No points inside test sphere R_min."
+                  "Ignoring this point".format(R))
+        else:
+
+            C = 2.0 * sumV / ((float(N) - w) * (float(N) - w - 1.0))
+
+            # Test lower bound
+            if C < 10.0 / float(N):
+
+                vprint(verbose, "Only {0} points in R={1}  consider a larger "
+                       "Rmin. This data will not be used in calculating"
+                       " the best fit".format(sumV, R))
+
+                # Add outsider to seperate lists
+                lnC_outsiders_list.append(py.log(C))
+                lnR_outsiders_list.append(py.log(R))
+
+            # Test upper bound
+            elif C > 0.1:
+
+                vprint(verbose, "More than 10 percent of all points in the "
+                       "test sphere of radius {}, this data will not be used "
+                       "in calculating"" the best fit".format(R))
+
+                lnC_outsiders_list.append(py.log(C))
+                lnR_outsiders_list.append(py.log(R))
+
+            # Add data to list
+            else:
+
+                lnC_list.append(py.log(C))
+                lnR_list.append(py.log(R))  # Is this correct?
+                # Print some data for the user
+                vprint(verbose, "Point added R ={} ln(R)={} C ={} ln(C)={} "
+                " Sum_total = {}".format(R, py.log(R), C, py.log(C), sumV))
+
+    if len(lnC_list) < 3:
+        print("\n WARNING: Too few points in usable range the correlation "
+              " dimension cannot be calculated from this run, better luck"
+              " next time")
+        return
+
+    # Linear fit
+    (x_fit, y_fit, f_p) = Useful_Tools.Fit_Function(lnR_list, lnC_list, 1)
+
+    # Correlation dimension
+    D = f_p[0]
+
+    if plot:
+        # Plot
+        fig = py.figure()
+        ax = fig.add_subplot(111)
+        ax.plot(x_fit, y_fit,
+                color="b", label=("$\ln(c)={0} \ln(R) + {1}$"
+                .format(str(round(f_p[0], 2)), str(round(f_p[1], 2)))))
+        ax.plot(lnR_list, lnC_list,
+                "o", color="r", label="Data used in fit")
+        ax.plot(lnR_outsiders_list, lnC_outsiders_list,
+                "x", color="r", label="Data not used in fit")
+
+        # Give upper and lower bounds on C(R)
+        ax.axhline(py.log(0.1), ls="--", color="k", alpha=0.6)
+        ax.axhline(py.log(10.0 / float(N)),
+            ls="--", color="k", label="Bounds on $\ln(C(R))$", alpha=0.6)
+
+        leg = py.legend(loc=2, fancybox=True)
+        leg.get_frame().set_alpha(0.6)
+        ax.set_ylabel(r"$\ln(C)$")
+        ax.set_xlabel(r"$\ln(R)$")
+
+        #py.title(r"Correlation plot for $\chi = $"+file_name.split("_")[4])
+
+        if save_fig:
+            File_Functions.Save_Figure(save_fig, "Correlation_Plot")
+        else:
+            py.show()
+
+    return D
+
+
+
 def Parameter_Space_Plot(file_name, Option_Dictionary={}, biaxial=False):
     """
 
@@ -358,7 +568,6 @@ def Parameter_Space_Plot(file_name, Option_Dictionary={}, biaxial=False):
     ax.view_init(elev, azim)
 
     ax.plot(omega_dot, a_dot, phi_dot, "-", lw=0.8, color="b")
-
 
     # Plot the 'shadows'
     ax.plot(omega_dot, a_dot, min(phi_dot),

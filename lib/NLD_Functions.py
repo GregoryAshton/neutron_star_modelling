@@ -369,7 +369,7 @@ def Embed_Seymour_Lorimer(time, x, n=False, frac=8, plot=False):
     return (x_0, x_1, x_2, tau)
 
 
-def Correlation_Sum2_new(x, y, z, R_min, R_max, number, ith=None,
+def Correlation_Sum(data, R_min, R_max, number, ith=None,
                      plot=True, verbose=True, save_fig=False,
                      Theiler_window=None):
     """
@@ -378,7 +378,8 @@ def Correlation_Sum2_new(x, y, z, R_min, R_max, number, ith=None,
 
     :param time:
     :type time: list
-    :param x,y,z: Attractor data
+    :param data: Attractor data, this can either be a tuple of list or a string
+                 of the file name from which to import the data
     :param lnR_min: Natural log of the radius of the smallest test sphere
     :type lnR_min: float
     :param R_max: Natural log of the radius of the largest test sphere
@@ -398,6 +399,14 @@ def Correlation_Sum2_new(x, y, z, R_min, R_max, number, ith=None,
              The Thieler window is not used.
 
     """
+
+    if type(data) is str:
+        (time, x, y, z) = File_Functions.One_Component_Import(data)
+    elif type(data) is tuple:
+        (x, y, z) = data
+    else:
+        print "ERROR: Data type is not understood"
+        return
 
     N = len(x)
 
@@ -454,8 +463,8 @@ def Correlation_Sum2_new(x, y, z, R_min, R_max, number, ith=None,
         # Check there is a satisfactory number of points in the sum
         if sumV == 0.0:
 
-            vprint(verbose, "No points inside test sphere R_min."
-                  "Ignoring this point".format(R))
+            vprint(verbose, "No points inside test sphere R_min={}."
+                  " Ignoring this point".format(R))
         else:
 
             C = 2.0 * sumV / ((float(N) - w) * (float(N) - w - 1.0))

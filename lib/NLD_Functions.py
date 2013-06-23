@@ -1,7 +1,7 @@
 #!/usr/bin/python
 """
 
-Functions used for nonlinear dynamics calculations. This
+Functions used for nonlinear dynamics calculations.
 
 """
 
@@ -369,7 +369,7 @@ def Embed_Seymour_Lorimer(time, x, n=False, frac=8, plot=False):
     return (x_0, x_1, x_2, tau)
 
 
-def Correlation_Sum2(x, y, z, R_min, R_max, number, ith=None,
+def Correlation_Sum2_new(x, y, z, R_min, R_max, number, ith=None,
                      plot=True, verbose=True, save_fig=False,
                      Theiler_window=None):
     """
@@ -418,7 +418,11 @@ def Correlation_Sum2(x, y, z, R_min, R_max, number, ith=None,
     R_list = py.logspace(R_min, R_max, number, base=py.e)
 
     def abs_val_diff(x1, x2, x3, y1, y2, y3):
-        """ Find the absolute value of the difference between x and y """
+        """
+
+        Find the square of the absolute value of the difference between x and y
+
+        """
         return (x1 - y1) ** 2.0 + (x2 - y2) ** 2.0 + (x3 - y3) ** 2.0
 
     # Calculate C(R) for each R and record natural log of both.
@@ -435,15 +439,17 @@ def Correlation_Sum2(x, y, z, R_min, R_max, number, ith=None,
 
     for R in R_list:
         sumV = 0.0
+        for i in xrange(N - 1):
+            res = abs_val_diff(x[i], y[i], z[i],
+                               x[i + w + 1:], y[i + w + 1:], z[i + w + 1:])
+            sumV += len(res[pow(R, 2.0) > res])
+
+        # This is the old method, leaving it here as it is easier to compehend
         #for i in xrange(N):
             #for j in xrange(i + w + 1, N):
                 #if pow(R, 2.0) > abs_val_diff(x[i], y[i], z[i],
-                                    #x[j], y[j], z[j]):
+                                              #x[j], y[j], z[j]):
                     #sumV += 1.0
-
-        for i in xrange(N):
-            res = abs_val_diff(x[i], y[i], z[i], x[1:], y[1:], z[1:])
-            sumV += len(res[pow(R, 2.0) > res])
 
         # Check there is a satisfactory number of points in the sum
         if sumV == 0.0:
@@ -526,7 +532,6 @@ def Correlation_Sum2(x, y, z, R_min, R_max, number, ith=None,
             py.show()
 
     return D
-
 
 
 def Parameter_Space_Plot(file_name, Option_Dictionary={}, biaxial=False):
@@ -628,7 +633,7 @@ def Parameter_Space_Plot(file_name, Option_Dictionary={}, biaxial=False):
             py.show()
 
 
-def Correlation_Sum(file_name, Option_Dictionary={}, verbose=False):
+def Correlation_Sum_Old(file_name, Option_Dictionary={}, verbose=False):
     """ Plots the correlation sum of the input file """
 
     (time, omega_dot, a_dot, phi_dot) = Dotted_Variable(file_name)
@@ -739,7 +744,7 @@ def Correlation_Sum(file_name, Option_Dictionary={}, verbose=False):
         py.show()
 
 
-# Theiler window
+
 def Correlation_Sum_W(file_name, Option_Dictionary={}, verbose=False):
     """ Plots the correlation sum of the input file """
 

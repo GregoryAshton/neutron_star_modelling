@@ -20,7 +20,7 @@ Plot.Defaults()
 
 
 def Attractor_Plot(file_name, elev=15., azim=150,
-                   return_vals=False, save_fig=False, close=False):
+                   return_vals=False, save_fig=False, close=False, plot=True):
     """
 
     Plots the attractor associated with the data in file_name, essentially the
@@ -220,7 +220,7 @@ def Dotted_Variable_Triaxial(file_name, anom_torque=None):
     return (time, omega_dot)
 
 
-def Embed_Seymour_Lorimer(time, x, n=False, frac=8, plot=False):
+def Embed_Seymour_Lorimer(time, x, n=False, frac=8, plot=False, verbose=True):
     """
 
     Takes 1d signal x and produces a 3-dimensional embedding calculating
@@ -308,7 +308,7 @@ def Embed_Seymour_Lorimer(time, x, n=False, frac=8, plot=False):
     fit_upper_index = first_minimum_index / frac
 
     if fit_upper_index < 500:
-        print ("WARNING: The polynomial is being fitted to"
+        vprint (verbose, "WARNING: The polynomial is being fitted to"
                " only {} points".format(fit_upper_index))
 
     mat = py.polyfit(dt_list[:fit_upper_index], rho[:fit_upper_index], 2)
@@ -401,7 +401,11 @@ def Correlation_Sum(data, R_min, R_max, number, ith=None,
     """
 
     if type(data) is str:
-        (time, x, y, z) = File_Functions.One_Component_Import(data)
+        (time, omega_dot) = Dotted_Variable_Triaxial(data)
+
+        (x, y, z, tau) = Embed_Seymour_Lorimer(time, omega_dot, verbose=False,
+                                               n=False, frac=4, plot=False)
+
     elif type(data) is tuple:
         (x, y, z) = data
     else:
@@ -463,8 +467,8 @@ def Correlation_Sum(data, R_min, R_max, number, ith=None,
         # Check there is a satisfactory number of points in the sum
         if sumV == 0.0:
 
-            vprint(verbose, "No points inside test sphere R_min={}."
-                  " Ignoring this point".format(R))
+            vprint(verbose, "No points inside test sphere lnR_min={}."
+                  " Ignoring this point".format(py.log(R)))
         else:
 
             C = 2.0 * sumV / ((float(N) - w) * (float(N) - w - 1.0))
@@ -472,9 +476,9 @@ def Correlation_Sum(data, R_min, R_max, number, ith=None,
             # Test lower bound
             if C < 10.0 / float(N):
 
-                vprint(verbose, "Only {0} points in R={1}  consider a larger "
-                       "Rmin. This data will not be used in calculating"
-                       " the best fit".format(sumV, R))
+                vprint(verbose, "Only {0} points for lnR={1}  consider a larger"
+                       " Rmin. This data will not be used in calculating"
+                       " the best fit".format(sumV, py.log(R)))
 
                 # Add outsider to seperate lists
                 lnC_outsiders_list.append(py.log(C))
@@ -484,8 +488,8 @@ def Correlation_Sum(data, R_min, R_max, number, ith=None,
             elif C > 0.1:
 
                 vprint(verbose, "More than 10 percent of all points in the "
-                       "test sphere of radius {}, this data will not be used "
-                       "in calculating"" the best fit".format(R))
+                       "test sphere of lnR = {}, this data will not be used "
+                       "in calculating"" the best fit".format(py.log(R)))
 
                 lnC_outsiders_list.append(py.log(C))
                 lnR_outsiders_list.append(py.log(R))
@@ -540,7 +544,7 @@ def Correlation_Sum(data, R_min, R_max, number, ith=None,
         else:
             py.show()
 
-    return D
+    return (D, len(lnC_list))
 
 
 def Parameter_Space_Plot(file_name, Option_Dictionary={}, biaxial=False):

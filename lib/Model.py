@@ -139,13 +139,14 @@ def Run(Input_Dictionary):
                       error=float(error)
                       )
 
-    pynotify.init("Basic")
 
-    n = pynotify.Notification("Run 1CM complete",
-      "output saved as {}".format(file_name)
-    )
-
-    n.show()
+        #pynotify.init("Basic")
+    #
+        #n = pynotify.Notification("Run 1CM complete",
+          #"output saved as {}".format(file_name)
+        #)
+    #
+        #n.show()
     return file_name
 
 

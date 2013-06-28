@@ -21,52 +21,6 @@ import math
 from cython_gsl cimport *
 import h5py
 
-ctypedef struct vector:
-    double one
-    double two
-    double three
-
-cdef double Torque_over_Io (double w[], void *params) nogil:
-    """ Returns the Goldreich torque
-
-    Note: it is important that chi is given in radians and not degrees,
-    this is not checked.
-
-    """
-
-    cdef double chi, epsA, anom_torque, pre, mx, mz, T_o_I[3]
-
-    epsA = (<double *> params)[0]
-    chi = (<double *> params)[1]
-    anom_torque = (<double *> params)[4]
-
-    mx = sin(chi)
-    mz = cos(chi)
-
-    pre =  ( pow(w[0],2) + pow(w[1],2) + pow(w[2],2) ) * 2.0 * pow(10,6) * pow(9.0 * pow(10,10),-1)
-
-    Tx_sd = pre * epsA * mz * (w[2] * mx - w[0] * mz)
-    Ty_sd = -pre * epsA * w[2]
-    Tz_sd = pre * epsA * mx * (w[0] * mz - w[2] * mx)
-
-    #if anom_torque == 1:
-    Tx_an = epsA * (w[0] * mx + w[2] * mz) * w[1] * mz
-    Ty_an = epsA * (w[0] * mx + w[2] * mz) * (w[2] * mx - w[0] * mz)
-    Tz_an = -epsA * (w[0] * mx + w[2] * mz) * w[1] * mx
-
-    #T_o_I = {Tx_sd + Tx_an, Tx_sd + Tx_an, Tx_sd + Tx_an}
-
-    #T_o_I[1] = Ty_sd + Ty_an
-    #T_o_I[2] = Tz_sd + Tz_an
-
-    #else
-
-    #T_o_I[0] = Tx_sd
-    # T_o_I[1] = Ty_sd
-    #T_o_I[2] = Tz_sd
-
-    return Tx_sd
-
 
 cdef int funcs (double t, double w[], double f[], void *params) nogil:
     """ Function defining the ODEs with the anomalous torque """
@@ -87,13 +41,13 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     pre =  ( pow(w[0],2) + pow(w[1],2) + pow(w[2],2) ) * 2.0 * pow(10,6) * pow(9.0 * pow(10,10),-1)
 
     Tx_sd = pre * epsA * mz * (w[2] * mx - w[0] * mz)
-    Ty_sd = -pre * epsA * w[2]
+    Ty_sd = -pre * epsA * w[1]
     Tz_sd = pre * epsA * mx * (w[0] * mz - w[2] * mx)
 
     if anom_torque == 1:
         Tx = Tx_sd + epsA * (w[0] * mx + w[2] * mz) * w[1] * mz
         Ty = Ty_sd + epsA * (w[0] * mx + w[2] * mz) * (w[2] * mx - w[0] * mz)
-        Tz = Tz_sd -epsA * (w[0] * mx + w[2] * mz) * w[1] * mx
+        Tz = Tz_sd - epsA * (w[0] * mx + w[2] * mz) * w[1] * mx
 
     else:
         Tx = Tx_sd
@@ -111,36 +65,6 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
 
     return GSL_SUCCESS
 
-
-cdef int no_anom_torque (double t, double y[], double f[], void *params) nogil:
-    """ Function defining the ODEs with the anomalous torque """
-    # Define the variables used in the calculation
-    cdef double wx,wy,wz,w_2,epsI,epsA,chi,Lambda
-
-    # Import the three time dependant variables from y[]
-    wx=y[0]
-    wy=y[1]
-    wz=y[2]
-    w_2 = pow(wx,2)+pow(wy,2)+pow(wz,2)
-
-    # Import the constant variables from params
-    Lambda = (<double *> params)[0]    #= 2R/3C */
-    epsI= (<double *> params)[1]
-    epsA = (<double *> params)[2]
-    chi = (<double *> params)[3]
-
-    # Calculate the angular parts of the three equations to avoid repeated calculation
-    cdef double Cx,Sx
-    Cx = cos(chi)
-    Sx = sin(chi)
-
-    #  Define the three ODEs in f[] as functions of the above variables
-    f[0] = epsA*(Lambda*w_2*Cx*(wz*Sx-wx*Cx)) - wy*wz*epsI
-
-    f[1] = epsA*(-Lambda*w_2*wy) + wx*wz*epsI
-
-    f[2] = epsA*pow(1+epsI,-1) * (Lambda*w_2*Sx*(wx*Cx - wz*Sx))
-    return GSL_SUCCESS
 
 # Currently jac is unused by the ODE solver so is left empty
 cdef int jac (double t, double y[], double *dfdy, double dfdt[], void *params) nogil:

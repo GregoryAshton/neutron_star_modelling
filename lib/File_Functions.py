@@ -7,7 +7,7 @@ import h5py
 import os
 
 
-def Save_Figure(file_name, type_of_plot, format_type=".png"):
+def Save_Figure(file_name, type_of_plot, format_type=".pdf"):
     """ Saves the currently open figure with an appropriate name"""
     plot_file_name = "{0}_{1}{2}".format(
                         type_of_plot, file_name.rstrip(".hdf5"), format_type

@@ -46,76 +46,76 @@ def Attractor_Plot(file_name, elev=15., azim=150,
                                                             n=False,
                                                             frac=4,
                                                             plot=False)
+    if plot:
+        # Plot the data in 3d
+        fig = py.figure(figsize=(8, 8))
+        ax = fig.add_subplot(111, projection='3d')
 
-    # Plot the data in 3d
-    fig = py.figure(figsize=(8, 8))
-    ax = fig.add_subplot(111, projection='3d')
+        # Set the view angle
+        ax.view_init(elev, azim)
 
-    # Set the view angle
-    ax.view_init(elev, azim)
+        ax.plot(x_0, x_1, x_2, "-", lw=0.8, color="b")
 
-    ax.plot(x_0, x_1, x_2, "-", lw=0.8, color="b")
+        # Plot the 'shadows'
+        ax.plot(x_0, x_1, min(x_2),
+            zdir='z', color="k", alpha=0.2, lw=0.8)
+        #ax.plot(x_0, x_2, max(x_1), zdir='x', color="k", alpha=0.2, lw=0.8)
+        #ax.plot(x_0, x_1, max(x_2), zdir='y', color="k", alpha=0.2, lw=0.8)
 
-    # Plot the 'shadows'
-    ax.plot(x_0, x_1, min(x_2),
-        zdir='z', color="k", alpha=0.2, lw=0.8)
-    #ax.plot(x_0, x_2, max(x_1), zdir='x', color="k", alpha=0.2, lw=0.8)
-    #ax.plot(x_0, x_1, max(x_2), zdir='y', color="k", alpha=0.2, lw=0.8)
+        # Plotting options, remove ticks and add labels
+        ax.set_xlabel(r"$\dot{\omega}(t)$", size=15)
+        ax.set_ylabel(r"$\dot{\omega}(t+\tau)$", size=15)
+        ax.set_zlabel(r"$\dot{\omega}(t+2\tau)$", size=15)
 
-    # Plotting options, remove ticks and add labels
-    ax.set_xlabel(r"$\dot{\omega}(t)$", size=15)
-    ax.set_ylabel(r"$\dot{\omega}(t+\tau)$", size=15)
-    ax.set_zlabel(r"$\dot{\omega}(t+2\tau)$", size=15)
+        ax.set_xticklabels([])  # ax.get_xticks()[1:-2:3])
+        ax.set_yticklabels([])
+        ax.set_zticklabels([])
 
-    ax.set_xticklabels([])  # ax.get_xticks()[1:-2:3])
-    ax.set_yticklabels([])
-    ax.set_zticklabels([])
-
-    #py.rcParams['axes.grid'] = True
-
-    if save_fig:
-        File_Functions.Save_Figure(file_name, "Attractor_Plot")
-    else:
-        py.show()
-
-    # Additional plot may be made if required
-    if close:
-        axis_label_list = [r"$\dot{\omega}$", r"$\dot{a}$", r"$\dot{\phi}$"]
-        axis_list = [x_0, x_1, x_2]
-        try:
-            (axis, xmin, xmax, ymin, ymax) = close
-        except ValueError:
-            print ("ERROR: close should be a tuple"
-                   " (axis, xmin, max, ymin, ymax)"
-                   "no plot will be produced")
-            return
-        # Remove the axis
-        axis_label_list.pop(int(axis))
-        axis_list.pop(int(axis))
-
-        fig2 = py.figure()
-        ax2 = fig2.add_subplot(111)
-        ax2.plot(axis_list[0], axis_list[1])
-
-        try:
-            float(xmin)
-            float(xmax)
-            float(ymin)
-            float(ymax)
-
-            ax2.set_xlim(float(xmin), float(xmax))
-            ax2.set_ylim(float(ymin), float(ymax))
-        except ValueError:
-            print ("x and y lims are not properly defined"
-                    "these should be floats. Using full range instead")
-
-        ax2.set_xlabel(axis_label_list[0])
-        ax2.set_ylabel(axis_label_list[1])
+        #py.rcParams['axes.grid'] = True
 
         if save_fig:
-            File_Functions.Save_Figure(file_name, "Attractor_Plot_close")
+            File_Functions.Save_Figure(file_name, "Attractor_Plot")
         else:
             py.show()
+
+        # Additional plot may be made if required
+        if close:
+            axis_label_list = [r"$\dot{\omega}$", r"$\dot{a}$", r"$\dot{\phi}$"]
+            axis_list = [x_0, x_1, x_2]
+            try:
+                (axis, xmin, xmax, ymin, ymax) = close
+            except ValueError:
+                print ("ERROR: close should be a tuple"
+                       " (axis, xmin, max, ymin, ymax)"
+                       "no plot will be produced")
+                return
+            # Remove the axis
+            axis_label_list.pop(int(axis))
+            axis_list.pop(int(axis))
+
+            fig2 = py.figure()
+            ax2 = fig2.add_subplot(111)
+            ax2.plot(axis_list[0], axis_list[1])
+
+            try:
+                float(xmin)
+                float(xmax)
+                float(ymin)
+                float(ymax)
+
+                ax2.set_xlim(float(xmin), float(xmax))
+                ax2.set_ylim(float(ymin), float(ymax))
+            except ValueError:
+                print ("x and y lims are not properly defined"
+                        "these should be floats. Using full range instead")
+
+            ax2.set_xlabel(axis_label_list[0])
+            ax2.set_ylabel(axis_label_list[1])
+
+            if save_fig:
+                File_Functions.Save_Figure(file_name, "Attractor_Plot_close")
+            else:
+                py.show()
 
     if return_vals:
         return (time, x_0, x_1, x_2)

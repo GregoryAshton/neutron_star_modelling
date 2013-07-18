@@ -152,9 +152,8 @@ def Torque_over_Io(omega, epsA, chi, anom_torque=True, c=3e10, R=1e6):
     T1 = (2 * R * pow(3 * c, -1) * epsA * omega_squared *
                         py.cross(py.cross(omega, m), m))
 
-    T2 = epsA * py.dot(omega, m) * py.cross(omega, m)
-
     if anom_torque:
+        T2 = epsA * py.dot(omega, m) * py.cross(omega, m)
         return T1 + T2
     else:
         return T1

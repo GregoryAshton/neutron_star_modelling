@@ -180,7 +180,7 @@ def Spherical_Plot(file_name, Option_Dictionary={}):
     ax3.set_yticks(ax3.get_yticks()[0:-1])
     ax3.set_ylabel("$\phi$ [deg]", rotation="vertical")
     ax3.yaxis.set_label_coords(labelx, 0.5)
-    ax3.set_xlabel(r"time  [$1\times 10^{{0}}$ s]".format(str(scale_val)))
+    ax3.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
     ax3.set_xlim(tmin * pow(10, -scale_val), tmax * pow(10, -scale_val))
     if 'end_val' in Option_Dictionary:
         print " Data on the end value of the spherical components of omega"

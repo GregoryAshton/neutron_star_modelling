@@ -44,22 +44,28 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
     if type(chi) in [float, int]:
         file_name_list.append("chi_{:.1f}_".format(chi))
     elif type(chi) is str:
-        file_name_list.append("chi_{}_".format(chi))
+        file_name_list.append("chi_{}".format(chi))
         chi = float(chi)
     else:
         print (" ERROR: You need to specify chi in degrees")
         return
 
-    if type(epsI3) in [float, int]:
+    if type(epsI1) in [float, int]:
         file_name_list.append("_epsI1_{:.2e}".format(epsI1))
+    elif type(epsI1) is str:
+        file_name_list.append("_epsI1_{}".format(epsI1))
+        epsI1 = float(epsI1)
+    else:
+        print (" ERROR: You need to specify epsI1")
+        return
+
+    if type(epsI3) in [float, int]:
         file_name_list.append("_epsI3_{:.2e}".format(epsI3))
     elif type(epsI3) is str:
-        file_name_list.append("_epsI1_{}".format(epsI1))
         file_name_list.append("_epsI3_{}".format(epsI3))
         epsI3 = float(epsI3)
     else:
-        print (" ERROR: You need to specify at least epsI3,"
-              " epsI1 is by default 0.0 ")
+        print (" ERROR: You need to specify epsI3")
         return
 
     if type(epsA) in [float, int]:
@@ -79,6 +85,10 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
     else:
         print (" ERROR: You need to specify omega0")
         return
+
+    if a_int != 50.0:
+        file_name_list.append("_aint_{}".format(a_int))
+        a_int = float(a_int)
 
     if eta != 0.0:
         file_name_list.append("_eta_{}".format(eta))
@@ -100,17 +110,20 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
 
     # Check if file already exists
     if file_name in os.listdir("."):
-        vprint(True, "File already exists, remove and rerun if is corrupted")
-        return file_name
-
-    print chi, file_name, n, epsA, epsI1, epsI3, epsA, eta, anom_torque
+        #vprint(True, "File already exists, remove and rerun if is corrupted")
+        #return file_name
+        os.remove(file_name)
 
     nsmod_one_component_model.main(
                       chi=chi,
                       file_name=file_name,
                       n=int(n),
                       epsA=epsA,
-                      eta=float(eta),
+                      epsI1=epsI1,
+                      epsI3=epsI3,
+                      omega0=omega0,
+                      t1=t1,
+                      eta=eta,
                       anom_torque=anom_torque,
                       error=float(error),
                       a_int=a_int

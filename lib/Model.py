@@ -9,18 +9,18 @@ from File_Functions import vprint
 
 
 def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
-        omega0=None, eta=0.0, t1=1e12, error=1e-12, n=1000, verbose=True,
+        omega0=None, t1=1e12, error=1e-12, n=1000, eta=0.0, verbose=True,
         a_int=50.0):
     """
 
     Run a simulation of the one component model
 
-    :param epsI3: Value of the deformation to the moment of inertia along the
-                 3 - axis e.g :math:`I_{zz} = I_{0}(1+\epsilon_{I3})`
-    :type epsI3: float
     :param epsI1: Value of the deformation to the moment of inertia along the
                  1 - axis e.g :math:`I_{xx} = I_{0}(1+\epsilon_{I1})`
     :type epsI1: float
+    :param epsI3: Value of the deformation to the moment of inertia along the
+                 3 - axis e.g :math:`I_{zz} = I_{0}(1+\epsilon_{I3})`
+    :type epsI3: float
     :param epsA: Magnetic deformation
     :type epsA: float
     :param omega0: Initial rotational speed in :math:`Hz/rad`

@@ -10,7 +10,7 @@ from mpl_toolkits.mplot3d import proj3d
 import File_Functions
 import Physics_Functions
 import Useful_Tools
-from Physics_Functions import Beta_Function  # ?
+from Physics_Functions import Beta_Function
 
 
 #def Save_Figure(file_name, type_of_plot, format_type=".png"):
@@ -180,7 +180,7 @@ def Spherical_Plot(file_name, Option_Dictionary={}):
     ax3.set_yticks(ax3.get_yticks()[0:-1])
     ax3.set_ylabel("$\phi$ [deg]", rotation="vertical")
     ax3.yaxis.set_label_coords(labelx, 0.5)
-    ax3.set_xlabel(r"time  [$1\times 10^{{0}}$ s]".format(str(scale_val)))
+    ax3.set_xlabel(r"time  [$1\times 10^{}$ s]".format(scale_val))
     ax3.set_xlim(tmin * pow(10, -scale_val), tmax * pow(10, -scale_val))
     if 'end_val' in Option_Dictionary:
         print " Data on the end value of the spherical components of omega"
@@ -249,7 +249,7 @@ def Alpha_Plot(file_name, Option_Dictionary={}):
     ax1 = fig.add_subplot(111)
     ax1.plot(t_scaled, alpha, lw=2)
     ax1.set_ylabel(r"$\alpha$ [deg]", rotation="vertical")
-    ax1.set_xlabel(r"time  [$1\times 10^{{0}}$ s]".format(str(scale_val)))
+    ax1.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
 
     Additional_Code(Option_Dictionary)
 
@@ -780,8 +780,7 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
 
         # Ploptions
 
-        ax3.set_xlabel(r"time  [$1\times 10^{" + str(scale_val)
-                       + '}$ s]', fontsize=16)
+        ax3.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
         ax3.yaxis.set_label_coords(labelx, 0.5)
         ax3.set_yticks(ax3.get_yticks()[0:-1])
 

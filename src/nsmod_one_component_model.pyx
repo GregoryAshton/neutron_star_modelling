@@ -32,7 +32,7 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     chi = (<double *> params)[1]
     epsI1 = (<double *> params)[2]
     epsI3 = (<double *> params)[3]
-    anom_torque = (<double *> params)[4]
+    anom_torque_b = (<double *> params)[4]
 
     # Calculate the torque
     mx = sin(chi)
@@ -44,7 +44,7 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     Ty_sd = -pre * epsA * w[1]
     Tz_sd = pre * epsA * mx * (w[0] * mz - w[2] * mx)
 
-    if anom_torque == 1:
+    if anom_torque_b == 1:
         Tx = Tx_sd + epsA * (w[0] * mx + w[2] * mz) * w[1] * mz
         Ty = Ty_sd + epsA * (w[0] * mx + w[2] * mz) * (w[2] * mx - w[0] * mz)
         Tz = Tz_sd - epsA * (w[0] * mx + w[2] * mz) * w[1] * mx
@@ -73,21 +73,19 @@ cdef int jac (double t, double y[], double *dfdy, double dfdt[], void *params) n
 
 
 def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
-    error=1e-10, t1=1.0e3 , eta=0.0 ,chi_degrees = 30.0 ,anom_torque=True ,
-    a_int=0.8736, file_name="generic.hdf5",n=None):
+    error=1e-10, t1=1.0e3 , eta=0.0, chi = 30.0, anom_torque=True ,
+    a_int=50.0, file_name="generic.hdf5", n=None):
     """ Solve the one component model  using gsl_odeiv2_step_rk8pd """
-
-    # Define default variables
-    cdef double chi
 
    # Test if the anomalous torque is required or not
     if anom_torque:
-        anom_torque = 1
+        anom_torque_b = 1
     else:
-        anom_torque = 0
+        anom_torque_b = 0
 
     # We allow the user to give chi in degrees and convert here
-    chi=math.pi*chi_degrees/180.0
+    chi = np.deg2rad(chi)
+    a_int = np.deg2rad(a_int)
 
     # Pass them to params list
     cdef double params[5]
@@ -95,7 +93,7 @@ def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
     params[1] = chi
     params[2] = epsI1
     params[3] = epsI3
-    params[4] = anom_torque
+    params[4] = anom_torque_b
 
     # Initial values and calculate eta_relative
     cdef int i

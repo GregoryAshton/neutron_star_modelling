@@ -32,7 +32,7 @@ def Parameter_Dictionary(user_input):
         p_d = {}
 
         # Remove the file descriptor and the path directory
-        f = user_input.rstrip(".txt")
+        f = user_input.rstrip(".hdf5")
         f = f.split("/")[-1]
 
         # Check if the anomalous torque was used or not

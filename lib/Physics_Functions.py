@@ -4,6 +4,9 @@ import numpy as np
 import pylab as py
 from math import pi
 
+from scipy.integrate import cumtrapz
+from scipy.optimize import curve_fit
+
 
 def Cartesian_2_Spherical(x, y, z, Angle_Type="Degrees", fix_phi=False):
     """ Transform x,y,z to radial,polar and azimuthal vectors"""
@@ -103,4 +106,37 @@ def Inertial_Frame(w_1, w_2, w_3):
     Transformation from rotating coordinate system x,y,z to inertial frame
 
     """
+
+
+def T_residual(time, w1, w2, w3):
+    """
+
+    Calculate the timing residuals from cartesian components of omega
+
+    """
+
+    def fit(t, phi0, nu0, nu_dot0, nu_ddot0, t0):
+        a = phi0
+        b = nu0 * (t - t0)
+        c = 0.5 * nu_dot0 * pow(t - t0, 2)
+        d = pow(6, -1) * nu_ddot0 * pow(t - t0, 3)
+        return a + b + c + d
+
+    N = len(time)
+
+    # Calculate the frequency from |omega|
+    nu = [2 * pi * py.norm([w1[i], w2[i], w3[i]]) for i in xrange(N)]
+
+    # Integrate
+    phi_exact = cumtrapz(nu, time, initial=0)
+
+    # Fit to taylor series
+    popt, pcov = curve_fit(fit, time, phi_exact)
+
+    phi_fit = [fit(t, *popt) for t in time]
+
+    T_res = [phi_exact[i] - phi_fit[i] for i in xrange(len(phi_exact))]
+
+    return T_res
+
 

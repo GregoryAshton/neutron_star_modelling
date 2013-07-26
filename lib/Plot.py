@@ -10,6 +10,7 @@ from mpl_toolkits.mplot3d import proj3d
 import File_Functions
 import Physics_Functions
 import Useful_Tools
+import NLD_Functions
 from Physics_Functions import Beta_Function
 
 
@@ -805,3 +806,45 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
         File_Functions.Save_Figure(file_name, 'Spherical_Plot_Transform')
     else:
         py.show()
+
+
+def Observables_Plot(file_name):
+    """
+
+    Plot the some physical observables
+
+    """
+
+    # Default settings
+    labelx = -0.1  # x position of the yaxis labels
+
+    (time, w1, w2, w3) = File_Functions.One_Component_Import(file_name)
+    (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
+    N = len(time)
+
+    nu = [2 * pi * py.norm([w1[i], w2[i], w3[i]]) for i in xrange(N)]
+    (time_2, omega_dot) = NLD_Functions.Dotted_Variable_Triaxial(file_name)
+    nu_dot = [o * 2 * pi for o in omega_dot]
+
+    T_res = Physics_Functions.T_residual(time, w1, w2, w3)
+
+    # Plotting
+    ax1 = py.subplot(311)
+    ax1.plot(t_scaled, nu)
+    ax1.set_ylabel(r"$\nu$")
+    ax1.set_xticklabels([])
+    ax1.yaxis.set_label_coords(labelx, 0.5)
+
+    ax2 = py.subplot(312)
+    ax2.plot(t_scaled, nu_dot)
+    ax2.set_ylabel(r"$\dot{\nu}$")
+    ax2.set_xticklabels([])
+    ax2.yaxis.set_label_coords(labelx, 0.5)
+
+    ax3 = py.subplot(313)
+    ax3.plot(t_scaled, T_res)
+    ax3.set_ylabel(r"$T_{\textrm{res}}$")
+    ax1.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+    ax3.yaxis.set_label_coords(labelx, 0.5)
+
+    py.subplots_adjust(hspace=0.0)

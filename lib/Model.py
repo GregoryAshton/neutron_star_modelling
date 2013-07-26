@@ -42,7 +42,7 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
         file_name_list .append("no_anom_")
 
     if type(chi) in [float, int]:
-        file_name_list.append("chi_{:.1f}_".format(chi))
+        file_name_list.append("chi_{:.1f}".format(chi))
     elif type(chi) is str:
         file_name_list.append("chi_{}".format(chi))
         chi = float(chi)

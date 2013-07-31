@@ -11,6 +11,7 @@ import lib.Plot as Plot
 import lib.Useful_Tools as Useful_Tools
 import lib.File_Functions as File_Functions
 import lib.Physics_Functions as Physics_Functions
+import lib.Frequency_Space_Tools as FST
 
 
 def Create_Dictionary(opts):

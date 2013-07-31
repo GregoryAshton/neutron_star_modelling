@@ -119,7 +119,7 @@ def T_residual(time, w1, w2, w3):
         a = phi0
         b = nu0 * (t - t0)
         c = 0.5 * nu_dot0 * pow(t - t0, 2)
-        d = pow(6, -1) * nu_ddot0 * pow(t - t0, 3)
+        d = 0.0 #pow(6, -1) * nu_ddot0 * pow(t - t0, 3)
         return a + b + c + d
 
     N = len(time)

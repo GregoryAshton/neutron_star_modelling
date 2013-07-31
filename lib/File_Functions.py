@@ -95,10 +95,10 @@ def One_Component_Import(file_name, nmax=None):
     """ Imports time and w1,w2,w3 from file_name """
     # max_int and d_int are obsolete for now
     f = Read_File(file_name)
-    time = f['time'].value
-    w1 = f['w1'].value
-    w2 = f['w2'].value
-    w3 = f['w3'].value
+    time = np.array(f['time'].value)
+    w1 = np.array(f['w1'].value)
+    w2 = np.array(f['w2'].value)
+    w3 = np.array(f['w3'].value)
     f.close()
     if nmax:
         return (time[0:nmax], w1[0:nmax], w2[0:nmax], w3[0:nmax])

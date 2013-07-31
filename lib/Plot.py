@@ -46,7 +46,7 @@ def Defaults():
     # Set the default font for all plots
     from matplotlib import rc
     rc('font', **{'family': 'serif',
-        'serif': ['Computer MOption_Dictionaryern Roman']})
+        'serif': ['Computer Modern']})
     rc('text', usetex=True)
 
     # Set the defaults for axis

@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import numpy as np
 import os
 import nsmod_one_component_model
 import nsmod_two_component_model
@@ -41,7 +42,7 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
     if anom_torque is False:
         file_name_list .append("no_anom_")
 
-    if type(chi) in [float, int]:
+    if type(chi) in [float, int, np.float32, np.float64]:
         file_name_list.append("chi_{:.1f}".format(chi))
     elif type(chi) is str:
         file_name_list.append("chi_{}".format(chi))
@@ -50,7 +51,7 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
         print (" ERROR: You need to specify chi in degrees")
         return
 
-    if type(epsI1) in [float, int]:
+    if type(epsI1) in [float, int, np.float32, np.float64]:
         file_name_list.append("_epsI1_{:.2e}".format(epsI1))
     elif type(epsI1) is str:
         file_name_list.append("_epsI1_{}".format(epsI1))
@@ -59,7 +60,7 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
         print (" ERROR: You need to specify epsI1")
         return
 
-    if type(epsI3) in [float, int]:
+    if type(epsI3) in [float, int, np.float32, np.float64]:
         file_name_list.append("_epsI3_{:.2e}".format(epsI3))
     elif type(epsI3) is str:
         file_name_list.append("_epsI3_{}".format(epsI3))
@@ -68,7 +69,7 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
         print (" ERROR: You need to specify epsI3")
         return
 
-    if type(epsA) in [float, int]:
+    if type(epsA) in [float, int, np.float32, np.float64]:
         file_name_list.append("_epsA_{:.2e}".format(epsA))
     elif type(epsA) is str:
         file_name_list.append("_epsA_{}".format(epsA))
@@ -77,7 +78,7 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
         print (" ERROR: You need to specify epsA")
         return
 
-    if type(omega0) in [float, int]:
+    if type(omega0) in [float, int, np.float32, np.float64]:
         file_name_list.append("_omega0_{:.2f}".format(omega0))
     elif type(omega0) is str:
         file_name_list.append("_omega0_{}".format(omega0))
@@ -95,7 +96,7 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
         n = None  # Save at discrete timesteps turned off by eta
         vprint(verbose, "Using eta turns of saving at discrete time steps")
 
-    if type(t1) in [float, int]:
+    if type(t1) in [float, int, np.float32, np.float64]:
         file_name_list.append("_t1_{:.2e}".format(t1))
     elif type(t1) is str:
         file_name_list.append("_t1_{}".format(t1))

@@ -100,12 +100,43 @@ def Beta_Function(epsI, epsA, chi):
     return beta
 
 
-def Inertial_Frame(w_1, w_2, w_3):
+def Inertial_Frame(omega=None, J_I=np.array([.0, .0, 1]),
+                   chi, epsI1, epsI3, Io=1e45):
     """
+    Transformation from rotating coordinate system to inertial frame
 
-    Transformation from rotating coordinate system x,y,z to inertial frame
+    :param omega: Spin vector in the rotating body frame `omega=[w1, w2, w3]`
+    :type omega:list
+    :param J_In: Fixed angular momentum in the inertial frame
+    :type J_In:numpy.ndarray
+    :default J_In: np.array([.0, .0, 1]
+    :param *args: Other vectors to rotate
 
     """
+    omega = np.array(omega)
+    JR = Io * np.array([omega[0] * (1 + epsI1),
+                        omega[1],
+                        omega[2] * (1 + epsI3)])
+
+    def Axis_Angle_Extraction(x, y):
+        """ Calculate rotation angle and axis of rotation for x onto y """
+        phi = np.arccos(np.dot(x, y) / (py.norm(x) * py.norm(y)))
+        n = np.cross(x, y)
+        return (phi, n)
+
+    def Axis_Angle_Rotation(x, phi, n):
+        """ Rotate vector x about axis n by phi"""
+        r_1 = a * np.cos(phi)
+        r_2 = np.cross(n, x) * np.sin(phi)
+        r_3 = n * np.dot(n, x) * (1 - np.cos(phi))
+        return r_1 + r_2 + r_3
+
+    # Calculate the rotation parameters as a function of time
+
+    for i in xrange(n):
+        (phi, n) = Axis_Angle_Extraction(JR[:, i], JI)
+
+
 
 
 def T_residual(time, w1, w2, w3):

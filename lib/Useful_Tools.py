@@ -121,9 +121,16 @@ def ThreeD_Sphere(axis, elevation, azimuth, x, y, z,
 
     """
 
+    elevation = np.radians(elevation)
+    azimuth = np.radians(azimuth)
+
     # Init. lists for the front and back
-    front_x = [] ; front_y=[] ; front_z=[]
-    back_x = [] ; back_y=[] ; back_z=[]
+    front_x = []
+    front_y = []
+    front_z = []
+    back_x = []
+    back_y = []
+    back_z = []
 
     def angle_between_vectors(a, b):
         """ Returns angle between a and b """
@@ -132,10 +139,10 @@ def ThreeD_Sphere(axis, elevation, azimuth, x, y, z,
         return angle
 
     # Define vector of the viewing position
-    elevation = 90.0  # Tempory fix
-    view_pos = [py.sin(elevation * py.pi / 180) * py.cos(azimuth * py.pi / 180),
-                py.sin(elevation * py.pi / 180) * py.sin(azimuth * py.pi / 180),
-                py.cos(elevation * py.pi / 180)]
+    elevation = np.radians(90.0)  # Tempory fix
+    view_pos = [py.sin(elevation) * py.cos(azimuth),
+                py.sin(elevation) * py.sin(azimuth),
+                py.cos(elevation)]
 
     for i in xrange(len(x)):
         point_vec = [x[i], y[i], z[i]]
@@ -156,24 +163,32 @@ def ThreeD_Sphere(axis, elevation, azimuth, x, y, z,
     if ls in ["-", "--", ":", "-."]:
         def plot(x, y, z, delta, alpha):
             delta = float(delta)
-            print len(x)
             j = 0
             i = 0
 
             for i in range(1, len(x)):
-                mag = py.norm([x[i] - x[i-1], y[i] - y[i-1], z[i] - z[i-1]])
+                mag = py.norm([x[i] - x[i - 1],
+                               y[i] - y[i - 1],
+                               z[i] - z[i - 1]])
                 if mag > delta:
-                    axis.plot3D(x[j:i-1],y[j:i-1],z[j:i-1],ls,alpha=alpha,color=color,lw=lw)
+                    axis.plot3D(x[j:i - 1],
+                                y[j:i - 1],
+                                z[j:i - 1],
+                                ls, alpha=alpha, color=color, lw=lw)
                     j = i
-            if j==0 : print "Bugger"
-            if i !=j :
-                axis.plot3D(x[j:i-1],y[j:i-1],z[j:i-1],ls,alpha=alpha,color=color,lw=lw )
+            if j == 0:
+                print "Bugger"
+            if i != j:
+                axis.plot3D(x[j:i - 1], y[j:i - 1], z[j:i - 1],
+                            ls, alpha=alpha, color=color, lw=lw)
 
-        plot(front_x,front_y,front_z,delta,alpha=1.0)
-        plot(back_x,back_y,back_z,delta,alpha=0.1)
-    else :
-        axis.plot3D(front_x,front_y,front_z,ls,alpha=1.0,color=color,lw=lw )
-        axis.plot3D(back_x,back_y,back_z,ls,alpha=0.3,color=color,lw=lw )
+        plot(front_x, front_y, front_z, delta, alpha=1.0)
+        plot(back_x, back_y, back_z, delta, alpha=0.1)
+    else:
+        axis.plot3D(front_x, front_y, front_z,
+                    ls, alpha=1.0, color=color, lw=lw)
+        axis.plot3D(back_x, back_y, back_z,
+                    ls, alpha=0.3, color=color, lw=lw)
 
 
 def Fit_Function(x, y, n):

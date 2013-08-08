@@ -100,41 +100,54 @@ def Beta_Function(epsI, epsA, chi):
     return beta
 
 
-#def Inertial_Frame(omega=None, J_I=np.array([.0, .0, 1]),
-                   #chi, epsI1, epsI3, Io=1e45):
-    #"""
-    #Transformation from rotating coordinate system to inertial frame
+def Inertial_Frame(omega, chi, epsI1, epsI3, epsA,
+                   Io=1e45, JI_norm=np.array([.0, .0, 1.0])):
+    """
+    Transformation from rotating coordinate system to inertial frame
 
-    #:param omega: Spin vector in the rotating body frame `omega=[w1, w2, w3]`
-    #:type omega:list
-    #:param J_In: Fixed angular momentum in the inertial frame
-    #:type J_In:numpy.ndarray
-    #:default J_In: np.array([.0, .0, 1]
-    #:param *args: Other vectors to rotate
+    :param omega: Spin vector in the rotating body frame `omega=[w1, w2, w3]`
+    :type omega:list
+    :param J_In: Fixed angular momentum in the inertial frame
+    :type J_In:numpy.ndarray
+    :default J_In: np.array([.0, .0, 1]
+    :param *args: Other vectors to rotate
 
-    #"""
-    #omega = np.array(omega)
-    #JR = Io * np.array([omega[0] * (1 + epsI1),
-                        #omega[1],
-                        #omega[2] * (1 + epsI3)])
+    """
 
-    #def Axis_Angle_Extraction(x, y):
-        #""" Calculate rotation angle and axis of rotation for x onto y """
-        #phi = np.arccos(np.dot(x, y) / (py.norm(x) * py.norm(y)))
-        #n = np.cross(x, y)
-        #return (phi, n)
+    omega = np.array(omega)
+    N = max(omega.shape)
+    JR = Io * np.array([omega[0] * (1 + epsI1),
+                        omega[1],
+                        omega[2] * (1 + epsI3)])
 
-    #def Axis_Angle_Rotation(x, phi, n):
-        #""" Rotate vector x about axis n by phi"""
-        #r_1 = a * np.cos(phi)
-        #r_2 = np.cross(n, x) * np.sin(phi)
-        #r_3 = n * np.dot(n, x) * (1 - np.cos(phi))
-        #return r_1 + r_2 + r_3
+    JR_norm = JR / py.norm(JR)
 
-    ## Calculate the rotation parameters as a function of time
+    def Axis_Angle_Extraction(x, y):
+        """ Calculate rotation angle and axis of rotation for x onto y """
+        phi = np.arccos(np.dot(x, y) / (py.norm(x) * py.norm(y)))
+        n = np.cross(x, y)
+        n_hat = n / py.norm(n)
+        return (phi, n_hat)
 
-    #for i in xrange(n):
-        #(phi, n) = Axis_Angle_Extraction(JR[:, i], JI)
+    def Axis_Angle_Rotation(x, phi, n_hat):
+        """ Rotate vector x about axis n by phi"""
+
+        r_1 = x * np.cos(phi)
+        r_2 = np.cross(n_hat, x) * np.sin(phi)
+        r_3 = n_hat * np.dot(n_hat, x) * (1 - np.cos(phi))
+        return r_1 + r_2 + r_3
+
+    omega_I = np.empty((3, N))
+    m_I = np.empty((3, N))
+
+    m = np.array([np.sin(np.radians(chi)), 0.0, np.cos(np.radians(chi))])
+
+    for i in xrange(N):
+        (phi, n_hat) = Axis_Angle_Extraction(JR_norm[:, i], JI_norm)
+        omega_I[:, i] = Axis_Angle_Rotation(omega[:, i], phi, n_hat)
+        m_I[:, i] = Axis_Angle_Rotation(m, phi, n_hat)
+
+    return omega_I, m_I
 
 
 

@@ -848,3 +848,4 @@ def Observables_Plot(file_name):
     ax3.yaxis.set_label_coords(labelx, 0.5)
 
     py.subplots_adjust(hspace=0.0)
+    py.show()

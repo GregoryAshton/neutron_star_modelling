@@ -811,7 +811,7 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
 def Observables_Plot(file_name):
     """
 
-    Plot the some physical observables
+    Plot some physical observables
 
     """
 

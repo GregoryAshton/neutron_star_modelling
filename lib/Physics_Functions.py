@@ -107,10 +107,18 @@ def Inertial_Frame(omega, chi, epsI1, epsI3, epsA,
 
     :param omega: Spin vector in the rotating body frame `omega=[w1, w2, w3]`
     :type omega:list
+    :param chi: Inclination angle of the magnetic dipole to the z axis
+    :type chi:float in degrees
+    :param epsI1: Deformation along the x axis of the body frame
+    :type epsI1: float
+    :param epsI3: Deformation along the z axis of the body frame
+    :type epsI3: float
+    :param epsA: Magnetic deformation
+    :type epsA: float
     :param J_In: Fixed angular momentum in the inertial frame
     :type J_In:numpy.ndarray
     :default J_In: np.array([.0, .0, 1]
-    :param *args: Other vectors to rotate
+
 
     """
 
@@ -150,8 +158,6 @@ def Inertial_Frame(omega, chi, epsI1, epsI3, epsA,
     return omega_I, m_I
 
 
-
-
 def T_residual(time, w1, w2, w3):
     """
 
@@ -163,7 +169,7 @@ def T_residual(time, w1, w2, w3):
         a = phi0
         b = nu0 * (t - t0)
         c = 0.5 * nu_dot0 * pow(t - t0, 2)
-        d = 0.0 #pow(6, -1) * nu_ddot0 * pow(t - t0, 3)
+        d = pow(6, -1) * nu_ddot0 * pow(t - t0, 3)
         return a + b + c + d
 
     N = len(time)

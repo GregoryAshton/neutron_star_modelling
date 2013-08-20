@@ -120,7 +120,7 @@ def Inertial_Frame(time, omega, epsI3):
     theta = [np.arccos(omega[2, 0] * (1 + epsI3) /
             (py.norm([omega[0, 0], omega[1, 0], omega[2, 0] * (1. + epsI3)])))]
     phi = [0.0]
-    psi = [-np.pi / 2]  # Unfinished
+    psi = [np.pi / 2]  # Unfinished
 
     for i in xrange(len(time)-1):
         dt = time[i + 1] - time[i]

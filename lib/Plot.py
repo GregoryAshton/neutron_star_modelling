@@ -851,37 +851,49 @@ def Observables_Plot(file_name):
     py.show()
 
 
-def Euler_Angles(file_name):
+def Euler_Angles(file_name, save_fig=False, verbose=True):
     labelx = -0.1  # x position of the yaxis labels
 
     (time, w1, w2, w3) = File_Functions.One_Component_Import(file_name)
+    data_dictionary = File_Functions.Read_File(file_name)
+    theta = np.degrees(data_dictionary['theta'].value)
+    phi = np.degrees(data_dictionary['phi'].value)
+    psi = np.degrees(data_dictionary['psi'].value)
     (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
 
     PD = File_Functions.Parameter_Dictionary(file_name)
     #epsI1 = float(PD['epsI1'])
     epsI3 = float(PD['epsI3'])
 
-    theta, phi, psi = Physics_Functions.Inertial_Frame(
-                        time, np.array([w1, w2, w3]), epsI3
-                                                    )
+    #theta, phi, psi = Physics_Functions.Inertial_Frame(
+    #                    time, np.array([w1, w2, w3]), epsI3)
+
     # Plotting
-    ax1 = py.subplot(311)
-    ax1.plot(t_scaled, np.degrees(theta))
-    ax1.set_ylabel(r"$\theta$")
+    fig = py.figure()
+    ax1 = fig.add_subplot(311)
+    ax1.plot(t_scaled, theta)
+    ax1.set_ylabel(r"$\theta$", rotation="horizontal")
     ax1.set_xticklabels([])
     ax1.yaxis.set_label_coords(labelx, 0.5)
 
     ax2 = py.subplot(312)
-    ax2.plot(t_scaled, np.degrees(phi))
-    ax2.set_ylabel(r"$\phi$")
+    ax2.plot(t_scaled, phi)
+    ax2.set_ylabel(r"$\phi$", rotation="horizontal")
     ax2.set_xticklabels([])
     ax2.yaxis.set_label_coords(labelx, 0.5)
 
     ax3 = py.subplot(313)
-    ax3.plot(t_scaled, np.degrees(psi))
-    ax3.set_ylabel(r"$\psi$")
-    ax1.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+    ax3.plot(t_scaled, psi)
+    ax3.set_ylabel(r"$\psi$", rotation="horizontal")
+    ax3.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
     ax3.yaxis.set_label_coords(labelx, 0.5)
 
     py.subplots_adjust(hspace=0.0)
-    py.show()
+
+    if save_fig:
+        File_Functions.Save_Figure(file_name, 'Euler_Angles')
+    else:
+        py.show()
+
+    if verbose:
+        return (max(theta) - min(theta)) / np.mean(theta)

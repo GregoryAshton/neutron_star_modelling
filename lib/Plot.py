@@ -844,7 +844,7 @@ def Observables_Plot(file_name):
     ax3 = py.subplot(313)
     ax3.plot(t_scaled, T_res)
     ax3.set_ylabel(r"$T_{\textrm{res}}$")
-    ax1.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+    ax3.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
     ax3.yaxis.set_label_coords(labelx, 0.5)
 
     py.subplots_adjust(hspace=0.0)

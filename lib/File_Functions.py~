@@ -7,7 +7,7 @@ import h5py
 import os
 
 
-def Save_Figure(file_name, type_of_plot, format_type=".png"):
+def Save_Figure(file_name, type_of_plot, format_type=".pdf"):
     """ Saves the currently open figure with an appropriate name"""
     plot_file_name = "{0}_{1}{2}".format(
                         type_of_plot, file_name.rstrip(".hdf5"), format_type
@@ -32,15 +32,15 @@ def Parameter_Dictionary(user_input):
         p_d = {}
 
         # Remove the file descriptor and the path directory
-        f = user_input.rstrip(".txt")
+        f = user_input.rstrip(".hdf5")
         f = f.split("/")[-1]
 
         # Check if the anomalous torque was used or not
         if "no_anom" in f:
             f = f.lstrip("no_anom_")
-            p_d["no_anom"] = True
+            p_d["anom_torque"] = False
         else:
-            p_d["no_anom"] = False
+            p_d["anom_torque"] = True
 
         # Import the rest of the parameters
         f = f.split("_")
@@ -91,14 +91,14 @@ def Parameter_Dictionary(user_input):
     return p_d
 
 
-def One_Component_Import(file_name, nmax):
+def One_Component_Import(file_name, nmax=None):
     """ Imports time and w1,w2,w3 from file_name """
     # max_int and d_int are obsolete for now
     f = Read_File(file_name)
-    time = f['time'].value
-    w1 = f['w1'].value
-    w2 = f['w2'].value
-    w3 = f['w3'].value
+    time = np.array(f['time'].value)
+    w1 = np.array(f['w1'].value)
+    w2 = np.array(f['w2'].value)
+    w3 = np.array(f['w3'].value)
     f.close()
     if nmax:
         return (time[0:nmax], w1[0:nmax], w2[0:nmax], w3[0:nmax])
@@ -142,3 +142,28 @@ def Read_File(file_name):
     f = h5py.File(file_name, "r")
 
     return f
+
+
+def vprint(verbose, *args):
+    """ Function to verbose print """
+    if verbose:
+        # Print each argument separately so caller doesn't need to
+        # stuff everything to be printed into a single string
+        for arg in args:
+            print arg,
+        print
+    else:
+        vprint = lambda *a: None      # do-nothing function
+
+def Euler_Angles_Import(file_name):
+    """ Returns tuple of "(time, w1, w2, w3, theta, phi, psi) """    
+    f = nsmod.File_Functions.Read_File(file_name)
+    time = np.array(f['time'].value)
+    w1 = np.array(f['w1'].value)
+    w2 = np.array(f['w2'].value)
+    w3 = np.array(f['w3'].value)
+    theta = np.array(f['theta'].value)
+    phi = np.array(f['phi'].value)
+    psi = np.array(f['psi'].value)
+    f.close()
+    return (time, w1, w2, w3, theta, phi, psi)

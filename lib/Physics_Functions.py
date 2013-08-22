@@ -3,6 +3,7 @@
 import numpy as np
 import pylab as py
 from math import pi
+from numpy import cos, sin, tan
 
 from scipy.integrate import cumtrapz
 from scipy.optimize import curve_fit
@@ -132,6 +133,32 @@ def Inertial_Frame(time, omega, epsI3):
 
     return theta, phi, psi
 
+# Equations for the Euler angles 
+
+def equations(omega, theta, phi, psi):
+    theta_dot = omega[0] * cos(psi) - omega[1] * sin(psi)
+    phi_dot = ((omega[0] * sin(psi) + omega[1] * cos(psi))
+                                                  / sin(theta))
+    psi_dot = omega[2] - phi_dot * cos(theta)
+    return theta_dot, phi_dot, psi_dot
+
+def Phi_dot(omega, theta, phi, psi, chi):
+    """ See equation (43) of Jones 2001 """
+    theta_dot, phi_dot, psi_dot = equations(omega, theta, phi, psi)
+    return phi_dot +  psi_dot * sin(chi) * (
+            (cos(theta) * sin(chi) - sin(psi) * sin(theta) * cos(chi)) /
+       (pow(sin(theta) * cos(chi) - cos(theta) * sin(psi) * sin(chi), 2) + pow(cos(psi) * sin(chi), 2)))
+    
+def Phi(theta, phi, psi, chi):
+    """ See equation (42) of Jones 2001 """
+    return phi - .5 * np.pi + np.arctan2(
+                (cos(psi) * tan(chi)) , 
+                (cos(theta) * (tan(theta) - sin(psi) * tan(chi))))
+
+def Theta(theta, psi, chi):  
+    """ See equation (52) of Jones 2001 """
+    return np.arccos(sin(theta) * sin(psi) * sin(chi) + cos(theta) * cos(chi))   
+    
 # Below is to be replaced by the Euler method
 
 #def Inertial_Frame(omega, chi, epsI1, epsI3, epsA,

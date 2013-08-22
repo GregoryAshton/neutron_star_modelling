@@ -44,6 +44,16 @@ setup(
                  include_dirs=[cython_gsl.get_cython_include_dir()])]
     )
 
+setup(
+    include_dirs=[cython_gsl.get_include()],
+    cmdclass={'build_ext': build_ext},
+    ext_modules=[Extension("nsmod_one_component_model_with_Euler",
+                ["src/nsmod_one_component_model_with_Euler.pyx"],
+                libraries=cython_gsl.get_libraries(),
+                library_dirs=[cython_gsl.get_library_dir()],
+                include_dirs=[cython_gsl.get_cython_include_dir()])]
+    )
+
 
 
 # python setup.py build_ext --inplace

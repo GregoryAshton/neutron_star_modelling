@@ -10,7 +10,8 @@ from mpl_toolkits.mplot3d import proj3d
 import File_Functions
 import Physics_Functions
 import Useful_Tools
-from Physics_Functions import Beta_Function  # ?
+import NLD_Functions
+from Physics_Functions import Beta_Function
 
 
 #def Save_Figure(file_name, type_of_plot, format_type=".png"):
@@ -45,7 +46,7 @@ def Defaults():
     # Set the default font for all plots
     from matplotlib import rc
     rc('font', **{'family': 'serif',
-        'serif': ['Computer MOption_Dictionaryern Roman']})
+        'serif': ['Computer Modern']})
     rc('text', usetex=True)
 
     # Set the defaults for axis
@@ -180,7 +181,7 @@ def Spherical_Plot(file_name, Option_Dictionary={}):
     ax3.set_yticks(ax3.get_yticks()[0:-1])
     ax3.set_ylabel("$\phi$ [deg]", rotation="vertical")
     ax3.yaxis.set_label_coords(labelx, 0.5)
-    ax3.set_xlabel(r"time  [$1\times 10^{{0}}$ s]".format(str(scale_val)))
+    ax3.set_xlabel(r"time  [$1\times 10^{}$ s]".format(scale_val))
     ax3.set_xlim(tmin * pow(10, -scale_val), tmax * pow(10, -scale_val))
     if 'end_val' in Option_Dictionary:
         print " Data on the end value of the spherical components of omega"
@@ -249,7 +250,7 @@ def Alpha_Plot(file_name, Option_Dictionary={}):
     ax1 = fig.add_subplot(111)
     ax1.plot(t_scaled, alpha, lw=2)
     ax1.set_ylabel(r"$\alpha$ [deg]", rotation="vertical")
-    ax1.set_xlabel(r"time  [$1\times 10^{{0}}$ s]".format(str(scale_val)))
+    ax1.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
 
     Additional_Code(Option_Dictionary)
 
@@ -780,8 +781,7 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
 
         # Ploptions
 
-        ax3.set_xlabel(r"time  [$1\times 10^{" + str(scale_val)
-                       + '}$ s]', fontsize=16)
+        ax3.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
         ax3.yaxis.set_label_coords(labelx, 0.5)
         ax3.set_yticks(ax3.get_yticks()[0:-1])
 
@@ -803,6 +803,97 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
     Additional_Code(Option_Dictionary)
 
     if 'save_fig' in Option_Dictionary:
-        File_FUnctions.Save_Figure(file_name, 'Spherical_Plot_Transform')
+        File_Functions.Save_Figure(file_name, 'Spherical_Plot_Transform')
     else:
         py.show()
+
+
+def Observables_Plot(file_name):
+    """
+
+    Plot some physical observables
+
+    """
+
+    # Default settings
+    labelx = -0.1  # x position of the yaxis labels
+
+    (time, w1, w2, w3) = File_Functions.One_Component_Import(file_name)
+    (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
+    N = len(time)
+
+    nu = [2 * pi * py.norm([w1[i], w2[i], w3[i]]) for i in xrange(N)]
+    (time_2, omega_dot) = NLD_Functions.Dotted_Variable_Triaxial(file_name)
+    nu_dot = [o * 2 * pi for o in omega_dot]
+
+    T_res = Physics_Functions.T_residual(time, w1, w2, w3)
+
+    # Plotting
+    ax1 = py.subplot(311)
+    ax1.plot(t_scaled, nu)
+    ax1.set_ylabel(r"$\nu$")
+    ax1.set_xticklabels([])
+    ax1.yaxis.set_label_coords(labelx, 0.5)
+
+    ax2 = py.subplot(312)
+    ax2.plot(t_scaled, nu_dot)
+    ax2.set_ylabel(r"$\dot{\nu}$")
+    ax2.set_xticklabels([])
+    ax2.yaxis.set_label_coords(labelx, 0.5)
+
+    ax3 = py.subplot(313)
+    ax3.plot(t_scaled, T_res)
+    ax3.set_ylabel(r"$T_{\textrm{res}}$")
+    ax1.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+    ax3.yaxis.set_label_coords(labelx, 0.5)
+
+    py.subplots_adjust(hspace=0.0)
+    py.show()
+
+
+def Euler_Angles(file_name, save_fig=False, verbose=True):
+    labelx = -0.1  # x position of the yaxis labels
+
+    (time, w1, w2, w3) = File_Functions.One_Component_Import(file_name)
+    data_dictionary = File_Functions.Read_File(file_name)
+    theta = np.degrees(data_dictionary['theta'].value)
+    phi = np.degrees(data_dictionary['phi'].value)
+    psi = np.degrees(data_dictionary['psi'].value)
+    (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
+
+    PD = File_Functions.Parameter_Dictionary(file_name)
+    #epsI1 = float(PD['epsI1'])
+    epsI3 = float(PD['epsI3'])
+
+    #theta, phi, psi = Physics_Functions.Inertial_Frame(
+    #                    time, np.array([w1, w2, w3]), epsI3)
+
+    # Plotting
+    fig = py.figure()
+    ax1 = fig.add_subplot(311)
+    ax1.plot(t_scaled, theta)
+    ax1.set_ylabel(r"$\theta$", rotation="horizontal")
+    ax1.set_xticklabels([])
+    ax1.yaxis.set_label_coords(labelx, 0.5)
+
+    ax2 = py.subplot(312)
+    ax2.plot(t_scaled, phi)
+    ax2.set_ylabel(r"$\phi$", rotation="horizontal")
+    ax2.set_xticklabels([])
+    ax2.yaxis.set_label_coords(labelx, 0.5)
+
+    ax3 = py.subplot(313)
+    ax3.plot(t_scaled, psi)
+    ax3.set_ylabel(r"$\psi$", rotation="horizontal")
+    ax3.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+    ax3.yaxis.set_label_coords(labelx, 0.5)
+
+    py.subplots_adjust(hspace=0.0)
+
+    if save_fig:
+        File_Functions.Save_Figure(file_name, 'Euler_Angles')
+    else:
+        py.show()
+
+    if verbose:
+        return (max(theta) - min(theta)) / np.mean(theta)

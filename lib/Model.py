@@ -5,6 +5,7 @@ import os
 import nsmod_one_component_model
 import nsmod_two_component_model
 import nsmod_two_component_model2
+import nsmod_one_component_model_with_Euler
 import pynotify
 from File_Functions import vprint
 
@@ -590,4 +591,95 @@ def Run_Cython_Two_Component2(Input_Dictionary):
 
 
 
+def Run_with_Euler(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
+        omega0=None, t1=1e12, error=1e-12, n=1000, verbose=True,
+        a_int=5.0):
+    
+    file_name_list = []
 
+    if anom_torque is False:
+        file_name_list .append("no_anom_")
+
+    if type(chi) in [float, int, np.float32, np.float64]:
+        file_name_list.append("chi_{:.1f}".format(chi))
+    elif type(chi) is str:
+        file_name_list.append("chi_{}".format(chi))
+        chi = float(chi)
+    else:
+        print (" ERROR: You need to specify chi in degrees")
+        return
+
+    if type(epsI1) in [float, int, np.float32, np.float64]:
+        file_name_list.append("_epsI1_{:.2e}".format(epsI1))
+    elif type(epsI1) is str:
+        file_name_list.append("_epsI1_{}".format(epsI1))
+        epsI1 = float(epsI1)
+    else:
+        print (" ERROR: You need to specify epsI1")
+        return
+
+    if type(epsI3) in [float, int, np.float32, np.float64]:
+        file_name_list.append("_epsI3_{:.2e}".format(epsI3))
+    elif type(epsI3) is str:
+        file_name_list.append("_epsI3_{}".format(epsI3))
+        epsI3 = float(epsI3)
+    else:
+        print (" ERROR: You need to specify epsI3")
+        return
+
+    if type(epsA) in [float, int, np.float32, np.float64]:
+        file_name_list.append("_epsA_{:.2e}".format(epsA))
+    elif type(epsA) is str:
+        file_name_list.append("_epsA_{}".format(epsA))
+        epsA = float(epsA)
+    else:
+        print (" ERROR: You need to specify epsA")
+        return
+    
+    if type(omega0) in [float, int, np.float32, np.float64]:
+        file_name_list.append("_omega0_{:.2f}".format(omega0))
+    elif type(omega0) is str:
+        file_name_list.append("_omega0_{}".format(omega0))
+        omega0 = float(omega0)
+    else:
+        print (" ERROR: You need to specify omega0")
+        return
+
+    if a_int != 50.0:
+        file_name_list.append("_aint_{}".format(a_int))
+        a_int = float(a_int)
+
+    if type(t1) in [float, int, np.float32, np.float64]:
+        file_name_list.append("_t1_{:.2e}".format(t1))
+    elif type(t1) is str:
+        file_name_list.append("_t1_{}".format(t1))
+        t1 = float(t1)
+    else:
+        print (" ERROR: t1 must be a float, int or string")
+        return
+
+    # Create file name
+    file_name_list.append(".hdf5")
+    file_name = "".join(file_name_list)
+
+    # Check if file already exists
+    if file_name in os.listdir("."):
+        #vprint(True, "File already exists, remove and rerun if is corrupted")
+        #return file_name
+        os.remove(file_name)
+
+    nsmod_one_component_model_with_Euler.main(
+      chi=chi,
+      file_name=file_name,
+      n=int(n),
+      epsA=epsA,
+      epsI1=epsI1,
+      epsI3=epsI3,
+      omega0=omega0,
+      t1=t1,
+      anom_torque=anom_torque,
+      error=float(error),
+      a_int=a_int
+      )
+
+    return file_name

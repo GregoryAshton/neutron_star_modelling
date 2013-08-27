@@ -94,13 +94,13 @@ def Simple_Plot(file_name, Option_Dictionary={}):
     fig2.set_xticklabels([])
     fig2.plot(time, y)
     py.yticks()
-    py.ylabel("$\omega_{y}$", rotation="horizontal")
+    py.ylabel(r"$\omega_{y}$", rotation="horizontal")
     py.yticks(fig2.get_yticks()[1:-1])
     py.xlim(tmin, tmax)
 
     fig2 = py.subplot(3, 1, 3)
     fig2.plot(time, z)
-    py.ylabel("$\omega_{z} $", rotation="horizontal")
+    py.ylabel(r"$\omega_{z} $", rotation="horizontal")
     py.xlim(tmin, tmax)
 
     py.xlabel(r"$t$")
@@ -140,8 +140,8 @@ def Spherical_Plot(file_name, Option_Dictionary={}):
         tmin = 0.0
 
     # Transform to spherical polar coordinates
-    (omega, a, phi) = Physics_Functions.Cartesian_2_Spherical(
-                        omega_x, omega_y, omega_z, fix_phi=True)
+    (omega, a, varphi) = Physics_Functions.Cartesian_2_Spherical(
+                        omega_x, omega_y, omega_z, fix_varphi=True)
 
     # Function to help scale the x-axis
     (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
@@ -167,19 +167,19 @@ def Spherical_Plot(file_name, Option_Dictionary={}):
     ax2.set_ylim(0, 105)
     #py.yticks(fig2.get_yticks()[0:-2])
     ax2.set_yticks(py.arange(0, 105, 15))
-    ax2.set_ylabel("$a $ [deg]", rotation="vertical")
+    ax2.set_ylabel(r"$a $ [deg]", rotation="vertical")
     ax2.yaxis.set_label_coords(labelx, 0.5)
     ax2.set_xlim(tmin * pow(10, -scale_val), tmax * pow(10, -scale_val))
 
-    # Plot phi(t)
+    # Plot varphi(t)
     ax3 = fig.add_subplot(3, 1, 3)
-    ax3.plot(t_scaled, phi)
+    ax3.plot(t_scaled, varphi)
 
     #Ploptions
     #ax3.set_ylim(0,110)
     #ax3.set_yticks(py.arange(0,105,15))
     ax3.set_yticks(ax3.get_yticks()[0:-1])
-    ax3.set_ylabel("$\phi$ [deg]", rotation="vertical")
+    ax3.set_ylabel(r"$\varphi$ [deg]", rotation="vertical")
     ax3.yaxis.set_label_coords(labelx, 0.5)
     ax3.set_xlabel(r"time  [$1\times 10^{}$ s]".format(scale_val))
     ax3.set_xlim(tmin * pow(10, -scale_val), tmax * pow(10, -scale_val))
@@ -191,9 +191,9 @@ def Spherical_Plot(file_name, Option_Dictionary={}):
         a_end = a[-100:-1]
         print (" Average of a: {0} s^-1 \n Range of a : {1}"
               .format(py.average(a_end), max(a_end) - min(a_end)))
-        phi_end = omega[-100:-1]
-        print (" Average of phi: {0} s^-1 \n Range of phi : {1}"
-            .format(py.average(phi_end), max(phi_end) - min(phi_end)))
+        varphi_end = omega[-100:-1]
+        print (" Average of varphi: {0} s^-1 \n Range of varphi : {1}"
+            .format(py.average(varphi_end), max(varphi_end) - min(varphi_end)))
 
     py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12, hspace=0.0)
 
@@ -229,7 +229,7 @@ def Alpha_Plot(file_name, Option_Dictionary={}):
 
     # Transform to spherical polar coordinates specifying that we want
     # the angles to be in Radians rather than degrees
-    (omega, a, phi) = Physics_Functions.Cartesian_2_Spherical(
+    (omega, a, varphi) = Physics_Functions.Cartesian_2_Spherical(
                         omega_x, omega_y, omega_z, "Radians")
 
     # Function to help scale the t-axis
@@ -237,14 +237,14 @@ def Alpha_Plot(file_name, Option_Dictionary={}):
 
     # Calculate the angle made with the magnetic dipole
     # assumed to lie at chi to the z axis in the x-z plane
-    def alpha_func(a, phi, chi):
+    def alpha_func(a, varphi, chi):
         """ Calculate angle between omega and magnetic dipole """
         chi_radians = chi * pi / 180
         Sx = py.sin(chi_radians)
         Cx = py.cos(chi_radians)
-        return py.arccos(Sx * py.sin(a) * py.cos(phi) + Cx * py.cos(a))
+        return py.arccos(Sx * py.sin(a) * py.cos(varphi) + Cx * py.cos(a))
 
-    alpha = [alpha_func(a[i], phi[i], chi) * 180 / pi for i in range(len(a))]
+    alpha = [alpha_func(a[i], varphi[i], chi) * 180 / pi for i in range(len(a))]
 
     fig = py.figure()
     ax1 = fig.add_subplot(111)
@@ -377,8 +377,8 @@ def Angle_Space_Plot(file_name, Option_Dictionary={}):
       of the spin vector. Option_Dictionary takes the following as arguments
     nmax : int ~ take only the first nmax points from the file
     EBF : True ~ Rotate the Effective Body Frame axis
-    2D : True ~ This will plot the angular components phi and a in normal plot
-    3D : True ~ This will plot the angular components phi and a projected onto
+    2D : True ~ This will plot the angular components varphi and a in normal plot
+    3D : True ~ This will plot the angular components varphi and a projected onto
                 the unit sphere
     3D : elevation/azimuthal the viewing angle deliminated by a slash
         split=n1/n2/n3/n4/... For use with 3D this will segment the data
@@ -411,27 +411,27 @@ def Angle_Space_Plot(file_name, Option_Dictionary={}):
     if '2D' in Option_Dictionary:
 
         # Transform to spherical coordinates
-        (omega, a, phi) = Physics_Functions.Cartesian_2_Spherical(
-                                            x, y, z, fix_phi=True)
+        (omega, a, varphi) = Physics_Functions.Cartesian_2_Spherical(
+                                            x, y, z, fix_varphi=True)
 
         fig = py.figure()
         ax1 = fig.add_subplot(111)
         n = len(time)
 
-        ax1.plot(phi, a)
+        ax1.plot(varphi, a)
         if 'beta' in Option_Dictionary:
-            ax1.set_xlabel("$\phi'$ [deg]")
-            ax1.set_ylabel("$a'$ [deg]")
+            ax1.set_xlabel(r"$\varphi'$ [deg]")
+            ax1.set_ylabel(r"$a'$ [deg]")
         else:
-            ax1.set_xlabel("$\phi$ [deg]")
-            ax1.set_ylabel("$a$ [deg]")
+            ax1.set_xlabel(r"$\varphi$ [deg]")
+            ax1.set_ylabel(r"$a$ [deg]")
         #ax1.set_xlim(0,180)
         #ax1.set_ylim(0,180)
 
         if 'arrow' in Option_Dictionary and Option_Dictionary['arrow']:
             for i in range(0, n, int(n / 20.0)):
-                py.arrow(phi[i], a[i],
-                0.1 * (phi[i + 1] - phi[i]), 0.1 * (a[i + 1] - a[i]),
+                py.arrow(varphi[i], a[i],
+                0.1 * (varphi[i + 1] - varphi[i]), 0.1 * (a[i + 1] - a[i]),
                 color="k", fill=True, head_width=1.0,
                 head_starts_at_zero=True, alpha=0.8
                 )
@@ -439,8 +439,8 @@ def Angle_Space_Plot(file_name, Option_Dictionary={}):
             else:
                 try:
                     i = int(Option_Dictionary['arrow'])
-                    py.arrow(phi[i], a[i],
-                    0.1 * (phi[i + 1] - phi[i]), 0.1 * (a[i + 1] - a[i]),
+                    py.arrow(varphi[i], a[i],
+                    0.1 * (varphi[i + 1] - varphi[i]), 0.1 * (a[i + 1] - a[i]),
                     color="k", fill=True, head_width=1.0,
                     head_starts_at_zero=True, alpha=0.8
                     )
@@ -469,9 +469,9 @@ def Angle_Space_Plot(file_name, Option_Dictionary={}):
         ax.view_init(elevation, azimuth)
 
         # Transform to spherical coordinates,
-        (omega, a, phi) = Physics_Functions.Cartesian_2_Spherical(
+        (omega, a, varphi) = Physics_Functions.Cartesian_2_Spherical(
                                         x, y, z,
-                                        fix_phi=True,
+                                        fix_varphi=True,
                                         Angle_Type="Radians")
 
         if 'split' in Option_Dictionary:
@@ -484,16 +484,16 @@ def Angle_Space_Plot(file_name, Option_Dictionary={}):
                 # Trajectory of path
                 low = values[j]
                 high = values[j + 1]
-                x = [py.sin(a[i]) * py.cos(phi[i]) for i in range(low, high)]
-                y = [py.sin(a[i]) * py.sin(phi[i]) for i in range(low, high)]
+                x = [py.sin(a[i]) * py.cos(varphi[i]) for i in range(low, high)]
+                y = [py.sin(a[i]) * py.sin(varphi[i]) for i in range(low, high)]
                 z = [py.cos(a[i]) for i in range(low, high)]
                 Useful_Tools.ThreeD_Sphere(ax, elevation, azimuth, x, y, z,
                                         ls="-", lw=0.8, color=colors[j / 2])
 
         else:
             # Trajectory of path
-            x = [py.sin(a[i]) * py.cos(phi[i]) for i in range(len(time))]
-            y = [py.sin(a[i]) * py.sin(phi[i]) for i in range(len(time))]
+            x = [py.sin(a[i]) * py.cos(varphi[i]) for i in range(len(time))]
+            y = [py.sin(a[i]) * py.sin(varphi[i]) for i in range(len(time))]
             z = [py.cos(a[i]) for i in range(len(time))]
 
             if 'delta' in Option_Dictionary:
@@ -599,12 +599,12 @@ def Simple_Plot_Transform(file_name, Option_Dictionary={}):
     fig2 = py.subplot(312)
     fig2.plot(time, w2_prime)
     py.yticks()
-    py.ylabel("$\omega_{y}' $", fontsize=20, rotation="horizontal")
+    py.ylabel(r"$\omega_{y}' $", fontsize=20, rotation="horizontal")
 
     fig2 = py.subplot(313)
     fig2.plot(time, w3_prime)
     py.xlabel(r"$t$", fontsize=20)
-    py.ylabel("$\omega_{z}' $", fontsize=20, rotation="horizontal")
+    py.ylabel(r"$\omega_{z}' $", fontsize=20, rotation="horizontal")
     py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12, hspace=0.0)
 
     Additional_Code(Option_Dictionary)
@@ -655,7 +655,7 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
 
     # Transform to the spherical polar coordinates
 
-    (omega_prime, a_prime, phi_prime) = \
+    (omega_prime, a_prime, varphi_prime) = \
         Physics_Functions.Cartesian_2_Spherical(w1_prime, w2_prime,
             w3_prime)
 
@@ -682,15 +682,15 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
         # py.yticks(fig2.get_yticks()[0:-2])
 
         py.yticks(py.arange(0, y_max, 15))
-        py.ylabel("$a' \;[^{\circ}]$", rotation='horizontal',
+        py.ylabel(r"$a' \;[^{\circ}]$", rotation='horizontal',
                   fontsize=18)
 
-        # Plot phi_prime(t)
+        # Plot varphi_prime(t)
 
         ax2 = ax1.twinx()
 
-        phi_prime = Physics_Functions.Fix_Phi(phi_prime)
-        if abs(phi_prime[-1]) > 100:
+        varphi_prime = Physics_Functions.Fix_Phi(varphi_prime)
+        if abs(varphi_prime[-1]) > 100:
 
             def Scale_Axis(axis):
                 """ """
@@ -702,16 +702,16 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
                 axis_scaled = [ai / scale for ai in axis]
                 return (axis_scaled, scale)
 
-            (phi_prime_scaled, scale) = Scale_Axis(phi_prime)
-            ax2.plot(t_scaled, phi_prime_scaled, color='b', lw=1.0)
+            (varphi_prime_scaled, scale) = Scale_Axis(varphi_prime)
+            ax2.plot(t_scaled, varphi_prime_scaled, color='b', lw=1.0)
 
-            py.ylabel(r"$\phi' \; 1\times 10^{"
+            py.ylabel(r"$\varphi' \; 1\times 10^{"
                       + str(int(py.log10(scale))) + "} [^{\circ}]$",
                       rotation='vertical')
         else:
 
-            ax2.plot(t_scaled, phi_prime, color='b', lw=1.0)
-            py.ylabel("$\phi' \; [^{\circ}]$", rotation='vertical')
+            ax2.plot(t_scaled, varphi_prime, color='b', lw=1.0)
+            py.ylabel(r"$\varphi' \; [^{\circ}]$", rotation='vertical')
 
         # Ploptions
 
@@ -753,31 +753,31 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
         # py.yticks(fig2.get_yticks()[0:-2])
 
         ax2.set_yticks(py.arange(0, y_max, 15))
-        ax2.set_ylabel("$a'$ [deg]", rotation='vertical')
+        ax2.set_ylabel(r"$a'$ [deg]", rotation='vertical')
         ax2.yaxis.set_label_coords(labelx, 0.5)
 
-        # Plot phi_prime(t)
+        # Plot varphi_prime(t)
 
         ax3 = fig.add_subplot(313)
 
-        # Check and fix rotations of 2pi in phi
+        # Check and fix rotations of 2pi in varphi
 
-        phi_prime = Physics_Functions.Fix_Phi(phi_prime)
+        varphi_prime = Physics_Functions.Fix_Phi(varphi_prime)
 
-        # Often phi becomes very large in which case we scale the axis
+        # Often varphi becomes very large in which case we scale the axis
 
-        if abs(phi_prime[-1]) > 1000:
+        if abs(varphi_prime[-1]) > 1000:
 
-            (phi_prime_scaled, scale) = \
-                Useful_Tools.Sort_Out_Some_Axis(phi_prime)
-            ax3.plot(t_scaled, phi_prime_scaled)
-            ax3.set_ylabel(r"$\phi' [\;1\times 10^{"
+            (varphi_prime_scaled, scale) = \
+                Useful_Tools.Sort_Out_Some_Axis(varphi_prime)
+            ax3.plot(t_scaled, varphi_prime_scaled)
+            ax3.set_ylabel(r"$\varphi' [\;1\times 10^{"
                            + str(int(py.log10(scale))) + '} $deg]',
                            rotation='vertical')
         else:
 
-            ax3.plot(t_scaled, phi_prime)
-            ax3.set_ylabel("$\phi'$  [deg]", rotation='vertical')
+            ax3.plot(t_scaled, varphi_prime)
+            ax3.set_ylabel(r"$\varphi'$  [deg]", rotation='vertical')
 
         # Ploptions
 
@@ -793,9 +793,9 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
         a_end = a_prime[-100:-1]
         print ' Average of a  : %s degrees \n Range of a : %s' \
             % (py.average(a_end), max(a_end) - min(a_end))
-        phi_end = phi_prime[-100:-1]
-        print ' Average of phi :  %s  degrees \n Range of phi : %s' \
-            % (py.average(phi_end), max(phi_end) - min(phi_end))
+        varphi_end = varphi_prime[-100:-1]
+        print ' Average of varphi :  %s  degrees \n Range of varphi : %s' \
+            % (py.average(varphi_end), max(varphi_end) - min(varphi_end))
 
     py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12,
                        hspace=0.0)
@@ -872,19 +872,31 @@ def Euler_Angles(file_name, save_fig=False, verbose=True):
     fig = py.figure()
     ax1 = fig.add_subplot(311)
     ax1.plot(t_scaled, theta)
-    ax1.set_ylabel(r"$\theta$", rotation="horizontal")
+    ax1.set_ylabel(r"$\theta$ [deg]")
     ax1.set_xticklabels([])
     ax1.yaxis.set_label_coords(labelx, 0.5)
+    ax1.set_yticks(ax1.get_yticks()[1:])
 
     ax2 = py.subplot(312)
-    ax2.plot(t_scaled, phi)
-    ax2.set_ylabel(r"$\phi$", rotation="horizontal")
+    if abs(phi[-1])>10000:
+        (phi_scaled, phi_scale_val) = Useful_Tools.Sort_Out_Some_Axis(phi)
+        ax2.plot(t_scaled, phi_scaled)
+        ax2.set_ylabel(r"$\phi$ [$1\times 10^{}$ deg]".format(phi_scale_val))
+    else:
+        ax2.plot(t_scaled, phi)
+        ax2.set_ylabel(r"$\phi$", rotation="horizontal")
     ax2.set_xticklabels([])
     ax2.yaxis.set_label_coords(labelx, 0.5)
+    ax2.set_yticks(ax2.get_yticks()[1:])
 
     ax3 = py.subplot(313)
-    ax3.plot(t_scaled, psi)
-    ax3.set_ylabel(r"$\psi$", rotation="horizontal")
+    if abs(psi[-1])>10000:
+        (psi_scaled, psi_scale_val) = Useful_Tools.Sort_Out_Some_Axis(psi)
+        ax2.plot(t_scaled, psi_scaled)
+        ax2.set_ylabel(r"$\psi$ [$1\times 10^{}$ deg]".format(psi_scale_val))
+    else:
+        ax3.plot(t_scaled, psi)
+        ax3.set_ylabel(r"$\psi$ [deg]")
     ax3.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
     ax3.yaxis.set_label_coords(labelx, 0.5)
 

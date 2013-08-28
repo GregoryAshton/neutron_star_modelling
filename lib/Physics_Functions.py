@@ -143,11 +143,12 @@ def equations(omega, theta, phi, psi):
     return theta_dot, phi_dot, psi_dot
 
 def Phi_dot(omega, theta, phi, psi, chi):
-    """ See equation (43) of Jones 2001 """
+    """ """
     theta_dot, phi_dot, psi_dot = equations(omega, theta, phi, psi)
-    return phi_dot +  psi_dot * sin(chi) * (
-            (cos(theta) * sin(chi) - sin(psi) * sin(theta) * cos(chi)) /
-       (pow(sin(theta) * cos(chi) - cos(theta) * sin(psi) * sin(chi), 2) + pow(cos(psi) * sin(chi), 2)))
+    return phi_dot +  sin(chi) * ( 
+            (psi_dot * (cos(theta) * sin(chi) - sin(psi) * sin(theta) * cos(chi)) +
+             theta_dot * cos(psi) * (sin(psi) * sin(chi) * sin(theta) - cos(chi) * cos(theta))) /
+	    (pow(sin(theta) * cos(chi) - cos(theta) * sin(psi) * sin(chi), 2) + pow(cos(psi) * sin(chi), 2)))
     
 def Phi(theta, phi, psi, chi):
     """ See equation (42) of Jones 2001 """

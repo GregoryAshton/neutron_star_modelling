@@ -152,12 +152,9 @@ def Phi_dot(omega, theta, phi, psi, chi):
     
 def Phi(theta, phi, psi, chi):
     """ See equation (42) of Jones 2001 """
-    #return phi - .5 * np.pi + np.arctan2(
-    #            (cos(psi) * tan(chi)) , 
-    #            (cos(theta) * (tan(theta) - sin(psi) * tan(chi))))
-    a = (sin(phi) * cos(psi) + cos(phi) * cos(theta) * sin(psi)) * sin(chi) - cos(phi) * sin(theta) * cos(chi)
-    b = (cos(phi) * cos(psi) - sin(phi) * cos(theta) * sin(psi)) * sin(chi) + sin(theta) * sin(theta) * cos(chi)
-    return a / b
+    return phi - .5 * np.pi + np.arctan(
+                (cos(psi) * tan(chi)) / 
+                (sin(theta) - cos(theta) * sin(psi) * tan(chi)))
 
 def Theta(theta, psi, chi):  
     """ See equation (52) of Jones 2001 """

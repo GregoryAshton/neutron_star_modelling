@@ -909,3 +909,61 @@ def Euler_Angles(file_name, save_fig=False, verbose=True):
 
     if verbose:
         return (max(theta) - min(theta)) / np.mean(theta)
+
+
+def big_phi_dot(file_name, ax=None, save_fig=False, *args, **kwargs):
+    """ 
+    
+    Plot Phi_dot for data given in file_name 
+    
+    :param file_name: Name of the `hdf5` file containing the data
+    :type file_name: str
+    :param ax: axis instance to use in plotting, if none a new one will be created
+
+    :save_fig: if True the file will be saved appropriately
+    :type save_fig: bool
+
+    """
+
+    if ax is None:
+        ax = py.subplot(111)
+
+    time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
+    chi = float(File_Functions.Parameter_Dictionary(file_name)['chi'])
+    (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
+    
+    Phi_dot_list = Physics_Functions.Phi_dot(np.array([w1, w2, w3]), theta, phi, psi, np.radians(chi))
+    ax.plot(t_scaled, Phi_dot_list, *args, **kwargs) 
+    ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+    ax.set_ylabel(r"$\dot{\Phi}$", rotation="horizontal", size=26)
+
+    return ax
+
+
+def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
+    """ 
+    
+    Plot Phi_dot for data given in file_name 
+    
+    :param file_name: Name of the `hdf5` file containing the data
+    :type file_name: str
+    :param ax: axis instance to use in plotting, if none a new one will be created
+
+    :save_fig: if True the file will be saved appropriately
+    :type save_fig: bool
+
+    """
+
+    if ax is None:
+        ax = py.subplot(111)
+
+    time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
+    chi = float(File_Functions.Parameter_Dictionary(file_name)['chi'])
+    (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
+    
+    Theta_list = np.degrees(Physics_Functions.Theta(theta, psi, np.radians(chi)))
+    ax.plot(t_scaled, Theta_list, *args, **kwargs) 
+    ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+    ax.set_ylabel(r"$\Theta$", rotation="horizontal", size=26)
+
+    return ax

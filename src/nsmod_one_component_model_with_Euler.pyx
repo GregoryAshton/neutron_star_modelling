@@ -96,10 +96,6 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
     
     """ Solve the one component model  using gsl_odeiv2_step_rk8pd """
 
-    if epsI1 != 0.0:
-        print "Triaxiality is currently not implemented, you need to define the initial conditions correctly"
-        return
-
    # Test if the anomalous torque is required or not
     if anom_torque:
         anom_torque_b = 1
@@ -128,7 +124,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
     w[2] = omega0*cos(a_int)
     w[3] = np.arccos(cos(a_int) * (1.0 + epsI3) * pow(pow(sin(a_int) * (1.0 + epsI1), 2) + pow(cos(a_int) * (1.0 + epsI3), 2), -0.5))
     w[4] = 0.0
-    w[5] = np.arccos(sin(a_int) * (1.0 + epsI1) * pow(1 - pow(cos(a_int) * (1.0 + epsI3), 2), -0.5))
+    w[5] = 0.5 * np.pi  
 
 
     # Inititate the system and define the set of functions

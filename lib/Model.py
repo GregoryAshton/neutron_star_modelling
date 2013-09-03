@@ -699,7 +699,7 @@ def Run_with_Euler(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
         if overwrite:
             os.remove(file_name)
         else:
-            vprint(True, "overwrite=False: I will not delete this file, delets manually if corrupted")
+            vprint(True, "overwrite=False, therefore I will not delete this file")
             return file_name
 
 

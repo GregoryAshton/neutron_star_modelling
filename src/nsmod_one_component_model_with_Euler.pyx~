@@ -126,9 +126,10 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
     w[0] = omega0*sin(a_int)
     w[1] = 0.0
     w[2] = omega0*cos(a_int)
-    w[3] = np.arccos(cos(a_int) * (1.0 + epsI3) * pow(pow(sin(a_int), 2) + pow(cos(a_int) * (1.0 + epsI3), 2), -0.5))
+    w[3] = np.arccos(cos(a_int) * (1.0 + epsI3) * pow(pow(sin(a_int) * (1.0 + epsI1), 2) + pow(cos(a_int) * (1.0 + epsI3), 2), -0.5))
     w[4] = 0.0
-    w[5] = np.pi / 2
+    w[5] = 0.5 * np.pi  
+
 
     # Inititate the system and define the set of functions
     cdef gsl_odeiv2_system sys

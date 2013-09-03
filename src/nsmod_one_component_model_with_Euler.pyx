@@ -57,30 +57,18 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
 
     #  Define the three ODEs in f[] as functions of the above variables
 
-    #f[0] = Tx * pow(1 + epsI1,-1) - w[1] * w[2] * epsI3 * pow(1 + epsI1, -1)
+    f[0] = Tx * pow(1 + epsI1, -1) - w[1] * w[2] * epsI3 * pow(1 + epsI1, -1)
 
-    #f[1] = Ty - w[0] * w[2] * (epsI1 - epsI3)
+    f[1] = Ty + w[0] * w[2] * (epsI3 - epsI1)
 
-    #f[2] = Tz * pow(1 + epsI3,-1) + w[0] * w[1] * epsI1 * pow(1 + epsI3, -1)
-    
-    #f[3] = w[0] * cos(w[5]) - w[1] * sin(w[5])
-    
-    #f[4] = pow(sin(w[3]), -1) * (w[0] * sin(w[5]) + w[1] * cos(w[5]))
- 
-    #f[5] = w[2] - pow(sin(w[3]), -1) * (w[0] * sin(w[5]) + w[1] * cos(w[5])) * cos(w[3])
-    
-    f[0] = Tx - w[1] * w[2] * epsI3
-
-    f[1] = Ty + w[0] * w[2] * epsI3
-
-    f[2] = Tz
+    f[2] = Tz * pow(1 + epsI3, -1) + w[0] * w[1] * epsI1 * pow(1 + epsI3, -1)
     
     f[3] = w[0] * cos(w[5]) - w[1] * sin(w[5])
     
     f[4] = pow(sin(w[3]), -1) * (w[0] * sin(w[5]) + w[1] * cos(w[5]))
- 
-    f[5] = w[2] - pow(sin(w[3]), -1) * (w[0] * sin(w[5]) + w[1] * cos(w[5])) * cos(w[3])
 
+    f[5] = w[2] - pow(sin(w[3]), -1) * (w[0] * sin(w[5]) + w[1] * cos(w[5])) * cos(w[3])
+    
     return GSL_SUCCESS
 
 

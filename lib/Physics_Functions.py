@@ -208,9 +208,9 @@ def timing_residual(time, w1, w2, w3, theta, phi, psi, chi, order=2, full=False)
     T_res = Phi_list - Phi_fit
     
     if full:
-        return time, T_res, coeffs
+        return T_res, coeffs
     else:
-        return time, T_res
+        return T_res
 
 # Below is to be replaced by the Euler method
 

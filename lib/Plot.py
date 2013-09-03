@@ -967,3 +967,20 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
     ax.set_ylabel(r"$\Theta$", rotation="horizontal", size=26)
 
     return ax
+
+def timing_residual(file_name, ax=None, save_fig=False, *args, **kwargs):
+    """ Plot the timing residuals for the data given in file_name. """
+
+    time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
+    chi = np.radians(float(File_Functions.Parameter_Dictionary(file_name)['chi']))
+    (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
+
+    Tres = Physics_Functions.timing_residual(time, w1, w2, w3, theta, phi, psi, np.radians(chi))
+
+    if ax is None:
+        ax = py.subplot(111)
+    ax.plot(t_scaled, Tres, *args, **kwargs)
+    ax.set_ylabel(r"Timing residual", rotation='vertical')
+    ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+
+    return ax

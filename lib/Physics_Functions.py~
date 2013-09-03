@@ -4,9 +4,10 @@ import numpy as np
 import pylab as py
 from math import pi
 from numpy import cos, sin, tan
+import scipy as sc
 
 from scipy.integrate import cumtrapz
-from scipy.optimize import curve_fit
+
 
 
 def Cartesian_2_Spherical(x, y, z, Angle_Type="Degrees", fix_varphi=False):
@@ -152,17 +153,65 @@ def Phi_dot(omega, theta, phi, psi, chi):
     
 def Phi(theta, phi, psi, chi):
     """ See equation (42) of Jones 2001 """
-    #return phi - .5 * np.pi + np.arctan2(
-    #            (cos(psi) * tan(chi)) , 
-    #            (cos(theta) * (tan(theta) - sin(psi) * tan(chi))))
-    a = (sin(phi) * cos(psi) + cos(phi) * cos(theta) * sin(psi)) * sin(chi) - cos(phi) * sin(theta) * cos(chi)
-    b = (cos(phi) * cos(psi) - sin(phi) * cos(theta) * sin(psi)) * sin(chi) + sin(theta) * sin(theta) * cos(chi)
-    return a / b
+    return phi - .5 * np.pi + np.arctan(
+                (cos(psi) * tan(chi)) / 
+                (sin(theta) - cos(theta) * sin(psi) * tan(chi)))
 
 def Theta(theta, psi, chi):  
     """ See equation (52) of Jones 2001 """
-    return np.arccos(sin(theta) * sin(psi) * sin(chi) + cos(theta) * cos(chi))   
+    return np.arccos(sin(theta) * sin(psi) * sin(chi) + cos(theta) * cos(chi))  
+
+def timing_residual(time, w1, w2, w3, theta, phi, psi, chi, order=2, full=False):
+    """ 
     
+    Calculate the timing residuals in the inertial frame using Phi_dot the 
+    instantaneous electromagnetic frequency. To understand the process it is 
+    best to follow the source code.
+
+    Parameters
+    ----------
+    file_name : str
+               hdf5 file to use as source data.
+    order : int
+            Order of polynomial to fit to the exact phase, options are 2 or 3
+    full : bool
+           If true return the coefficients of the fit as w;;
+
+    Returns
+    -------
+    r : tuple
+        if full = True : time, T_res, coeffs
+        else time, T_res
+
+    """
+
+    if order not in [2, 3]:
+        print "ERROR: order must be either 2 or 3 other values are not used"
+        return
+
+    #time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
+    #chi = float(nsmod.File_Functions.Parameter_Dictionary(file_name)['chi'])
+
+    # Calculate Phi_dot the instantaneous electromagnetic frequency
+    Phi_dot_list = Phi_dot(np.array([w1, w2, w3]), theta, phi, psi, chi)
+
+    # Numerically intergrate Phi_dot to get a phase (initial conditon is Phi=0
+    Phi_list = cumtrapz(y=Phi_dot_list, x=time, initial=0)
+  
+    # Fit polynomial to Phi or order order
+    coefs = np.polyfit(time, Phi_list, order)
+
+    # poly1d returns the polynomial we then evaluate this at time giving the fitted phi
+    Phi_fit = np.poly1d(coefs)(time)
+    
+    # Subtract the two to get a residual
+    T_res = Phi_list - Phi_fit
+    
+    if full:
+        return time, T_res, coeffs
+    else:
+        return time, T_res
+
 # Below is to be replaced by the Euler method
 
 #def Inertial_Frame(omega, chi, epsI1, epsI3, epsA,

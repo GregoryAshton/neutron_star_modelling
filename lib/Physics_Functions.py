@@ -200,7 +200,7 @@ def timing_residual(time, w1, w2, w3, theta, phi, psi, chi, order=2, full=False)
   
     # Fit polynomial to Phi or order order
     coefs = np.polyfit(time, Phi_list, order)
-
+    print coefs
     # poly1d returns the polynomial we then evaluate this at time giving the fitted phi
     Phi_fit = np.poly1d(coefs)(time)
     

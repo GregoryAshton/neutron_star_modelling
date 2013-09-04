@@ -9,12 +9,19 @@ Dependencies
 ------------
 
 * Python 2.7 
-* Python modules : numpy, scipy, matplotlib
+* Python modules : numpy, scipy, matplotlib, h5py
 * Cython 
 * hdf5 
 * PyTables 
 * C compiler such as `gcc`
 
+Model
+-----
+
+The model is implemented through `nsmod.Model`. Currently two functions exist:
+
+* `Run(Input Dictionary)` : Standard single component model
+* `Run_Cython_Two_Component` : *NEW" Two component model 
 
 
 

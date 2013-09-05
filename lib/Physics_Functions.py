@@ -197,7 +197,6 @@ def timing_residual(time, w1, w2, w3, theta, phi, psi, chi, order=2, full=False)
   
     # Fit polynomial to Phi or order order
     coefs = np.polyfit(time, Phi_list, order)
-    print coefs
     # poly1d returns the polynomial we then evaluate this at time giving the fitted phi
     Phi_fit = np.poly1d(coefs)(time)
     
@@ -208,6 +207,33 @@ def timing_residual(time, w1, w2, w3, theta, phi, psi, chi, order=2, full=False)
         return T_res, coeffs
     else:
         return T_res
+
+# This needs to be checked some nsmods etc in there I spreckpn
+def nu_dot(time, w1, w2, w3, theta, phi, psi, chi):
+    # Calculate Phi_dot the instantaneous electromagnetic frequency
+    Phi_dot_list = nsmod.Physics_Functions.Phi_dot(np.array([w1, w2, w3]), theta, phi, psi, chi)
+
+    # Numerically intergrate Phi_dot to get a phase (initial conditon is Phi=0
+    Phi_list = cumtrapz(y=Phi_dot_list, x=time, initial=0)
+
+    # Convert T into an index range of time
+    T = 0.0001 # days
+    T = T * (24 * 3600)
+    dt = time[1] - time[0]
+    T_index_range = int(T / dt)
+
+    dT = int(0.25 * T_index_range)
+
+    nu_dot_list = []
+    time_list = []
+    i=0
+    while i < len(time):
+        coefs = np.polyfit(time[i:i + T_index_range], Phi_list[i:i + T_index_range], order)
+        nu_dot_list.append(coefs[0])
+        time_list.append(time[i]) #  Perhaps should be in the middle?
+    
+        i += dT
+
 
 # Below is to be replaced by the Euler method
 

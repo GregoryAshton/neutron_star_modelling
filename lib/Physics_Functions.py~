@@ -189,9 +189,6 @@ def timing_residual(time, w1, w2, w3, theta, phi, psi, chi, order=2, full=False)
         print "ERROR: order must be either 2 or 3 other values are not used"
         return
 
-    #time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
-    #chi = float(nsmod.File_Functions.Parameter_Dictionary(file_name)['chi'])
-
     # Calculate Phi_dot the instantaneous electromagnetic frequency
     Phi_dot_list = Phi_dot(np.array([w1, w2, w3]), theta, phi, psi, chi)
 

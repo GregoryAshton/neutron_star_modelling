@@ -155,6 +155,7 @@ def vprint(verbose, *args):
     else:
         vprint = lambda *a: None      # do-nothing function
 
+
 def Euler_Angles_Import(file_name):
     """ Returns tuple of "(time, w1, w2, w3, theta, phi, psi) """    
     f = Read_File(file_name)
@@ -167,3 +168,21 @@ def Euler_Angles_Import(file_name):
     psi = np.array(f['psi'].value)
     f.close()
     return (time, w1, w2, w3, theta, phi, psi)
+
+
+def Clean_Data(directory):
+    """ Remove all .hdf5 files in directory """
+
+    print ("WARNING: Permanent removal of all '.hdf5' files in the directory {}, do you wish to proceed? \n y/n".format(directory))
+    answer = raw_input()
+    if answer in['yes', 'y', 'alright']:
+        file_type = 'hdf5'
+        data_files = [dfile for dfile in os.listdir(directory) if file_type in dfile]
+        for dfile in data_files:
+            os.remove(dfile)
+
+    else:
+        print "Okay no files will be deleted"
+        return
+
+

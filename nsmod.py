@@ -54,6 +54,9 @@ def parse_command_line(argvs):
     parser.add_argument("-pp", "--print_parameters",
                         help=Useful_Tools.Print_Parameters.__doc__)
 
+    parser.add_argument("-d", "--delete", 
+           		       help=File_Functions.Clean_Data.__doc__)
+
     # Plotting arguments
 
     parser.add_argument("-p", "--plot",
@@ -76,9 +79,6 @@ def parse_command_line(argvs):
 
     parser.add_argument("-z", "--splot_beta_transform",
                         help=Plot.Spherical_Plot_Transform.__doc__)
-
-    parser.add_argument("-n", "--param_space_plot",
-                        help=NLD_Functions.Parameter_Space_Plot.__doc__)
 
     # Additional arguments are passed to opts
     parser.add_argument("-o", "--options",
@@ -115,6 +115,9 @@ def main():
     if arguments.print_parameters:
         Useful_Tools.Print_Parameters(arguments.print_parameters)
 
+    if arguments.delete:
+        File_Functions.Clean_Data(arguments.delete)
+
     if arguments.plot:
         Plot.Simple_Plot(arguments.plot, Option_Dictionary)
 
@@ -137,10 +140,6 @@ def main():
     if arguments.splot_beta_transform:
         Plot.Spherical_Plot_Transform(arguments.splot_beta_transform,
                                       Option_Dictionary)
-
-    if arguments.param_space_plot:
-        NLD_Functions.Parameter_Space_Plot(arguments.param_space_plot,
-                                           Option_Dictionary)
 
 if __name__ == "__main__":
     main()

@@ -201,8 +201,8 @@ def Spherical_Plot(file_name, Option_Dictionary={}):
 
     if 'save_fig' in Option_Dictionary and Option_Dictionary['save_fig']:
         File_Functions.Save_Figure(file_name, "Spherical_Plot")
-    else:
-        py.show()
+    
+    py.show()
 
 
 def Alpha_Plot(file_name, Option_Dictionary={}):
@@ -851,7 +851,16 @@ def Observables_Plot(file_name):
     py.show()
 
 
-def Euler_Angles(file_name, save_fig=False, verbose=True):
+def Euler_Angles(file_name, ax_tup=None, save_fig=False, *args, **kwargs):
+    """ Plot the Euler angles in thee subplots """
+
+    if ax_tup:
+        (ax1, ax2, ax3)= ax_tup
+    else:
+        ax1 = py.subplot(311)
+        ax2 = py.subplot(312)
+        ax3 = py.subplot(313)   
+
     labelx = -0.1  # x position of the yaxis labels
 
     (time, w1, w2, w3) = File_Functions.One_Component_Import(file_name)
@@ -869,47 +878,43 @@ def Euler_Angles(file_name, save_fig=False, verbose=True):
     #                    time, np.array([w1, w2, w3]), epsI3)
 
     # Plotting
-    fig = py.figure()
-    ax1 = fig.add_subplot(311)
-    ax1.plot(t_scaled, theta)
+    ax1.plot(t_scaled, theta, *args, **kwargs)
     ax1.set_ylabel(r"$\theta$ [deg]")
     ax1.set_xticklabels([])
     ax1.yaxis.set_label_coords(labelx, 0.5)
     ax1.set_yticks(ax1.get_yticks()[1:])
 
-    ax2 = py.subplot(312)
     if abs(phi[-1])>10000:
         (phi_scaled, phi_scale_val) = Useful_Tools.Sort_Out_Some_Axis(phi)
-        ax2.plot(t_scaled, phi_scaled)
+        ax2.plot(t_scaled, phi_scaled, *args, **kwargs)
         ax2.set_ylabel(r"$\phi$ [$1\times 10^{}$ deg]".format(phi_scale_val))
     else:
-        ax2.plot(t_scaled, phi)
+        ax2.plot(t_scaled, phi, *args, **kwargs)
         ax2.set_ylabel(r"$\phi$", rotation="horizontal")
     ax2.set_xticklabels([])
     ax2.yaxis.set_label_coords(labelx, 0.5)
     ax2.set_yticks(ax2.get_yticks()[1:])
 
-    ax3 = py.subplot(313)
+
     if abs(psi[-1])>10000:
         (psi_scaled, psi_scale_val) = Useful_Tools.Sort_Out_Some_Axis(psi)
-        ax2.plot(t_scaled, psi_scaled)
-        ax2.set_ylabel(r"$\psi$ [$1\times 10^{}$ deg]".format(psi_scale_val))
+        ax3.plot(t_scaled, psi_scaled, *args, **kwargs)
+        ax3.set_ylabel(r"$\psi$ [$1\times 10^{}$ deg]".format(psi_scale_val))
     else:
-        ax3.plot(t_scaled, psi)
+        ax3.plot(t_scaled, psi, *args, **kwargs)
         ax3.set_ylabel(r"$\psi$ [deg]")
     ax3.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
     ax3.yaxis.set_label_coords(labelx, 0.5)
 
     py.subplots_adjust(hspace=0.0)
 
-    if save_fig:
+    if ax_tup:
+        return (ax1, ax2, ax3)
+
+    elif save_fig:
         File_Functions.Save_Figure(file_name, 'Euler_Angles')
     else:
         py.show()
-
-    if verbose:
-        return (max(theta) - min(theta)) / np.mean(theta)
-
 
 def big_phi_dot(file_name, ax=None, save_fig=False, *args, **kwargs):
     """ 
@@ -969,7 +974,24 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
     return ax
 
 def timing_residual(file_name, order=2, ax=None, save_fig=False, *args, **kwargs):
-    """ Plot the timing residuals for the data given in file_name. """
+    """ 
+    
+    Plot the timing residuals for the data given in file_name. 
+    
+    Parameters:
+    -----------
+    file_name: string referencing the h5py data file
+    order: order of polynomial to fit, must be either 2 or 3
+    ax: an axis instance to plot, if None a new instance is initiated
+    save_fig: Option to save the figure using the default save feature
+    
+    Note: One can also pass *args and **kwargs onto the matplotlib plot function
+
+    Returns:
+    --------
+    ax: the axis instance
+
+    """
 
     time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
     chi = np.radians(float(File_Functions.Parameter_Dictionary(file_name)['chi']))
@@ -984,3 +1006,52 @@ def timing_residual(file_name, order=2, ax=None, save_fig=False, *args, **kwargs
     ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
 
     return ax
+
+def nu_dot(file_name, ax=None, normalise=False, *args, **kwargs):
+    """ 
+
+    Plot an approximation of nu_dot the Slowdown rate using the Lyne2010 method
+
+    Parameters:
+    ----------
+    file_name: string referencing the h5py data file
+    ax: an axis instance to plot, if None a new instance is initiated
+    save_fig: Option to save the figure using the default save feature
+    normalise: option to normalise the plotted output, useful when comparing several 
+               different simulations
+    
+    Note: One can also pass *args and **kwargs onto the matplotlib plot function
+
+    Returns:
+    --------
+    ax: the axis instance
+
+
+    """
+
+    time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
+    PD = File_Functions.Parameter_Dictionary(file_name)
+    chi = np.radians(float(PD['chi']))
+    tauP = float(PD['tauP'])
+
+    out = Physics_Functions.nu_dot(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=10)
+
+    if ax is None:
+        ax = py.subplot(111)
+
+    (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(out[0])
+
+    if normalise:
+        nu_dot = out[1] / sum(out[1]**2)**0.5
+    else:
+        nu_dot = out[1]
+
+    ax.plot(t_scaled, nu_dot, *args, **kwargs)
+
+    ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+    ax.set_ylabel(r"$\dot{\nu}$", rotation="horizontal", size=26)
+
+    
+    return ax
+
+    

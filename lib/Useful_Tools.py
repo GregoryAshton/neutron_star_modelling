@@ -2,6 +2,7 @@
 """ Some useful functions"""
 
 import pylab as py
+import numpy as np
 from math import floor
 
 
@@ -22,6 +23,24 @@ def Texify_Float(f, n=1, power=True):
         f_SF = Round_To_n(f, n)
         return  str(f_SF)
 
+# This is not working at the moment, need to think some more....
+def rescale_axis(ax, axis='x', label="time"):
+    """
+
+    Replacement of Sort_Out_Some_Axis
+
+    """
+    
+    largest_value = ax.get_xlims()[1]
+    scale = Round_To_n(largest_value, 0)
+
+    order_of_magnitude = int(py.log10(scale))
+
+    x_scaled = [xi / scale for xi in x]
+
+    
+    return (x_scaled, Order_of_Magnitude)
+
 
 def Sort_Out_Some_Axis(x):
     """ Scales an axis appropriately returns a list of the scaled axis
@@ -41,7 +60,7 @@ def Sort_Out_Some_Axis(x):
 
 
 def Round_To_n(x, n):
-    return round(x, -int(floor(py.sign(x) * py.log10(abs(x)))) + n)
+    return round(x, -int(np.floor(np.sign(x) * np.log10(abs(x)))) + n)
 
 
 def Print_Parameters(file_name):

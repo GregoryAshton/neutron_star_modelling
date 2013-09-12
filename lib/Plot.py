@@ -54,7 +54,7 @@ def Defaults():
     py.rcParams['font.size'] = 15
     py.rcParams['axes.labelsize'] = 20
     py.rcParams['lines.linewidth'] = 2
-    py.rcParams['axes.grid'] = True
+    py.rcParams['axes.grid'] = False
     py.rcParams['figure.figsize'] = (10.0, 8.0)
     #py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12,hspace=0.0)
 
@@ -883,6 +883,7 @@ def Euler_Angles(file_name, ax_tup=None, save_fig=False, *args, **kwargs):
     ax1.set_xticklabels([])
     ax1.yaxis.set_label_coords(labelx, 0.5)
     ax1.set_yticks(ax1.get_yticks()[1:])
+    #ax1.ticklabel_format(useOffset=False, axis='y')
 
     if abs(phi[-1])>10000:
         (phi_scaled, phi_scale_val) = Useful_Tools.Sort_Out_Some_Axis(phi)

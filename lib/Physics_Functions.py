@@ -243,7 +243,7 @@ def nu_dot(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=5):
     nu_dot_list = []
     time_list = []
     i=0
-    while i < len(time):
+    while i < len(time)-T_index_range:
         coefs = np.polyfit(time[i:i + T_index_range], Phi_list[i:i + T_index_range], 2)
         nu_dot_list.append(coefs[0])
         time_list.append(0.5*(time[i] + time[i+T_index_range])) 

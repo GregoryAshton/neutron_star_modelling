@@ -17,33 +17,38 @@ the home directory.
 
 """
 
-from numpy import arccos
-import numpy as np
-import math
+#!python
+#cython: boundscheck=False
+#cython: wraparound=False 
+#cython: nonecheck=False
+
 from cython_gsl cimport *
 import h5py
+import numpy as np
 
 
 cdef int funcs (double t, double w[], double f[], void *params) nogil:
     """ Function defining the ODEs with the anomalous torque """
 
+    cdef double mx, mz, Tx_sd, Ty_sd, Tz_sd, sin_theta, cos_theta, sin_psi, cos_psi, epsA, chi_rad, epsI1, epsI3
+    
     # Import the constant variables from params
     epsA = (<double *> params)[0]
-    chi = (<double *> params)[1]
+    chi_rad = (<double *> params)[1]
     epsI1 = (<double *> params)[2]
     epsI3 = (<double *> params)[3]
     anom_torque_b = (<double *> params)[4]
 
-    # Calculate the torque
-    mx = sin(chi)
-    mz = cos(chi)
+    # Precalculations
+    mx = sin(chi_rad)
+    mz = cos(chi_rad)
 
-    pre =  ( pow(w[0],2) + pow(w[1],2) + pow(w[2],2) ) * 2.0 * pow(10,6) * pow(9.0 * pow(10,10),-1)
+    pre =  epsA * (pow(w[0],2) + pow(w[1],2) + pow(w[2],2)) * pow(45000, -1)
 
-    Tx_sd = pre * epsA * mz * (w[2] * mx - w[0] * mz)
-    Ty_sd = -pre * epsA * w[1]
-    Tz_sd = pre * epsA * mx * (w[0] * mz - w[2] * mx)
-
+    Tx_sd = pre * mz * (w[2] * mx - w[0] * mz)
+    Ty_sd = -pre * w[1]
+    Tz_sd = pre * mx * (w[0] * mz - w[2] * mx)
+    
     if anom_torque_b == 1:
         Tx = Tx_sd + epsA * (w[0] * mx + w[2] * mz) * w[1] * mz
         Ty = Ty_sd + epsA * (w[0] * mx + w[2] * mz) * (w[2] * mx - w[0] * mz)
@@ -54,33 +59,25 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
         Ty = Ty_sd
         Tz = Tz_sd
 
-
     #  Define the three ODEs in f[] as functions of the above variables
 
-    f[0] = Tx * pow(1 + epsI1, -1) - w[1] * w[2] * epsI3 * pow(1 + epsI1, -1)
+    sin_theta = sin(w[4])
+    cos_theta = cos(w[4])
+    sin_psi = sin(w[5])
+    cos_psi = cos(w[5])
+    
+    f[0] = pow(1 + epsI1, -1) * (Tx  - w[1] * w[2] * epsI3) 
 
     f[1] = Ty + w[0] * w[2] * (epsI3 - epsI1)
 
-    f[2] = Tz * pow(1 + epsI3, -1) + w[0] * w[1] * epsI1 * pow(1 + epsI3, -1)
+    f[2] = pow(1 + epsI3, -1) * (Tz + w[0] * w[1] * epsI1 )
     
-    f[3] = w[0] * cos(w[5]) - w[1] * sin(w[5])
+    f[3] = pow(sin_theta, -1) * (w[0] * sin_psi + w[1] * cos_psi)
     
-    f[4] = pow(sin(w[3]), -1) * (w[0] * sin(w[5]) + w[1] * cos(w[5]))
-
-    f[5] = w[2] - pow(sin(w[3]), -1) * (w[0] * sin(w[5]) + w[1] * cos(w[5])) * cos(w[3])
+    f[4] = (w[0] - f[3] * sin_theta * sin_psi) * pow(cos_psi, -1)  #cos_psi *(w[0] - w[1] * tan(w[5])) 
     
-    #f[0] = Tx - w[1] * w[2] * epsI3
-
-    #f[1] = Ty + w[0] * w[2] * epsI3
-
-    #f[2] = Tz
+    f[5] = w[2] - f[3] * cos_theta
     
-    #f[3] = w[0] * cos(w[5]) - w[1] * sin(w[5])
-    
-    #f[4] = pow(sin(w[3]), -1) * (w[0] * sin(w[5]) + w[1] * cos(w[5]))
- 
-    #f[5] = w[2] - pow(sin(w[3]), -1) * (w[0] * sin(w[5]) + w[1] * cos(w[5])) * cos(w[3])
-
     return GSL_SUCCESS
 
 
@@ -90,12 +87,13 @@ cdef int jac (double t, double y[], double *dfdy, double dfdt[], void *params) n
     return GSL_SUCCESS
 
 
-def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
+def main(epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
     error=1e-10, t1=1.0e3 ,  chi = 30.0, anom_torque=True ,
     a_int=50.0, file_name="generic.hdf5", n=None):
     
     """ Solve the one component model  using gsl_odeiv2_step_rk8pd """
 
+    cdef long double chi_rad, a_int_rad
    # Test if the anomalous torque is required or not
     if anom_torque:
         anom_torque_b = 1
@@ -103,28 +101,27 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
         anom_torque_b = 0
 
     # We allow the user to give chi in degrees and convert here
-    chi = np.deg2rad(chi)
-    a_int = np.deg2rad(a_int)
+    chi_rad = chi * M_PI / 180.0
+    a_int_rad = a_int * M_PI / 180.0
 
     # Pass them to params list
     cdef double params[5]
     params[0] = epsA
-    params[1] = chi
+    params[1] = chi_rad
     params[2] = epsI1
     params[3] = epsI3
     params[4] = anom_torque_b
 
     # Initial values and calculate eta_relative
     cdef int i
-    cdef double t , w[6] ,h 
-    h = 1e-15   # Initial step size
+    cdef double t , w[6] 
     t = 0.0
-    w[0] = omega0*sin(a_int)
+    w[0] = omega0*sin(a_int_rad)
     w[1] = 0.0
-    w[2] = omega0*cos(a_int)
-    w[3] = np.arccos(cos(a_int) * (1.0 + epsI3) * pow(pow(sin(a_int) * (1.0 + epsI1), 2) + pow(cos(a_int) * (1.0 + epsI3), 2), -0.5))
-    w[4] = 0.0
-    w[5] = 0.5 * np.pi  
+    w[2] = omega0*cos(a_int_rad)
+    w[3] = 0.0
+    w[4] = acos(cos(a_int_rad) * (1.0 + epsI3) / sqrt(pow(sin(a_int_rad) * (1.0 + epsI1), 2) + pow(cos(a_int_rad) * (1.0 + epsI3), 2)))
+    w[5] = 0.5 * M_PI
 
 
     # Inititate the system and define the set of functions
@@ -140,15 +137,14 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
     d = gsl_odeiv2_driver_alloc_y_new(
                     &sys,  # const gsl_odeiv2_system * sys
                     gsl_odeiv2_step_rkf45, # const gsl_odeiv2_step_type * T
-                    1e-10, # const double hstart
+                    1e-15, # const double hstart
                     error,  #const double epsabs,
                     error # const double epsrel
                     )
 
     cdef int status
-    cdef double ti
+    cdef double ti, dt
 
-    time = [0.0]
     w1 = [w[0]]
     w2 = [w[1]]
     w3 = [w[2]]
@@ -156,17 +152,17 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
     w5 = [w[4]]
     w6 = [w[5]]
 
-
+    dt = t1 / n
+    
     # Run saving at discrete time values
     for i from 1 <= i <= n:
-        ti = i * t1 / n
+        ti = i * dt
         status = gsl_odeiv2_driver_apply (d, &t, ti, w)
 
         if (status != GSL_SUCCESS):
             print("error, return value=%d\n" % status)
             break
-
-        time.append(t)
+        
         w1.append(w[0])
         w2.append(w[1])
         w3.append(w[2])
@@ -176,12 +172,13 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
 
     gsl_odeiv2_driver_free(d)
 
+    time = np.linspace(0, t1, n+1)
     f = h5py.File(file_name, 'w')
     f.create_dataset("time", data=time)
     f.create_dataset("w1", data=w1)
     f.create_dataset("w2", data=w2)
     f.create_dataset("w3", data=w3)
-    f.create_dataset("theta", data=w4)
-    f.create_dataset("phi", data=w5)
+    f.create_dataset("phi", data=w4)
+    f.create_dataset("theta", data=w5)
     f.create_dataset("psi", data=w6)
     return file_name

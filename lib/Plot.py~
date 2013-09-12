@@ -883,6 +883,7 @@ def Euler_Angles(file_name, ax_tup=None, save_fig=False, *args, **kwargs):
     ax1.set_xticklabels([])
     ax1.yaxis.set_label_coords(labelx, 0.5)
     ax1.set_yticks(ax1.get_yticks()[1:])
+    #ax1.ticklabel_format(useOffset=False, axis='y')
 
     if abs(phi[-1])>10000:
         (phi_scaled, phi_scale_val) = Useful_Tools.Sort_Out_Some_Axis(phi)
@@ -974,7 +975,24 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
     return ax
 
 def timing_residual(file_name, order=2, ax=None, save_fig=False, *args, **kwargs):
-    """ Plot the timing residuals for the data given in file_name. """
+    """ 
+    
+    Plot the timing residuals for the data given in file_name. 
+    
+    Parameters:
+    -----------
+    file_name: string referencing the h5py data file
+    order: order of polynomial to fit, must be either 2 or 3
+    ax: an axis instance to plot, if None a new instance is initiated
+    save_fig: Option to save the figure using the default save feature
+    
+    Note: One can also pass *args and **kwargs onto the matplotlib plot function
+
+    Returns:
+    --------
+    ax: the axis instance
+
+    """
 
     time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
     chi = np.radians(float(File_Functions.Parameter_Dictionary(file_name)['chi']))
@@ -991,6 +1009,26 @@ def timing_residual(file_name, order=2, ax=None, save_fig=False, *args, **kwargs
     return ax
 
 def nu_dot(file_name, ax=None, normalise=False, *args, **kwargs):
+    """ 
+
+    Plot an approximation of nu_dot the Slowdown rate using the Lyne2010 method
+
+    Parameters:
+    ----------
+    file_name: string referencing the h5py data file
+    ax: an axis instance to plot, if None a new instance is initiated
+    save_fig: Option to save the figure using the default save feature
+    normalise: option to normalise the plotted output, useful when comparing several 
+               different simulations
+    
+    Note: One can also pass *args and **kwargs onto the matplotlib plot function
+
+    Returns:
+    --------
+    ax: the axis instance
+
+
+    """
 
     time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
     PD = File_Functions.Parameter_Dictionary(file_name)

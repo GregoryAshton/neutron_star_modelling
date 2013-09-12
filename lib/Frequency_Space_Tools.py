@@ -16,8 +16,8 @@ def FFT(time, data):
     frequency = np.fft.fftfreq(n, d=time[-1] / n)
 
     complex_amplitude = np.fft.fft(data)
-    magnitude = [py.norm(a) for a in complex_amplitude]
-    phase = [py.arctan(a.imag / a.real) for a in complex_amplitude]
+    magnitude = [np.sqrt(a.real**2 + a.imag**2) for a in complex_amplitude]
+    phase = [np.arctan(a.imag / a.real) for a in complex_amplitude]
 
     return (frequency[0:n / 2], magnitude[0:n / 2], phase[0:n / 2])
 

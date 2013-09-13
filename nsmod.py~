@@ -55,7 +55,7 @@ def parse_command_line(argvs):
                         help=Useful_Tools.Print_Parameters.__doc__)
 
     parser.add_argument("-d", "--delete", 
-		       help=File_Functions.Clean_Data.__doc__)
+           		       help=File_Functions.Clean_Data.__doc__)
 
     # Plotting arguments
 
@@ -116,10 +116,10 @@ def main():
         Useful_Tools.Print_Parameters(arguments.print_parameters)
 
     if arguments.delete:
-        File_Functions.Clean_Data()
+        File_Functions.Clean_Data(arguments.delete)
 
     if arguments.plot:
-        Plot.Simple_Plot(arguments.plot, Option_Dictionary)
+        Plot.simple_plot(arguments.plot, Option_Dictionary)
 
     if arguments.splot:
         Plot.Spherical_Plot(arguments.splot, Option_Dictionary)

@@ -57,7 +57,7 @@ def simple_plot(file_name, tmax=None, tmin=None):
 
     ax2.plot(time, wy)
     ax2.set_ylabel(r"$\omega_{y}$", rotation="horizontal")
-    ax2.set_yticks(fig2.get_yticks()[1:-1])
+    ax2.set_yticks(ax2.get_yticks()[1:-1])
     ax2.set_xlim(tmin, tmax)
 
     ax3.plot(time, wz)

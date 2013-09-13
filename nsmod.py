@@ -60,7 +60,7 @@ def parse_command_line(argvs):
     # Plotting arguments
 
     parser.add_argument("-p", "--plot",
-                        help=Plot.Simple_Plot.__doc__, metavar="FILE")
+                        help=Plot.simple_plot.__doc__, metavar="FILE")
 
     parser.add_argument("-s", "--splot",
                         help=Plot.Spherical_Plot.__doc__, metavar="FILE")
@@ -119,7 +119,7 @@ def main():
         File_Functions.Clean_Data(arguments.delete)
 
     if arguments.plot:
-        Plot.Simple_Plot(arguments.plot, Option_Dictionary)
+        Plot.simple_plot(arguments.plot, Option_Dictionary)
 
     if arguments.splot:
         Plot.Spherical_Plot(arguments.splot, Option_Dictionary)

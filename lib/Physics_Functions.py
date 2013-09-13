@@ -193,8 +193,10 @@ def timing_residual(time, w1, w2, w3, theta, phi, psi, chi, order=2, full=False)
     Phi_dot_list = Phi_dot(np.array([w1, w2, w3]), theta, phi, psi, chi)
 
     # Numerically intergrate Phi_dot to get a phase (initial conditon is Phi=0
-    Phi_list = cumtrapz(y=Phi_dot_list, x=time, initial=0)
+    #Phi_list = cumtrapz(y=Phi_dot_list, x=time, initial=0)
 
+    Phi_list = Phi(theta, phi, psi, chi)
+    
     # Fit polynomial to Phi or order order
     coefs = np.polyfit(time, Phi_list, order)
     # poly1d returns the polynomial we then evaluate this at time giving the fitted phi

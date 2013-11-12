@@ -12,7 +12,7 @@ from File_Functions import vprint
 
 def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
         omega0=None, t1=1e12, error=1e-12, n=1000, eta=0.0, verbose=True,
-        a_int=50.0):
+        a_int=50.0, phi0=None):
     """
 
     Run a simulation of the one component model
@@ -92,6 +92,12 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
         file_name_list.append("_aint_{}".format(a_int))
         a_int = float(a_int)
 
+    if phi0:
+        file_name_list.append("_phi0_{}".format(phi0))
+        phi0 = float(phi0)
+    else:
+        phi0 = 0.0
+
     if eta != 0.0:
         file_name_list.append("_eta_{}".format(eta))
         n = None  # Save at discrete timesteps turned off by eta
@@ -117,7 +123,7 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
         os.remove(file_name)
 
     nsmod_one_component_model.main(
-                      chi=chi,
+                      chi=np.radians(chi),
                       file_name=file_name,
                       n=int(n),
                       epsA=epsA,
@@ -128,7 +134,8 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
                       eta=eta,
                       anom_torque=anom_torque,
                       error=float(error),
-                      a_int=a_int
+                      a_int=np.radians(a_int),
+                      phi0=np.radians(phi0),
                       )
 
     return file_name

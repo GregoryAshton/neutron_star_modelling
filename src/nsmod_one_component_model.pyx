@@ -73,8 +73,8 @@ cdef int jac (double t, double y[], double *dfdy, double dfdt[], void *params) n
 
 
 def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
-    error=1e-10, t1=1.0e3 , eta=0.0, chi = 30.0, anom_torque=True ,
-    a_int=50.0, file_name="generic.hdf5", n=None):
+    error=1e-10, t1=1.0e3 , eta=0.0, chi = 0.5, anom_torque=True ,
+    a_int=0.5, file_name="generic.hdf5", n=None, phi0=0.0):
     """ Solve the one component model  using gsl_odeiv2_step_rk8pd """
 
    # Test if the anomalous torque is required or not
@@ -82,10 +82,6 @@ def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
         anom_torque_b = 1
     else:
         anom_torque_b = 0
-
-    # We allow the user to give chi in degrees and convert here
-    chi = np.deg2rad(chi)
-    a_int = np.deg2rad(a_int)
 
     # Pass them to params list
     cdef double params[5]
@@ -101,9 +97,9 @@ def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
     eta_relative = eta*pow(omega0,2)
     h = 1e-15   # Initial step size
     t = 0.0
-    w[0] = omega0*sin(a_int)
-    w[1] = 0.0
-    w[2] = omega0*cos(a_int)
+    w[0] = omega0 * cos(phi0) * sin(a_int)
+    w[1] = omega0 * sin(phi0) * sin(a_int)
+    w[2] = omega0 * cos(a_int)
 
     # Inititate the system and define the set of functions
     cdef gsl_odeiv2_system sys

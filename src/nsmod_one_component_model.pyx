@@ -2,7 +2,7 @@
 Solver for three coupled ODEs which define the single component system
 
 The solver used GSL odeint to actually solve the odes and Cython_GSL
-as a npthon interface documentation can be found at
+as a python interface documentation can be found at
 
     http://www.gnu.org/software/gsl/manual/
     html_node/Ordinary-Differential-Equations.html
@@ -11,7 +11,7 @@ and
 
     https://github.com/twiecki/CythonGSL
 
-any changes to these files will require recompiling using the setup.np in
+any changes to these files will require recompiling using the setup.py in
 the home directory.
 
 """
@@ -180,4 +180,5 @@ def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
     f.create_dataset("w1",data=w1)
     f.create_dataset("w2",data=w2)
     f.create_dataset("w3",data=w3)
+    f.close()
     return file_name

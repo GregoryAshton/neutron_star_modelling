@@ -219,5 +219,5 @@ def main (epsI=1.0e-2, epsA=1.0e-3 , omega0=1.0e4, error=1e-5, t1=1.0e6 ,
     f.create_dataset("o1",data=o1)
     f.create_dataset("o2",data=o2)
     f.create_dataset("o3",data=o3)
-
+    f.close()
     return file_name

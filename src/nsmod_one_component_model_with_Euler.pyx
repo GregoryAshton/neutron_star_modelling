@@ -181,4 +181,5 @@ def main(epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
     f.create_dataset("phi", data=w4)
     f.create_dataset("theta", data=w5)
     f.create_dataset("psi", data=w6)
+    f.close()
     return file_name

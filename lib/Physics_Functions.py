@@ -49,6 +49,9 @@ def Cartesian_2_EBF(x, y, z, beta):
     y_prime = y
     return (x_prime, y_prime, z_prime)
 
+def epsA(Bs, R=1e6, I0=1e45, c=1e10):
+    ''' Return epsA from standard equations '''
+    return np.power(Bs, 2) * np.power(R, 5) / (4 * I0 * np.power(c, 2))
 
 def Rotational_Kinetic_Energy(Ix, Iy, Iz, omega_x, omega_y, omega_z):
     en_2 = (Ix * pow(omega_x, 2) + Iy * pow(omega_y, 2) + Iz * pow(omega_z, 2))

@@ -11,10 +11,11 @@ Dependencies
 * Python 2.7 
 * Python modules : numpy, scipy, matplotlib, h5py
 * Cython 
+* CythonGSL
 * hdf5 
-* PyTables 
 * C compiler such as `gcc`
 
+All modules should be installable via `pip` or a package manager.
 
 
 

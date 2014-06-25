@@ -20,7 +20,7 @@ import numpy as np
 import math
 from cython_gsl cimport *
 import h5py
-
+from nsmod.File_Functions import FileNamer
 
 cdef int funcs (double t, double w[], double f[], void *params) nogil:
     """ Function defining the ODEs with the anomalous torque """
@@ -32,7 +32,7 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     chi = (<double *> params)[1]
     epsI1 = (<double *> params)[2]
     epsI3 = (<double *> params)[3]
-    anom_torque_b = (<double *> params)[4]
+    AnomTorque = (<double *> params)[4]
 
     # Calculate the torque
     mx = sin(chi)
@@ -44,7 +44,7 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     Ty_sd = -pre * epsA * w[1]
     Tz_sd = pre * epsA * mx * (w[0] * mz - w[2] * mx)
 
-    if anom_torque_b == 1:
+    if AnomTorque == 1:
         Tx = Tx_sd + epsA * (w[0] * mx + w[2] * mz) * w[1] * mz
         Ty = Ty_sd + epsA * (w[0] * mx + w[2] * mz) * (w[2] * mx - w[0] * mz)
         Tz = Tz_sd - epsA * (w[0] * mx + w[2] * mz) * w[1] * mx
@@ -67,29 +67,62 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
 
 
 # Currently jac is unused by the ODE solver so is left empty
-cdef int jac (double t, double y[], double *dfdy, double dfdt[], void *params) nogil:
+cdef int jac (double t, double y[], double *dfdy, 
+              double dfdt[], void *params) nogil:
 
     return GSL_SUCCESS
 
 
 def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
-    error=1e-10, t1=1.0e3 , eta=0.0, chi = 0.5, anom_torque=True ,
-    a_int=0.5, file_name="generic.hdf5", n=None, phi0=0.0):
-    """ Solve the one component model  using gsl_odeiv2_step_rk8pd """
+    chi0=30.0, a0=50., T=1.0e3 , AnomTorque=True, eta=0.1, n=None, 
+    error=1e-10):
+    """ One component NS model
+    
+    This solves the Euler equations for a single component NS and the 
+    Euler angles to take it into the inertial frame. The body is acted
+    on by the Deutsch torque, with the addition of a switching component
 
-   # Test if the anomalous torque is required or not
-    if anom_torque:
-        anom_torque_b = 1
-    else:
-        anom_torque_b = 0
+    Paramaters
+    ----------
+    epsI1 : float
+        Ellipticity along the x axis
+    epsI3 : float
+        Ellipticity along the z axis
+    epsA : float
+        Magnetic deformation [Glampedakis & Jones, 2010]
+    chi0 : float
+        Initial polar angle of the magnetic dipole in degrees
+    omega0 : float
+        Initial magnitude of the spin vector
+    a0 : float
+        Initial polar angle of the spin vector in degrees
+    T : float
+        Duration of the simulation in seconds
+    AnomTorque : bool
+        If true, include the anomalous torque
+    eta : float
+        Tolerance to prematurely end simulation by if T is not yet reached,
+        this requires that n be None.
+    n : int
+        Number of data points to save
+    error : float
+        Error passed to the ODE solver
+    
+    
+    """
+
+    file_name = FileNamer(epsI1=epsI1, epsI3=epsI3, epsA=epsA,
+                          omega0=omega0, chi0=chi0, a0=a0, T=T,
+                          AnomTorque=AnomTorque, n=n, eta=eta,
+                          error=error)
 
     # Pass them to params list
     cdef double params[5]
     params[0] = epsA
-    params[1] = chi
+    params[1] = chi0
     params[2] = epsI1
     params[3] = epsI3
-    params[4] = anom_torque_b
+    params[4] = AnomTorque
 
     # Initial values and calculate eta_relative
     cdef int i
@@ -97,9 +130,9 @@ def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
     eta_relative = eta*pow(omega0,2)
     h = 1e-15   # Initial step size
     t = 0.0
-    w[0] = omega0 * cos(phi0) * sin(a_int)
-    w[1] = omega0 * sin(phi0) * sin(a_int)
-    w[2] = omega0 * cos(a_int)
+    w[0] = omega0 * sin(a0)
+    w[1] = 0.0
+    w[2] = omega0 * cos(a0)
 
     # Inititate the system and define the set of functions
     cdef gsl_odeiv2_system sys
@@ -119,11 +152,11 @@ def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
     error, error, 0.0)
 
     # Setup the solver alternative to n
-    cdef gsl_odeiv2_step_type * T
-    T = gsl_odeiv2_step_rk8pd
+    cdef gsl_odeiv2_step_type * TT
+    TT= gsl_odeiv2_step_rk8pd
 
     cdef gsl_odeiv2_step * s
-    s = gsl_odeiv2_step_alloc (T, 3)
+    s = gsl_odeiv2_step_alloc (TT, 3)
     cdef gsl_odeiv2_control * c
     c = gsl_odeiv2_control_y_new (error, error)
     cdef gsl_odeiv2_evolve * e
@@ -140,7 +173,7 @@ def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
     if n :
         # Run saving at discrete time values
         for i from 1 <= i <= n:
-            ti = i * t1 / n
+            ti = i * T / n
             status = gsl_odeiv2_driver_apply (d, &t, ti, w)
 
             if (status != GSL_SUCCESS):
@@ -156,8 +189,8 @@ def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
 
     else:
 
-        while (pow(w[0],2)+pow(w[1],2)+pow(w[2],2) > eta_relative and t < t1 ):
-            status = gsl_odeiv2_evolve_apply (e, c, s, &sys, &t, t1, &h, w)
+        while (pow(w[0],2)+pow(w[1],2)+pow(w[2],2) > eta_relative and t < T ):
+            status = gsl_odeiv2_evolve_apply (e, c, s, &sys, &t, T, &h, w)
 
             if (status != GSL_SUCCESS):
                 break

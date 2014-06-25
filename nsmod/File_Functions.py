@@ -189,10 +189,13 @@ def FormatValue(key, val):
     elif key in ["chi0", "a0"]:
         formatted_val = "{:2.2f}".format(val)
     elif key in ["n"]:
-        formatted_val = "{:.0f}".format(val)
+        if val:
+            formatted_val = "{:.0f}".format(val)
+        else:
+            formatted_val = None
     elif key in ["AnomTorque"]:
         formatted_val = "{:.0f}".format(val)
-    elif key in ["upsilon"]:
+    elif key in ["upsilon", "eta"]:
         formatted_val = "{:.3f}".format(val)
     elif key in ["error"]:
         formatted_val = None

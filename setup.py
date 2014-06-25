@@ -8,8 +8,7 @@ import os
 
 os.system("mv nsmod/*.so .")
 
-name_list = ["nsmod_cython", 
-             "nsmod_one_component_model",
+name_list = ["one_component_model",
              "nsmod_two_component_model",
              "nsmod_two_component_model2",
              "nsmod_one_component_model_with_Euler",

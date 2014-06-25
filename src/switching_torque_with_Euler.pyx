@@ -90,7 +90,7 @@ cdef int jac (double t, double y[], double *dfdy,
 
 
 def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
-    a0=50., T=1.0e3, AnomTorque=True , n=10000, upsilon=0.0, error=1e-10):
+    a0=50., T=1.0e3, AnomTorque=True , upsilon=0.0, n=10000, error=1e-10):
     """ One component NS with Euler angles and switching
     
     This solves the Euler equations for a single component NS and the 
@@ -115,10 +115,10 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
         Duration of the simulation in seconds
     AnomTorque : bool
         If true, include the anomalous torque
+    upsilon : float in [0, 1]
+        Fractional reduction in spindown torque during the off-phase   
     n : int
         Number of data points to save
-    upsilon : float in [0, 1]
-        Fractional reduction in spindown torque during the off-phase
     error : float
         Error passed to the ODE solver
     

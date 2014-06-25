@@ -6,11 +6,14 @@ from Cython.Distutils import build_ext
 import cython_gsl
 import os
 
+os.system("mv nsmod/*.so .")
+
 name_list = ["nsmod_cython", 
              "nsmod_one_component_model",
              "nsmod_two_component_model",
              "nsmod_two_component_model2",
              "nsmod_one_component_model_with_Euler",
+             "nsmod_switching_torque_with_Euler"
              ]
 extension_list = [Extension(name,
                 ["src/"+name+".pyx"],
@@ -25,4 +28,4 @@ setup(
     ext_modules=extension_list
     )
 
-os.system("mv *.so lib/")
+os.system("mv *.so nsmod/")

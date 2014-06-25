@@ -185,4 +185,41 @@ def Clean_Data(directory):
         print "Okay no files will be deleted"
         return
 
+def FormatValue(key, val):
+    """ Formats value to give sensible file name 
+    
+    Note: None is returned if the key is not used in the filename, e.g 
+          the error.
+    """
+    if key in ["epsI1", "epsI3", "epsA", "omega0", "T"]:
+        formatted_val = "{:.2e}".format(val)
+    elif key in ["chi0", "a0"]:
+        formatted_val = "{:2.2f}".format(val)
+    elif key in ["n"]:
+        formatted_val = "{:.0f}".format(val)
+    elif key in ["anom_torque"]:
+        formatted_val = "{:.0f}".format(val)
+    elif key in ["upsilon"]:
+        formatted_val = "{:.3f}".format(val)
+    elif key in ["error"]:
+        formatted_val = None
+    else:
+        raise ValueError(
+          "The pair {}:{} do not match known values".format(key, val))
 
+    return formatted_val
+
+def FileNamer(**kwargs):
+    """ Returns a file name describing the key word arguments """
+   
+    file_name_list = []
+    for key, val in kwargs.iteritems():
+        formatted_val = FormatValue(key, val)
+        if formatted_val:
+            file_name_list.append("{}_{}_".format(key, formatted_val))
+
+    file_name_list[-1] = file_name_list[-1].rstrip("_")
+    file_name_list.append(".hdf5")
+    file_name = "".join(file_name_list)
+
+    return file_name

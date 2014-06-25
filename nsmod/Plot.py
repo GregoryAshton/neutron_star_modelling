@@ -11,26 +11,13 @@ from mpl_toolkits.mplot3d import proj3d
 import File_Functions
 import Physics_Functions
 import Useful_Tools
-import NLD_Functions
 from Physics_Functions import Beta_Function
 
-def Defaults():
-    """ Default plotting options """
-    # Set the default font for all plots
-    from matplotlib import rc
-    rc('font', **{'family': 'serif',
-        'serif': ['Computer Modern']})
-    rc('text', usetex=True)
+from matplotlib import rc_file, ticker
+rc_file("../matplotlibrc")
 
-    # Set the defaults for axis
-    py.rcParams['axes.color_cycle'] = ['k', 'b', 'r', 'g']
-    py.rcParams['font.size'] = 15
-    py.rcParams['axes.labelsize'] = 20
-    py.rcParams['lines.linewidth'] = 2
-    py.rcParams['axes.grid'] = False
-    py.rcParams['figure.figsize'] = (10.0, 8.0)
-    #py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12,hspace=0.0)
-
+SCI_FORMATTER = ticker.ScalarFormatter(useOffset=False,
+                                       useMathText=True)
 
 # Plotting functions
 def simple_plot(file_name, tmax=None, tmin=None):
@@ -69,17 +56,34 @@ def simple_plot(file_name, tmax=None, tmin=None):
     py.show()
 
 
-def Spherical_Plot(file_name, Option_Dictionary={}):
+def Spherical_Plot(file_name, fig=None, tmax=None, tmin=0.0, end_val=False):
     """
 
     Plot the input data after transforming to spherical polar coordinates
 
-    The opts dictionary may contain
-    nmax=int limit the data from 0:nmax
-    tmax=float, tmin=float ~ limit the xaxis
-    end_val=True ~ print the average of the last 100 points
-    save_fig=True ~ saves the figure
+    Parameters
+    ----------
+    file_name : string
+        .hdf5 file name
+    fig : matplotlib figure instance
+        If none a new instance is created, if exists it must contain 3 axes
+    tmax : float
+        Maximum time to plot over
+    tmin : float
+        Minimum time to plot over
+    end_val : bool
+        If True print the average of the last 100 points
+
+    Returns
+    -------
+    fig : matplotlib figure instance
+        
     """
+
+    if fig:
+        [ax1, ax2, ax3] = fig.get_axes()
+    else:
+        fig, (ax1, ax2, ax3) = plt.subplots(nrows=3)
 
     # Default settings
     labelx = -0.1  # x position of the yaxis labels
@@ -89,28 +93,19 @@ def Spherical_Plot(file_name, Option_Dictionary={}):
     (time, omega_x, omega_y, omega_z) = \
             File_Functions.One_Component_Import(file_name)
 
-    if 'tmax' in Option_Dictionary:
-        tmax = Option_Dictionary['tmax']
-    else:
+    if not tmax:
         tmax = max(time)
-    if 'tmin' in Option_Dictionary:
-        tmin = Option_Dictionary['tmin']
-    else:
-        tmin = 0.0
+
 
     # Transform to spherical polar coordinates
     (omega, a, varphi) = Physics_Functions.Cartesian_2_Spherical(
                         omega_x, omega_y, omega_z, fix_varphi=True)
 
-    # Function to help scale the x-axis
-    (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
 
     # Plot omega(t)
-    fig = py.figure()
-    ax1 = fig.add_subplot(3, 1, 1)
     ax1.set_xticklabels([])
-    ax1.plot(t_scaled, omega)
-    ax1.set_xlim(tmin * pow(10, -scale_val), tmax * pow(10, -scale_val))
+    ax1.plot(time, omega)
+    ax1.set_xlim(tmin, tmax)
 
     ax1.set_ylim(0, 1.1 * max(omega))
     #py.yticks(fig1.get_yticks()[1:-1])
@@ -118,9 +113,8 @@ def Spherical_Plot(file_name, Option_Dictionary={}):
     ax1.yaxis.set_label_coords(labelx, 0.5)
 
     # Plot a(t)
-    ax2 = fig.add_subplot(3, 1, 2)
     ax2.set_xticklabels([])
-    ax2.plot(t_scaled, a)
+    ax2.plot(time, a)
     #py.axhline(90,ls="--",color="k")
 
     ax2.set_ylim(0, 105)
@@ -128,11 +122,10 @@ def Spherical_Plot(file_name, Option_Dictionary={}):
     ax2.set_yticks(py.arange(0, 105, 15))
     ax2.set_ylabel(r"$a $ [deg]", rotation="vertical")
     ax2.yaxis.set_label_coords(labelx, 0.5)
-    ax2.set_xlim(tmin * pow(10, -scale_val), tmax * pow(10, -scale_val))
+    ax2.set_xlim(tmin, tmax)
 
     # Plot varphi(t)
-    ax3 = fig.add_subplot(3, 1, 3)
-    ax3.plot(t_scaled, varphi)
+    ax3.plot(time, varphi)
 
     #Ploptions
     #ax3.set_ylim(0,110)
@@ -140,9 +133,10 @@ def Spherical_Plot(file_name, Option_Dictionary={}):
     ax3.set_yticks(ax3.get_yticks()[0:-1])
     ax3.set_ylabel(r"$\varphi$ [deg]", rotation="vertical")
     ax3.yaxis.set_label_coords(labelx, 0.5)
-    ax3.set_xlabel(r"time  [$1\times 10^{}$ s]".format(scale_val))
-    ax3.set_xlim(tmin * pow(10, -scale_val), tmax * pow(10, -scale_val))
-    if 'end_val' in Option_Dictionary:
+    ax3.set_xlabel(r"time [s]")
+    #ax3.xaxis.set_major_formatter(SCI_FORMATTER)
+    ax3.set_xlim(tmin, tmax)
+    if end_val:
         print " Data on the end value of the spherical components of omega"
         omega_end = omega[-100:-1]
         print ("Average of |omega|: {0} s^-1 \n Range of omega : {1}"
@@ -154,13 +148,9 @@ def Spherical_Plot(file_name, Option_Dictionary={}):
         print (" Average of varphi: {0} s^-1 \n Range of varphi : {1}"
             .format(py.average(varphi_end), max(varphi_end) - min(varphi_end)))
 
-    py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12, hspace=0.0)
+    #py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12, hspace=0.0)
 
-    if 'save_fig' in Option_Dictionary and Option_Dictionary['save_fig']:
-        File_Functions.Save_Figure(file_name, "Spherical_Plot")
-    
-    py.show()
-
+    return fig
 
 def Alpha_Plot(file_name, Option_Dictionary={}):
     """
@@ -761,7 +751,8 @@ def Observables_Plot(file_name):
     Plot some physical observables
 
     """
-
+    
+    import NLD_Functions
     # Default settings
     labelx = -0.1  # x position of the yaxis labels
 
@@ -815,7 +806,6 @@ def Euler_Angles(file_name, ax_tup=None, save_fig=False, *args, **kwargs):
     theta = np.degrees(data_dictionary['theta'].value)
     phi = np.degrees(data_dictionary['phi'].value)
     psi = np.degrees(data_dictionary['psi'].value)
-    (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
 
     PD = File_Functions.Parameter_Dictionary(file_name)
     #epsI1 = float(PD['epsI1'])
@@ -825,7 +815,7 @@ def Euler_Angles(file_name, ax_tup=None, save_fig=False, *args, **kwargs):
     #                    time, np.array([w1, w2, w3]), epsI3)
 
     # Plotting
-    ax1.plot(t_scaled, theta, *args, **kwargs)
+    ax1.plot(time, theta, *args, **kwargs)
     ax1.set_ylabel(r"$\theta$ [deg]")
     ax1.set_xticklabels([])
     ax1.yaxis.set_label_coords(labelx, 0.5)
@@ -833,11 +823,10 @@ def Euler_Angles(file_name, ax_tup=None, save_fig=False, *args, **kwargs):
     #ax1.ticklabel_format(useOffset=False, axis='y')
 
     if abs(phi[-1])>10000:
-        (phi_scaled, phi_scale_val) = Useful_Tools.Sort_Out_Some_Axis(phi)
-        ax2.plot(t_scaled, phi_scaled, *args, **kwargs)
-        ax2.set_ylabel(r"$\phi$ [$1\times 10^{}$ deg]".format(phi_scale_val))
+        ax2.plot(time, phi, *args, **kwargs)
+        ax2.set_ylabel(r"$\phi$ [deg]")
     else:
-        ax2.plot(t_scaled, phi, *args, **kwargs)
+        ax2.plot(time, phi, *args, **kwargs)
         ax2.set_ylabel(r"$\phi$", rotation="horizontal")
     ax2.set_xticklabels([])
     ax2.yaxis.set_label_coords(labelx, 0.5)
@@ -845,13 +834,12 @@ def Euler_Angles(file_name, ax_tup=None, save_fig=False, *args, **kwargs):
 
 
     if abs(psi[-1])>10000:
-        (psi_scaled, psi_scale_val) = Useful_Tools.Sort_Out_Some_Axis(psi)
-        ax3.plot(t_scaled, psi_scaled, *args, **kwargs)
-        ax3.set_ylabel(r"$\psi$ [$1\times 10^{}$ deg]".format(psi_scale_val))
-    else:
-        ax3.plot(t_scaled, psi, *args, **kwargs)
+        ax3.plot(time, psi, *args, **kwargs)
         ax3.set_ylabel(r"$\psi$ [deg]")
-    ax3.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+    else:
+        ax3.plot(time, psi, *args, **kwargs)
+        ax3.set_ylabel(r"$\psi$ [deg]")
+    ax3.set_xlabel(r"time  [s]")
     ax3.yaxis.set_label_coords(labelx, 0.5)
 
     py.subplots_adjust(hspace=0.0)

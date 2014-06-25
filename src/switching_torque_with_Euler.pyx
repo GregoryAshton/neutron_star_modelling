@@ -32,7 +32,7 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     chi = (<double *> params)[1]
     epsI1 = (<double *> params)[2]
     epsI3 = (<double *> params)[3]
-    anom_torque = (<double *> params)[4]
+    AnomTorque = (<double *> params)[4]
     upsilon = (<double *> params)[5]
 
     # Calculate the torque
@@ -53,7 +53,7 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     if Psi < max(chi, w[3]):
         S = 1.0 - upsilon
     
-    if anom_torque == 1:
+    if AnomTorque == 1:
         Tx = S * (Tx_sd + epsA * (w[0] * mx + w[2] * mz) * w[1] * mz)
         Ty = S * (Ty_sd + epsA * (w[0] * mx + w[2] * mz) * (w[2] * mx - w[0] * mz))
         Tz = S * (Tz_sd - epsA * (w[0] * mx + w[2] * mz) * w[1] * mx)
@@ -90,7 +90,7 @@ cdef int jac (double t, double y[], double *dfdy,
 
 
 def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
-    a0=50., T=1.0e3 , anom_torque=True , n=10000, upsilon=0.0, error=1e-10):
+    a0=50., T=1.0e3, AnomTorque=True , n=10000, upsilon=0.0, error=1e-10):
     """ One component NS with Euler angles and switching
     
     This solves the Euler equations for a single component NS and the 
@@ -113,7 +113,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
         Initial polar angle of the spin vector in degrees
     T : float
         Duration of the simulation in seconds
-    anom_torque : bool
+    AnomTorque : bool
         If true, include the anomalous torque
     n : int
         Number of data points to save
@@ -124,9 +124,14 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     
     
     """
+ 
+    file_name = FileNamer(epsI1=epsI1, epsI3=epsI3, epsA=epsA,
+                          omega0=omega0, chi0=chi0, a0=a0, T=T,
+                          AnomTorque=AnomTorque, n=n, upsilon=upsilon,
+                          error=error)
 
-    # Convert python Bool to int
-    anom_torque = anom_torque.real
+   # Convert python Bool to int
+    AnomTorque = AnomTorque.real
 
     # We allow the user to give angles in degrees and convert here
     chi0 = np.deg2rad(chi0)
@@ -138,7 +143,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     params[1] = chi0
     params[2] = epsI1
     params[3] = epsI3
-    params[4] = anom_torque
+    params[4] = AnomTorque
     params[5] = upsilon
 
     # Initial values and calculate eta_relative
@@ -203,11 +208,6 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     gsl_odeiv2_driver_free(d)
 
     time = np.linspace(0, T, n+1)
-
-    file_name = FileNamer(epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 ,
-                          omega0=1.0e1, chi0=30.0, a0=50., T=1.0e3,
-                          anom_torque=True , n=10000, upsilon=0.0,
-                          error=1e-10)
 
     f = h5py.File(file_name, 'w')
     f.create_dataset("time", data=time)

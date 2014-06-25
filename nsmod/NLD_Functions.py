@@ -15,10 +15,6 @@ import Useful_Tools
 
 from File_Functions import vprint
 
-# Import defaults for plotting
-Plot.Defaults()
-
-
 def Attractor_Plot(file_name, elev=15., azim=150,
                    return_vals=False, save_fig=False, close=False, plot=True):
     """

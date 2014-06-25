@@ -35,13 +35,6 @@ def Parameter_Dictionary(user_input):
         f = user_input.rstrip(".hdf5")
         f = f.split("/")[-1]
 
-        # Check if the anomalous torque was used or not
-        if "no_anom" in f:
-            f = f.lstrip("no_anom_")
-            p_d["anom_torque"] = False
-        else:
-            p_d["anom_torque"] = True
-
         # Import the rest of the parameters
         f = f.split("_")
         for i in range(0, len(f), 2):
@@ -197,7 +190,7 @@ def FormatValue(key, val):
         formatted_val = "{:2.2f}".format(val)
     elif key in ["n"]:
         formatted_val = "{:.0f}".format(val)
-    elif key in ["anom_torque"]:
+    elif key in ["AnomTorque"]:
         formatted_val = "{:.0f}".format(val)
     elif key in ["upsilon"]:
         formatted_val = "{:.3f}".format(val)

@@ -159,7 +159,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     w[0] = omega0*sin(a0)
     w[1] = 0.0
     w[2] = omega0*cos(a0)
-    w[3] = (np.arccos(cos(a0) * (1.0 + epsI3) * 
+    w[3] = (np.arccos(cos(a0) * (1.0 + epsI3) / 
              np.sqrt(pow(sin(a0) * (1.0 + epsI1), 2) + 
                  pow(cos(a0) * (1.0 + epsI3), 2))))
     w[4] = 0.0

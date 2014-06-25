@@ -56,7 +56,8 @@ def simple_plot(file_name, tmax=None, tmin=None):
     py.show()
 
 
-def Spherical_Plot(file_name, fig=None, tmax=None, tmin=0.0, end_val=False):
+def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0, 
+                   end_val=False, save_fig=False):
     """
 
     Plot the input data after transforming to spherical polar coordinates
@@ -73,15 +74,16 @@ def Spherical_Plot(file_name, fig=None, tmax=None, tmin=0.0, end_val=False):
         Minimum time to plot over
     end_val : bool
         If True print the average of the last 100 points
-
+    save_fig : bool
+        If True save an appropriately named figure
     Returns
     -------
     fig : matplotlib figure instance
         
     """
 
-    if fig:
-        [ax1, ax2, ax3] = fig.get_axes()
+    if axes:
+        (ax1, ax2, ax3) = axes
     else:
         fig, (ax1, ax2, ax3) = plt.subplots(nrows=3)
 
@@ -148,9 +150,12 @@ def Spherical_Plot(file_name, fig=None, tmax=None, tmin=0.0, end_val=False):
         print (" Average of varphi: {0} s^-1 \n Range of varphi : {1}"
             .format(py.average(varphi_end), max(varphi_end) - min(varphi_end)))
 
-    #py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12, hspace=0.0)
+    py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12, hspace=0.0)
+    
+    if save_fig:
+        File_Functions.Save_Figure(file_name, 'Euler_Angles')
 
-    return fig
+    return (ax1, ax2, ax3)
 
 def Alpha_Plot(file_name, Option_Dictionary={}):
     """
@@ -789,11 +794,11 @@ def Observables_Plot(file_name):
     py.show()
 
 
-def Euler_Angles(file_name, ax_tup=None, save_fig=False, *args, **kwargs):
+def Euler_Angles(file_name, axes=None, save_fig=False, *args, **kwargs):
     """ Plot the Euler angles in thee subplots """
 
-    if ax_tup:
-        (ax1, ax2, ax3)= ax_tup
+    if axes:
+        (ax1, ax2, ax3)= axes
     else:
         fig, (ax1, ax2, ax3) = plt.subplots(nrows=3)
 
@@ -842,13 +847,11 @@ def Euler_Angles(file_name, ax_tup=None, save_fig=False, *args, **kwargs):
 
     py.subplots_adjust(hspace=0.0)
 
-    if ax_tup:
-        return (ax1, ax2, ax3)
-
-    elif save_fig:
+    if save_fig:
         File_Functions.Save_Figure(file_name, 'Euler_Angles')
-    else:
-        return fig
+
+
+    return (ax1, ax2, ax3)
 
 def big_phi_dot(file_name, ax=None, save_fig=False, *args, **kwargs):
     """ 

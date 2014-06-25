@@ -8,3 +8,4 @@ text.usetex     : True  # use latex for all text handling
 figure.figsize  : 7.3, 4.2
 axes.formatter.use_mathtext : True
 axes.formatter.limits : -3, 3
+figure.facecolor : w

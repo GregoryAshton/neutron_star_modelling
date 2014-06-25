@@ -14,7 +14,7 @@ import Useful_Tools
 from Physics_Functions import Beta_Function
 
 from matplotlib import rc_file, ticker
-rc_file("../matplotlibrc")
+rc_file("/home/greg/Neutron_star_modelling/matplotlibrc")
 
 SCI_FORMATTER = ticker.ScalarFormatter(useOffset=False,
                                        useMathText=True)
@@ -172,7 +172,7 @@ def Alpha_Plot(file_name, Option_Dictionary={}):
     Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
 
     # Extract some parameters about the pulsar
-    chi = float(Parameter_Dictionary["chi"]) * pi / 180  # radians
+    chi0 = float(Parameter_Dictionary["chi0"]) * pi / 180  # radians
 
     # Transform to spherical polar coordinates specifying that we want
     # the angles to be in Radians rather than degrees
@@ -183,15 +183,15 @@ def Alpha_Plot(file_name, Option_Dictionary={}):
     (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
 
     # Calculate the angle made with the magnetic dipole
-    # assumed to lie at chi to the z axis in the x-z plane
-    def alpha_func(a, varphi, chi):
+    # assumed to lie at chi0 to the z axis in the x-z plane
+    def alpha_func(a, varphi, chi0):
         """ Calculate angle between omega and magnetic dipole """
-        chi_radians = chi * pi / 180
-        Sx = py.sin(chi_radians)
-        Cx = py.cos(chi_radians)
+        chi0_radians = chi0 * pi / 180
+        Sx = py.sin(chi0_radians)
+        Cx = py.cos(chi0_radians)
         return py.arccos(Sx * py.sin(a) * py.cos(varphi) + Cx * py.cos(a))
 
-    alpha = [alpha_func(a[i], varphi[i], chi) * 180 / pi for i in range(len(a))]
+    alpha = [alpha_func(a[i], varphi[i], chi0) * 180 / pi for i in range(len(a))]
 
     fig = py.figure()
     ax1 = fig.add_subplot(111)
@@ -248,8 +248,8 @@ def ThreeD_Plot_Cartesian(file_name, Option_Dictionary={}):
         Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
         epsI = float(Parameter_Dictionary["epsI"])
         epsA = float(Parameter_Dictionary["epsA"])
-        chi = float(Parameter_Dictionary["chi"]) * pi / 180
-        beta = Beta_Function(epsI, epsA, chi)
+        chi0 = float(Parameter_Dictionary["chi0"]) * pi / 180
+        beta = Beta_Function(epsI, epsA, chi0)
         (x, y, z) = Physics_Functions.Cartesian_2_EBF(x, y, z, beta)
 
     # Create subplot and define view angle, this is fixed
@@ -347,8 +347,8 @@ def Angle_Space_Plot(file_name, Option_Dictionary={}):
         Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
         epsI = float(Parameter_Dictionary["epsI"])
         epsA = float(Parameter_Dictionary["epsA"])
-        chi = float(Parameter_Dictionary["chi"]) * pi / 180
-        beta = Beta_Function(epsI, epsA, chi)
+        chi0 = float(Parameter_Dictionary["chi0"]) * pi / 180
+        beta = Beta_Function(epsI, epsA, chi0)
         (x, y, z) = Physics_Functions.Cartesian_2_EBF(x, y, z, beta)
 
     if '2D' in Option_Dictionary:
@@ -527,8 +527,8 @@ def Simple_Plot_Transform(file_name, Option_Dictionary={}):
 
     epsI = float(Parameter_Dictionary["epsI"])
     epsA = float(Parameter_Dictionary["epsA"])
-    chi = float(Parameter_Dictionary["chi"]) * pi / 180
-    beta = Beta_Function(epsI, epsA, chi)
+    chi0 = float(Parameter_Dictionary["chi0"]) * pi / 180
+    beta = Beta_Function(epsI, epsA, chi0)
 
     (w1_prime, w2_prime, w3_prime) = Physics_Functions.Cartesian_2_EBF(
                                                         w1, w2, w3, beta)
@@ -583,8 +583,8 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
 
     epsI = float(Parameter_Dictionary['epsI'])
     epsA = float(Parameter_Dictionary['epsA'])
-    chi = float(Parameter_Dictionary['chi']) * pi / 180
-    beta = Beta_Function(epsI, epsA, chi)
+    chi0 = float(Parameter_Dictionary['chi0']) * pi / 180
+    beta = Beta_Function(epsI, epsA, chi0)
     print
     print 'Beta  = {}s degrees for %s'.format(beta * 180 / pi,
             file_name)
@@ -795,9 +795,7 @@ def Euler_Angles(file_name, ax_tup=None, save_fig=False, *args, **kwargs):
     if ax_tup:
         (ax1, ax2, ax3)= ax_tup
     else:
-        ax1 = py.subplot(311)
-        ax2 = py.subplot(312)
-        ax3 = py.subplot(313)   
+        fig, (ax1, ax2, ax3) = plt.subplots(nrows=3)
 
     labelx = -0.1  # x position of the yaxis labels
 
@@ -850,7 +848,7 @@ def Euler_Angles(file_name, ax_tup=None, save_fig=False, *args, **kwargs):
     elif save_fig:
         File_Functions.Save_Figure(file_name, 'Euler_Angles')
     else:
-        py.show()
+        return fig
 
 def big_phi_dot(file_name, ax=None, save_fig=False, *args, **kwargs):
     """ 
@@ -870,10 +868,10 @@ def big_phi_dot(file_name, ax=None, save_fig=False, *args, **kwargs):
         ax = py.subplot(111)
 
     time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
-    chi = float(File_Functions.Parameter_Dictionary(file_name)['chi'])
+    chi0 = float(File_Functions.Parameter_Dictionary(file_name)['chi0'])
     (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
     
-    Phi_dot_list = Physics_Functions.Phi_dot(np.array([w1, w2, w3]), theta, phi, psi, np.radians(chi))
+    Phi_dot_list = Physics_Functions.Phi_dot(np.array([w1, w2, w3]), theta, phi, psi, np.radians(chi0))
     ax.plot(t_scaled, Phi_dot_list, *args, **kwargs) 
     ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
     ax.set_ylabel(r"$\dot{\Phi}$", rotation="horizontal", size=26)
@@ -899,17 +897,17 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
         ax = py.subplot(111)
 
     time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
-    chi = float(File_Functions.Parameter_Dictionary(file_name)['chi'])
+    chi0 = float(File_Functions.Parameter_Dictionary(file_name)['chi0'])
     (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
     
-    Theta_list = np.degrees(Physics_Functions.Theta(theta, psi, np.radians(chi)))
+    Theta_list = np.degrees(Physics_Functions.Theta(theta, psi, np.radians(chi0)))
     ax.plot(t_scaled, Theta_list, *args, **kwargs) 
     ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
     ax.set_ylabel(r"$\Theta$", rotation="horizontal", size=26)
 
     return ax
 
-def timing_residual(file_name, order=2, ax=None, save_fig=False, *args, **kwargs):
+def timing_residual(file_name, order=2, fig=None, save_fig=False, *args, **kwargs):
     """ 
     
     Plot the timing residuals for the data given in file_name. 
@@ -930,27 +928,32 @@ def timing_residual(file_name, order=2, ax=None, save_fig=False, *args, **kwargs
     """
 
     time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
-    chi = np.radians(float(File_Functions.Parameter_Dictionary(file_name)['chi']))
+    chi0 = np.radians(float(File_Functions.Parameter_Dictionary(file_name)['chi0']))
     (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
 
-    Tres = Physics_Functions.timing_residual(time, w1, w2, w3, theta, phi, psi, chi, order=order)
+    Tres = Physics_Functions.timing_residual(time, w1, w2, w3, 
+                                             theta, phi, psi, chi0, 
+                                             order=order)
 
-    if ax is None:
-        ax = py.subplot(111)
+    if fig:
+        [ax] = fig.get_axes()
+    else:
+        fig, ax = plt.subplots()
+
     ax.plot(t_scaled, Tres, *args, **kwargs)
     ax.set_ylabel(r"Timing residual", rotation='vertical')
     ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
 
-    return ax
+    return fig
 
-def nu_dot(file_name, ax=None, normalise=False, *args, **kwargs):
+def nu_dot(file_name, fig=None, normalise=False, *args, **kwargs):
     """ 
 
     Plot an approximation of nu_dot the Slowdown rate using the Lyne2010 method
 
     Parameters:
     ----------
-    file_name: string referencing the h5py data file
+    file_name: string referencing t0he h5py data file
     ax: an axis instance to plot, if None a new instance is initiated
     save_fig: Option to save the figure using the default save feature
     normalise: option to normalise the plotted output, useful when comparing several 
@@ -967,13 +970,17 @@ def nu_dot(file_name, ax=None, normalise=False, *args, **kwargs):
 
     time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
     PD = File_Functions.Parameter_Dictionary(file_name)
-    chi = np.radians(float(PD['chi']))
+    chi0 = np.radians(float(PD['chi0']))
     tauP = float(PD['tauP'])
 
-    out = Physics_Functions.nu_dot(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=10)
+    out = Physics_Functions.nu_dot(time, w1, w2, w3, theta, phi, psi, chi0, 
+                                   tauP, divisor=10)
 
-    if ax is None:
-        ax = py.subplot(111)
+    if fig:
+        [ax] = fig.get_axes()
+    else:
+        fig, ax = plt.subplots()
+
 
     (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(out[0])
 
@@ -988,7 +995,7 @@ def nu_dot(file_name, ax=None, normalise=False, *args, **kwargs):
     ax.set_ylabel(r"$\dot{\nu}$", rotation="horizontal", size=26)
 
     
-    return ax
+    return fig
 
 
     

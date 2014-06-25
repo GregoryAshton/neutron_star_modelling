@@ -163,14 +163,21 @@ def Euler_Angles_Import(file_name):
     return (time, w1, w2, w3, theta, phi, psi)
 
 
-def Clean_Data(directory):
+def Clean_Data(directory, ask_user=True):
     """ Remove all .hdf5 files in directory """
 
-    print ("WARNING: Permanent removal of all '.hdf5' files in the directory {}, do you wish to proceed? \n y/n".format(directory))
-    answer = raw_input()
+    if ask_user:
+        print ("WARNING: Permanent removal of all '.hdf5' files in the "
+               "directory {}, do you wish to proceed? \n y/n".format(
+                                                            directory))
+        answer = raw_input()
+    else:
+        answer="yes"
+
     if answer in['yes', 'y', 'alright']:
         file_type = 'hdf5'
-        data_files = [dfile for dfile in os.listdir(directory) if file_type in dfile]
+        data_files = [dfile for dfile in os.listdir(directory) 
+                                            if file_type in dfile]
         for dfile in data_files:
             os.remove(dfile)
 
@@ -188,16 +195,16 @@ def FormatValue(key, val):
         formatted_val = "{:.2e}".format(val)
     elif key in ["chi0", "a0"]:
         formatted_val = "{:2.2f}".format(val)
-    elif key in ["n"]:
-        if val:
-            formatted_val = "{:.0f}".format(val)
-        else:
-            formatted_val = None
     elif key in ["AnomTorque"]:
         formatted_val = "{:.0f}".format(val)
     elif key in ["upsilon", "eta"]:
         formatted_val = "{:.3f}".format(val)
-    elif key in ["error"]:
+    elif key in ["n"]:
+        if val:
+            formatted_val = "{:.0f}".format(val)
+        else:
+            formatted_val = None  
+    elif key in ["error", "cleanup"]:
         formatted_val = None
     else:
         raise ValueError(
@@ -207,7 +214,6 @@ def FormatValue(key, val):
 
 def FileNamer(**kwargs):
     """ Returns a file name describing the key word arguments """
-   
     file_name_list = []
     for key, val in kwargs.iteritems():
         formatted_val = FormatValue(key, val)
@@ -218,4 +224,12 @@ def FileNamer(**kwargs):
     file_name_list.append(".hdf5")
     file_name = "".join(file_name_list)
 
-    return file_name
+    run_sim = True
+    if file_name in os.listdir("."):
+        if kwargs['cleanup']:
+            os.remove(file_name)
+        else:
+            print("WARNING: File already exists and cleanup=False")
+            run_sim = False
+
+    return file_name, run_sim

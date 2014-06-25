@@ -90,7 +90,8 @@ cdef int jac (double t, double y[], double *dfdy,
 
 
 def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
-    a0=50., T=1.0e3, AnomTorque=True , upsilon=0.0, n=10000, error=1e-10):
+    a0=50., T=1.0e3, AnomTorque=True , upsilon=0.0, n=10000, error=1e-10,
+    cleanup=False):
     """ One component NS with Euler angles and switching
     
     This solves the Euler equations for a single component NS and the 
@@ -121,14 +122,19 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
         Number of data points to save
     error : float
         Error passed to the ODE solver
+    cleanup = bool
+        If true old data files with the same file_name will be removed. If 
+        False then the simulation will not run and simply return the file_name
     
     
     """
  
-    file_name = FileNamer(epsI1=epsI1, epsI3=epsI3, epsA=epsA,
+    (file_name, run_sim) = FileNamer(epsI1=epsI1, epsI3=epsI3, epsA=epsA,
                           omega0=omega0, chi0=chi0, a0=a0, T=T,
                           AnomTorque=AnomTorque, n=n, upsilon=upsilon,
-                          error=error)
+                          error=error, cleanup=cleanup)
+    if not run_sim:
+        return file_name
 
    # Convert python Bool to int
     AnomTorque = AnomTorque.real

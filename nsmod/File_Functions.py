@@ -1,18 +1,24 @@
-#!/usr/bin/python
+#!/usr/bin/pltthon
 
 import numpy as np
 from numpy import pi
-import pylab as py
+import matplotlib.pyplot as plt
 import h5py
 import os
 
 
-def Save_Figure(file_name, type_of_plot, format_type=".pdf"):
+def Save_Figure(file_path, type_of_plot, dest_dir="img", format_type=".pdf"):
     """ Saves the currently open figure with an appropriate name"""
-    plot_file_name = "{0}_{1}{2}".format(
-                        type_of_plot, file_name.rstrip(".hdf5"), format_type
-                            )
-    py.savefig(plot_file_name)
+    if not os.path.isdir(dest_dir):
+        os.mkdir(dest_dir)
+
+    file_name = file_path.split("/")[-1]
+    plot_file_name = "./{0}/{1}_{2}{3}".format(
+                                        dest_dir, type_of_plot, 
+                                        file_name.rstrip(".hdf5"), format_type)
+ 
+    plt.tight_layout()                  
+    plt.savefig(plot_file_name)
     print "Saving figure as %s" % plot_file_name
 
 

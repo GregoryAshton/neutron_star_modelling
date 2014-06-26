@@ -15,7 +15,7 @@
 %\usepackage{hyperref}
 
 % Packages for setting figures
-\usepackage[demo]{graphicx}
+\usepackage{graphicx}
 \usepackage{caption}
 \usepackage{subfig}
 %\usepackage{subcaption}
@@ -43,7 +43,7 @@ font=small,}
 
 
 % Default image directory
-\graphicspath{ {/home/greg/Dropbox/Work/Inertial_space_transformation/Images/}}
+\graphicspath{ {../InertialSpaceResults/img/}}
 
 % tickz
 \usepackage{amsmath}
@@ -81,18 +81,39 @@ font=small,}
 \author{}
 \maketitle
 \section{Introduction}
-In the rotating body frame we can solve Euler's rigid body equations to calculate the motion of the spin vector $\spin$ as a function of time; this allows observation of precession without resolving individual rotations on the faster spin period. Nevertheless, observations of the star are made in the inertial frame and so observers report on quantities calculable from the phase: timing residuals, frequency of the the pulse and the slowdown rate. In an effort to understand the implications of precession on these quantities we aim to calculate the motion of the star in the inertial frame.  A natural way to do this  is to determine the Euler angles which transform the rotating body frame axis, denoted by $(x',y', z')$, to the inertial frame axis for which we will use $(x, y, z)$. In defining these angles the system presented in \citet{Landau1969} is observed, a schematic of how these angles are constructed is given in figure \ref{fig:Euler}. 
+
+In the rotating body frame we can solve Euler's rigid body equations to
+calculate the motion of the spin vector $\spin$ as a function of time; this
+allows observation of precession without resolving individual rotations on the
+faster spin period. Observations of the star are made in the inertial frame and
+so observers report on quantities calculable from the phase: timing residuals,
+frequency of the the pulse and the spindown rate. In an effort to understand
+the implications of precession on these quantities we aim to calculate the
+motion of the star in the inertial frame.  A natural way to do this  is to
+determine the Euler angles which transform the rotating body frame axis,
+denoted by $(x',y', z')$, to the inertial frame axis for which we will use $(x,
+y, z)$. Using the Euler angle parameterisation as described by
+\citet{Landau1969} a schematic of how these angles are constructed is given in
+figure \ref{fig:Euler}. 
 
 \begin{figure}[ht]
 \centering
 \includegraphics[scale=0.25]{Eulerangles-alternative.pdf}
 % http://commons.wikimedia.org/wiki/File:Eulerangles-alternative.svg
-\caption{Schematic of the Euler angle rotation. In the inertial frame the angular momentum is set to lie initially along the $z$ axis. In the rotating body frame for a biaxial body the deformation lies along $z'$ while the spin vector initially lies along in the $x'- z'$ plane.}
+\caption{Schematic of the Euler angle rotation. In the inertial frame the
+angular momentum is set to lie initially along the $z$ axis. In the rotating
+body frame for a biaxial body the deformation lies along $z'$ while the spin
+vector initially lies along in the $x'- z'$ plane.}
 \label{fig:Euler}
 \end{figure}•
 
-In the body frame we define the diagonal moment of inertia to have components  $I_{xx}, I_{yy}$ and $I_{zz}$ and acted upon by a torque $\boldsymbol{T}$. The Euler rigid body equations are then the left most equations in \eqref{eqn:ODEs}.
-Decomposing the motion of the spin vector into Euler angles and rearranging yields the second set of equations in \eqref{eqn:ODEs} for the rate of change of the three Euler angles.
+In the body frame we define the diagonal moment of inertia to have components
+$I_{xx}$, $I_{yy}$ and $I_{zz}$ and acted upon by a torque $\boldsymbol{T}$. The
+Euler rigid body equations are then the left most equations in
+\eqref{eqn:ODEs}.
+Decomposing the motion of the spin vector into Euler angles and rearranging
+yields the second set of equations in \eqref{eqn:ODEs} for the rate of change
+of the three Euler angles.
 
 \begin{align*}
 \dot{\omega_{x}} & = \frac{1}{I_{xx}}\left[T_{x}  + \left(I_{yy} - I_{zz}\right) \omega_{y} \omega_{z}\right],   &  
@@ -106,23 +127,56 @@ Decomposing the motion of the spin vector into Euler angles and rearranging yiel
      \dot{\psi} & =  \omega_{z} - \dot{\phi} \cos \theta ,
 \end{align*}
 
-These equations can be solved numerically using a time stepper\footnote{For now we will use the rkf45 stepper provided by GSL}. % Need reference
-The rotation period of the star is several orders of magnitude smaller than the precession period, as a result the Euler angles evolve on a much shorter time scale than the body frame spin components. This is numerically expensive. To allow efficient investigations we will therefore consider unrealistic values to understand the different types of motion before using realistic values only in cases of interest.
+These equations can be solved numerically using a time stepper\footnote{For now
+we will use the rkf45 stepper provided by GSL}. % Need reference
+The rotation period of the star is several orders of magnitude smaller than the
+precession period, as a result the Euler angles evolve on a much shorter time
+scale than the body frame spin components. This is numerically expensive. To
+allow efficient investigations we will therefore consider unrealistic values to
+understand the different types of motion before using realistic values only in
+cases of interest.
 
-Initially only torque free biaxial bodies are considered for simplicity, this system was studied by \citet{Jones2001} where it was demonstrated that for a biaxial body with deformation $\n_{d}$ along the $z'$ axis, this deformation, the spin vector and the angular momentum $\J$ are coplanar. They form a system which undergoes two different rotations: firstly at approximately the fast spin frequency the system rotates about $\J$ corresponding to a linear increase in $\phi$, then at the slower precession frequency the system counter rotates about $\n_{d}$ corresponding to a linear decrease in $\psi$ while $\theta$ remains constant. This analytic example can be used to test the stability of numerical results before we go on to consider the effect of the torque and triaxiality. 
+%Initially only torque free biaxial bodies are considered for simplicity, this
+%system was studied by \citet{Jones2001} where it was demonstrated that for a
+%biaxial body with deformation $\n_{d}$ along the $z'$ axis, this deformation,
+%the spin vector and the angular momentum $\J$ are coplanar. They form a system
+%which undergoes two different rotations: firstly at approximately the fast spin
+%frequency the system rotates about $\J$ corresponding to a linear increase in
+%$\phi$, then at the slower precession frequency the system counter rotates
+%about $\n_{d}$ corresponding to a linear decrease in $\psi$ while $\theta$
+%remains constant. This analytic example can be used to test the stability of
+%numerical results before we go on to consider the effect of the torque and
+%triaxiality. 
 
 \section{Initial conditions}
-Solving the rigid body equations in the body frame the following initial conditions are imposed on the spin vector:
+
+Solving the rigid body equations in the body frame the following initial
+conditions are imposed on the spin vector:
+
 \begin{align}\label{eqn:spin init}
-\omega_{x} & = \omega_{0}\sin(a_{0}), & \omega_{y} & = 0, & \omega_{z} & = \omega_{0}\cos(a_{0}),
+\omega_{x} & = \omega_{0}\sin(a_{0}), & 
+\omega_{y} & = 0, & 
+\omega_{z} & = \omega_{0}\cos(a_{0}),
 \end{align}
-such that  $\spin(t=0)$ lies in the $x' - z'$ plane. Together with the moment of inertia and torque this is sufficient to solve the rigid body equations.
-The inertial frame is defined initially by setting the angular momentum vector at $t=0$ to lie along the inertial $z$ axis. In the torque free case this will remain true, the addition of the torque will induce variations, however the inertial frame will remain fixed. Then the components of the angular momentum in the rotating frame are given by:
+such that  $\spin(t=0)$ lies in the $x' - z'$ plane. Defining the moment of
+inertia and torque this is sufficient to solve the rigid body equations. The 
+angular momentum vector in the two frames are related by the rotation matrix 
+$R(\theta, \phi, \psi)$ constructed from the Euler angles
 \begin{equation}
 \left. \J \right|_{\textrm{Rot}} = R(\theta, \phi, \psi) \left. \J \right|_{\textrm{In} }
+\label{eqn: transform}
 \end{equation}•
-where $ R(\theta, \phi, \psi) $ is the rotation matrix constructed from the Euler rotations. %does this need more eplanation?
-In the rotating frame we have that $\left. \J \right|_{\textrm{Rot}}= I \spin$,  inserting the initial conditions for $\spin$ from equation \eqref{eqn:spin init} and $\left.\J\right|_{\textrm{I}} = \hat{z}$ we take unit vectors of both sides (the rotation preserves the length of the vector) to give:
+The angular momentum in the inertial frame is given by $\left. \J
+\right|_{\textrm{Rot}}= I \spin$, the initial conditions on $\spin$ then
+provide initial conditions for the angular momentum.  BY setting an initial
+condition on the angular momentum in the inertial frame we uniquely define the
+inital Euler angles. We are free to set the initial angular momentum in the
+inertial frame to lie along the inertial $z$ axis such that
+$\left.\J_{0}\right|_{\textrm{I}} = |J|\hat{z}$. In the torque free case this
+will remain true, the addition of the torque will induce variations.
+Normalising the two vectors in equation \eqref{eqn: transform} and rearranging
+gives the expression
+
 \begin{equation}
 \left[ \begin{array}{c}
 \sin \psi_{0} \sin \theta_{0} \\
@@ -136,18 +190,32 @@ I_{xx}\sin a_{0} \\
 I_{zz} \cos a_{0}
 \end{array}\right].
 \end{equation}•
-Notably we have three equations for two unknowns; our choice to set $\J$ along the $z$ axis leaves the initial value of $\phi$ a free variable, for simplicity we set it to $0$. Comparing the components we have:
+
+We have three equations for two unknowns; our choice to set $\J$ along
+the $z$ axis leaves the initial value of $\phi$ a free variable, for simplicity
+we set it to $\phi_{0} = 0$. Inserting this and comparing the components
+
 \begin{equation}
 \theta_{0} =  \arccos\left(\frac{I_{zz}\cos a_{0}}{ \sqrt{(I_{xx}\sin a_{0})^{2}  + (I_{zz}\cos a_{0})^{2}}} \right).
 \label{eqn:theta init}
 \end{equation} 
+
 For $\psi_0$, we  use that $\sin(\arccos(x)) = \sqrt{1 - x^{2}}$ giving:
+
 \begin{equation}
 \psi_0 = \frac{\pi}{2}.
 \end{equation}
 
+We now have a suitable set of initial conditions to solve the 6 ODEs in \eqref{eqn:ODEs}.
+
 \section{Biaxial body with no torque}
-This system is well studied by \citet{Jones2001}, it was  found that the angular momentum $\J$, deformation axis $\n_{d}$\footnote{ for a biaxial body we set $\n_{d}$ to lie along the $z'$ axis of the body frame} and spin vector $\spin$ are always coplanar. We will label this plane as the reference plane. Decomposing the angular velocity according to 
+
+This system was studied by \citet{Jones2001} where it was  found that the
+angular momentum $\J$, deformation axis $\n_{d}$\footnote{for a biaxial body we
+    set $\n_{d}$ to lie along the $z'$ axis of the body frame} and spin vector
+    $\spin$ are always coplanar. We will label this plane as the reference
+    plane. Decomposing the angular velocity according to 
+
 \begin{equation}
 \spin = \dot{\phi}\n_{J} + \dot{\psi}\n_{d}
 \label{eqn:decomp}
@@ -158,8 +226,9 @@ Numerically solving the equations of motion these results are confirmed in figur
 
 It is of note that in these simulations $\theta$ is not constant, this is caused by the finite numerical precision  when calculating the subtraction defined in equation \eqref{eqn:ODEs} for $\dot{\theta}=0$. On short time scales these errors have fractional size $1\times10^{-14}$ and so the results hold. Over sufficiently long time scale these errors can accumulate and  eventually leads to a complete loss of numerical accuracy, we must therefore be vigilant to ensure this does not occur when considering realistic values.
 \begin{figure}[ht]
-	\subfloat[Spherical components in the body frame]{\includegraphics[width=0.5\textwidth]{{Spherical_Plot_chi_80.0_epsI1_0.00e+00_epsI3_1.00e-03_epsA_0.00e+00_omega0_10.00_aint_15_t1_5.00e+03}.pdf}}
-	\subfloat[Euler angles ]{\includegraphics[width=0.5\textwidth]{{Euler_Angles_chi_80.0_epsI1_0.00e+00_epsI3_1.00e-03_epsA_0.00e+00_omega0_10.00_aint_15_t1_5.00e+03}.pdf}}
+	\subfloat[Spherical components in the body frame]{\includegraphics[width=0.5\textwidth]{{Spherical_Plot_chi0_80.00_omega0_1.00e+01_epsI3_1.00e-03_n_10000_a0_15.00_T_5.00e+03_upsilon_0.000_epsA_0.00e+00_epsI1_0.00e+00_AnomTorque_1}.pdf}}
+	\subfloat[Euler angles ]{\includegraphics[width=0.5\textwidth]
+{{Euler_Angles_chi0_80.00_omega0_1.00e+01_epsI3_1.00e-03_n_10000_a0_15.00_T_5.00e+03_upsilon_0.000_epsA_0.00e+00_epsI1_0.00e+00_AnomTorque_1}.pdf}}
 \caption{Solution to the differential equations in \eqref{eqn:ODEs} for a biaxial body with deformation of $\epsilon_{I3} = 1 \times 10^{-3}$}
 \label{fig:biaxial body no torque}
 \end{figure}•
@@ -318,8 +387,8 @@ that realistic pulsars exist in the region $\tau_{P} > \tau_{A}$ for which $\eps
 In figure \ref{fig:biaxial body with torque} we plot the spherical components of the spin vector in the body frame (a), and the evolution of the Euler angles. Comparing this with figure \ref{fig:biaxial body no torque} the most striking difference is the wobble in both $\theta$ and $a$, on closer inspection one also finds this wobble in the other angles and the magnitude of $\spin$ along with a monotonic spin down.
 
 \begin{figure}[ht]
-	\subfloat[]{\includegraphics[width=0.5\textwidth]{{Spherical_Plot_chi_80.0_epsI1_0.00e+00_epsI3_1.00e-03_epsA_5.00e-04_omega0_10.00_aint_5_t1_5.00e+03}.pdf}}
-	\subfloat[]{\includegraphics[width=0.5\textwidth]{{Euler_Angles_chi_80.0_epsI1_0.00e+00_epsI3_1.00e-03_epsA_5.00e-04_omega0_10.00_aint_5_t1_5.00e+03}.pdf}}
+	\subfloat[]{\includegraphics[width=0.5\textwidth]{{Spherical_Plot_chi0_80.00_omega0_1.00e+01_epsI3_1.00e-03_n_10000_a0_15.00_T_5.00e+03_upsilon_0.000_epsA_5.00e-04_epsI1_0.00e+00_AnomTorque_1}.pdf}}
+	\subfloat[]{\includegraphics[width=0.5\textwidth]{{Euler_Angles_chi0_80.00_omega0_1.00e+01_epsI3_1.00e-03_n_10000_a0_15.00_T_5.00e+03_upsilon_0.000_epsA_5.00e-04_epsI1_0.00e+00_AnomTorque_1}.pdf}}
 \caption{Solution to the differential equations in \eqref{eqn:ODEs} including the torque defined in  \eqref{eqn:torque} for a biaxial body with $\epsilon_{A}=\epsilon_{I}/2$ }
 \label{fig:biaxial body with torque}
 \end{figure}•
@@ -384,43 +453,43 @@ With these values we have the following timescales
 
 No obvious way exists to define $\chi$ other than to assume it must not be aligned on grounds that we can observe the pulsar. Since this pulsar satisfies the region A conditions and is therefore subject to the critical of $\chi$ we again choose the two values of $\chi$ previously used.
 \FloatBarrier
-\section{Torque switching effects}
-\citet{Lyne2010} found strong evidence that a periodic switching in the rate of spin down $\dot\nu$ induces structure in the residual. Modeling this they found that for a strictly periodic switching the variations are precisely mirrored in the residual, if instead a random dither is introduced between switches the residuals take form very similar to those found in \citet{Hobbs2010}. The model assumes apriori that the switching occurs with a time scale of several 100 days, the switching itself is motivated by changes in the magnetosphere: enhances emmison correlates with larger values of $\dot\nu$. A mechanism is required to keep the magnetosphere in serveral meta-stable states with swithing occuring on a much shorter time scale than the period between swithces. \citet{Jones2010} % is that right?
-proposed that if the star were to be precessing, its relative orientation to the angular momentum may bias it towards different magneospheric configurations. Stars born near the boundary between configurations will then periodially flip between them on the precession timescale which matches well with the observed switching times. In this section we aim to model this proposal by extending our model; this is done by adding a switching into the torque that depends on the angle $\Psi $ between $\m$ and the angular momentum. As previously shown this angle is bounded by $|\chi - \theta| < \Psi < \chi + \theta$ during a precessional cycle, it therefore has an average value of $\Psi_{\textrm{ave}}\max(\theta, \chi)$; while many different scenarios could be considered we choose the following: 
-\begin{equation}
-\boldsymbol{S}(\Psi, \chi, \theta, \upsilon) = \left\{
-\begin{array}{ccc}
-1 & \textrm{if} & \Psi > \Psi_{\textrm{ave}} \\
-1 - \upsilon & \textrm{else} & 
-\end{array}•\right. 
-\end{equation}
-where $\upsilon$ is a number between 0 and 1 parameterising the reduction in torque. 
-
-To illustrate the effect this can have we use a value of $\upsilon=0.8$ 
-
-\begin{figure}[ht]
-\centering
-	\subfloat[ ]{\includegraphics[width=0.55\textwidth]{../../Testing/switching_euler_angles.pdf}} 
-	\subfloat[]{\includegraphics[width=0.55\textwidth]{../../Testing/switching_big_theta.pdf}} \\
-	\subfloat[ ]{\includegraphics[width=0.55\textwidth]{../../Testing/switching_timing_residual.pdf}} 
-	\subfloat[]{\includegraphics[width=0.55\textwidth]{../../Testing/switching_nu_dot.pdf}} \\
-\caption{}
-\label{fig:switching}
-\end{figure}
-
-\FloatBarrier
-\appendix
-\section{Euler angles}
-\begin{equation}
-\left[\begin{smallmatrix}- \sin{\left (\phi \right )} \sin{\left (\psi \right )} \cos{\left (\theta \right )} + \cos{\left (\phi \right )} \cos{\left (\psi \right )} & \sin{\left (\phi \right )} \cos{\left (\psi \right )} + \sin{\left (\psi \right )} \cos{\left (\phi \right )} \cos{\left (\theta \right )} & \sin{\left (\psi \right )} \sin{\left (\theta \right )}\\- \sin{\left (\phi \right )} \cos{\left (\psi \right )} \cos{\left (\theta \right )} - \sin{\left (\psi \right )} \cos{\left (\phi \right )} & - \sin{\left (\phi \right )} \sin{\left (\psi \right )} + \cos{\left (\phi \right )} \cos{\left (\psi \right )} \cos{\left (\theta \right )} & \sin{\left (\theta \right )} \cos{\left (\psi \right )}\\\sin{\left (\phi \right )} \sin{\left (\theta \right )} & - \sin{\left (\theta \right )} \cos{\left (\phi \right )} & \cos{\left (\theta \right )}\end{smallmatrix}\right]
-\label{eqn:rotation matrix}
-\end{equation}•
-
-
-\section{Catastrophic cancellation}
-The ODEs defined in \eqref{eqn:ODEs} suffer a 
+%\section{Torque switching effects}
+%\citet{Lyne2010} found strong evidence that a periodic switching in the rate of spin down $\dot\nu$ induces structure in the residual. Modeling this they found that for a strictly periodic switching the variations are precisely mirrored in the residual, if instead a random dither is introduced between switches the residuals take form very similar to those found in \citet{Hobbs2010}. The model assumes apriori that the switching occurs with a time scale of several 100 days, the switching itself is motivated by changes in the magnetosphere: enhances emmison correlates with larger values of $\dot\nu$. A mechanism is required to keep the magnetosphere in serveral meta-stable states with swithing occuring on a much shorter time scale than the period between swithces. \citet{Jones2010} % is that right?
+%proposed that if the star were to be precessing, its relative orientation to the angular momentum may bias it towards different magneospheric configurations. Stars born near the boundary between configurations will then periodially flip between them on the precession timescale which matches well with the observed switching times. In this section we aim to model this proposal by extending our model; this is done by adding a switching into the torque that depends on the angle $\Psi $ between $\m$ and the angular momentum. As previously shown this angle is bounded by $|\chi - \theta| < \Psi < \chi + \theta$ during a precessional cycle, it therefore has an average value of $\Psi_{\textrm{ave}}\max(\theta, \chi)$; while many different scenarios could be considered we choose the following: 
+%\begin{equation}
+%\boldsymbol{S}(\Psi, \chi, \theta, \upsilon) = \left\{
+%\begin{array}{ccc}
+%1 & \textrm{if} & \Psi > \Psi_{\textrm{ave}} \\
+%1 - \upsilon & \textrm{else} & 
+%\end{array}•\right. 
+%\end{equation}
+%where $\upsilon$ is a number between 0 and 1 parameterising the reduction in torque. 
+%
+%To illustrate the effect this can have we use a value of $\upsilon=0.8$ 
+%
+%\begin{figure}[ht]
+%\centering
+%	\subfloat[ ]{\includegraphics[width=0.55\textwidth]{../../Testing/switching_euler_angles.pdf}} 
+%	\subfloat[]{\includegraphics[width=0.55\textwidth]{../../Testing/switching_big_theta.pdf}} \\
+%	\subfloat[ ]{\includegraphics[width=0.55\textwidth]{../../Testing/switching_timing_residual.pdf}} 
+%	\subfloat[]{\includegraphics[width=0.55\textwidth]{../../Testing/switching_nu_dot.pdf}} \\
+%\caption{}
+%\label{fig:switching}
+%\end{figure}
+%
+%\FloatBarrier
+%\appendix
+%\section{Euler angles}
+%\begin{equation}
+%\left[\begin{smallmatrix}- \sin{\left (\phi \right )} \sin{\left (\psi \right )} \cos{\left (\theta \right )} + \cos{\left (\phi \right )} \cos{\left (\psi \right )} & \sin{\left (\phi \right )} \cos{\left (\psi \right )} + \sin{\left (\psi \right )} \cos{\left (\phi \right )} \cos{\left (\theta \right )} & \sin{\left (\psi \right )} \sin{\left (\theta \right )}\\- \sin{\left (\phi \right )} \cos{\left (\psi \right )} \cos{\left (\theta \right )} - \sin{\left (\psi \right )} \cos{\left (\phi \right )} & - \sin{\left (\phi \right )} \sin{\left (\psi \right )} + \cos{\left (\phi \right )} \cos{\left (\psi \right )} \cos{\left (\theta \right )} & \sin{\left (\theta \right )} \cos{\left (\psi \right )}\\\sin{\left (\phi \right )} \sin{\left (\theta \right )} & - \sin{\left (\theta \right )} \cos{\left (\phi \right )} & \cos{\left (\theta \right )}\end{smallmatrix}\right]
+%\label{eqn:rotation matrix}
+%\end{equation}•
+%
+%
+%\section{Catastrophic cancellation}
+%The ODEs defined in \eqref{eqn:ODEs} suffer a 
 
 \bibliographystyle{apalike}	
-\bibliography{../../9_Month_Report/Documentation/Mendeley_Bibliography}
+\bibliography{../bibliography}
 \end{document}
 

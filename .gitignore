@@ -12,3 +12,5 @@
 *.gz
 *.aux
 *.ipynb
+*.bbl
+*.blg

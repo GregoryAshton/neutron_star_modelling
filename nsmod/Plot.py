@@ -153,7 +153,7 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
     py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12, hspace=0.0)
     
     if save_fig:
-        File_Functions.Save_Figure(file_name, 'Euler_Angles')
+        File_Functions.Save_Figure(file_name, 'Spherical_Plot')
 
     return (ax1, ax2, ax3)
 
@@ -910,7 +910,7 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
 
     return ax
 
-def timing_residual(file_name, order=2, fig=None, save_fig=False, *args, **kwargs):
+def timing_residual(file_name, order=2, ax=None, save_fig=False, *args, **kwargs):
     """ 
     
     Plot the timing residuals for the data given in file_name. 
@@ -938,18 +938,16 @@ def timing_residual(file_name, order=2, fig=None, save_fig=False, *args, **kwarg
                                              theta, phi, psi, chi0, 
                                              order=order)
 
-    if fig:
-        [ax] = fig.get_axes()
-    else:
+    if not ax:
         fig, ax = plt.subplots()
 
     ax.plot(t_scaled, Tres, *args, **kwargs)
     ax.set_ylabel(r"Timing residual", rotation='vertical')
     ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
 
-    return fig
+    return ax
 
-def nu_dot(file_name, fig=None, normalise=False, *args, **kwargs):
+def nu_dot(file_name, ax=None, normalise=False, *args, **kwargs):
     """ 
 
     Plot an approximation of nu_dot the Slowdown rate using the Lyne2010 method
@@ -979,9 +977,7 @@ def nu_dot(file_name, fig=None, normalise=False, *args, **kwargs):
     out = Physics_Functions.nu_dot(time, w1, w2, w3, theta, phi, psi, chi0, 
                                    tauP, divisor=10)
 
-    if fig:
-        [ax] = fig.get_axes()
-    else:
+    if not ax:
         fig, ax = plt.subplots()
 
 
@@ -998,7 +994,7 @@ def nu_dot(file_name, fig=None, normalise=False, *args, **kwargs):
     ax.set_ylabel(r"$\dot{\nu}$", rotation="horizontal", size=26)
 
     
-    return fig
+    return ax
 
 
     

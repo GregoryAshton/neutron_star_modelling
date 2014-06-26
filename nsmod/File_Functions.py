@@ -212,8 +212,15 @@ def FormatValue(key, val):
 
     return formatted_val
 
-def FileNamer(**kwargs):
+def FileNamer(data_dir="data", **kwargs):
     """ Returns a file name describing the key word arguments """
+
+    # Check if data folder exists
+    data_dir = "./"+data_dir+"/"
+    if not os.path.isdir(data_dir):
+        os.mkdir(data_dir)
+
+    # Create the file name
     file_name_list = []
     for key, val in kwargs.iteritems():
         formatted_val = FormatValue(key, val)
@@ -224,12 +231,13 @@ def FileNamer(**kwargs):
     file_name_list.append(".hdf5")
     file_name = "".join(file_name_list)
 
+    file_path = data_dir + file_name
     run_sim = True
-    if file_name in os.listdir("."):
+    if os.path.isfile(file_path):
         if kwargs['cleanup']:
-            os.remove(file_name)
+            os.remove(file_path)
         else:
             print("WARNING: File already exists and cleanup=False")
             run_sim = False
 
-    return file_name, run_sim
+    return file_path, run_sim

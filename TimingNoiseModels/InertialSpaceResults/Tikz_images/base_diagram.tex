@@ -1,41 +1,6 @@
-\documentclass{article}
-\usepackage{mathptmx}
-\usepackage{tikz}
-\usepackage{color}
-\usepackage{amsmath}
-\DeclareSymbolFont{symbolsb}{OMS}{cmsy}{m}{n}
-\SetSymbolFont{symbolsb}{bold}{OMS}{cmsy}{b}{n}
-\DeclareSymbolFontAlphabet{\mathcal}{symbolsb}
-\usepackage[active,pdftex,tightpage]{preview}
-\PreviewEnvironment[]{tikzpicture}
-\PreviewEnvironment[]{pgfpicture}
-\usetikzlibrary{ decorations.markings, calc, fadings,
-decorations.pathreplacing, patterns, decorations.pathmorphing, positioning}
-\usetikzlibrary{calc}
-
-
-\begin{document}
-
-\newcommand{\AxisRotator}[1][rotate=0] {%
-  \tikz[decoration={
-    markings,
-    mark=at position 1 with {\arrow{latex}}}]\draw[x = .5em, y = 2.75em, line width = .2ex,#1,postaction=decorate] (0,0)  arc (-150:150:.45 and .5) -- ++(-95:2pt);%                                                   
-  }
-
-
-\begin{figure}[ht]
-\centering
-
-\begin{tikzpicture}[scale=5]
-
 % Define some colors
 \definecolor{deformation}{rgb}{0.0, 0, 0.8}
 \definecolor{dipole}{rgb}{1.0, 0.7, 0.0}
-
-%define angles
-\pgfmathsetmacro{\thetaang}{30}
-\pgfmathsetmacro{\chiang}{50}
-\pgfmathsetmacro{\thetaanghat}{-5}
 
 % draw cones
 \draw[fill = deformation, opacity=0.5] 
@@ -71,16 +36,9 @@ decorations.pathreplacing, patterns, decorations.pathmorphing, positioning}
 %\draw[purple] (0, 0.6)  arc (90: 116-(2*\thetaang - \chiang): 0.75);
 %\node[purple] at ({-0.79 * cos(2*\chiang-\thetaang)},{0.79 * sin(2*\chiang-\thetaang)}){$2\theta - \chi$} ;
 
-\draw[red!90!black] (0, 0.7)  arc (90: 90-(\thetaang - \chiang): 0.7);
-\node[red!90!black] at ({-0.73 * sin(.5*(\chiang-\thetaang))},{0.73 * cos(.5*(\chiang-\thetaang))}){$\chi- \theta$} ;
-
 % Draw rotation
 \draw[color=black] (0.0,0.0) node at (0.,1.15) {\AxisRotator[rotate =-90]} ;
 \node[above] at (0, 1.17) {$\dot{\phi}$};
 
 \draw[color=deformation] (0.0,0.0) node at ({1.1*sin(\thetaang)}, {1.1*cos(\thetaang)}) {\AxisRotator[rotate =90 - \thetaang]} ;
 \node[above,  color=deformation] at ({1.15*sin(\thetaang)}, {1.15*cos(\thetaang)}) {$\dot{\psi}$};
-
-\end{tikzpicture}
-\end{figure}
-\end{document}

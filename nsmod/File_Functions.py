@@ -157,15 +157,16 @@ def vprint(verbose, *args):
 
 def Euler_Angles_Import(file_name):
     """ Returns tuple of "(time, w1, w2, w3, theta, phi, psi) """    
-    f = Read_File(file_name)
-    time = np.array(f['time'].value)
-    w1 = np.array(f['w1'].value)
-    w2 = np.array(f['w2'].value)
-    w3 = np.array(f['w3'].value)
-    theta = np.array(f['theta'].value)
-    phi = np.array(f['phi'].value)
-    psi = np.array(f['psi'].value)
-    f.close()
+
+    with Read_File(file_name) as f:
+        time = np.array(f['time'].value)
+        w1 = np.array(f['w1'].value)
+        w2 = np.array(f['w2'].value)
+        w3 = np.array(f['w3'].value)
+        theta = np.array(f['theta'].value)
+        phi = np.array(f['phi'].value)
+        psi = np.array(f['psi'].value)
+
     return (time, w1, w2, w3, theta, phi, psi)
 
 

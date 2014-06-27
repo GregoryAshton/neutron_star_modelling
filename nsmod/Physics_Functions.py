@@ -262,3 +262,11 @@ def nu_dot(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=5):
 
     return np.array([time_list, nu_dot_list])
 
+def Amplitude(Phi, Theta, PhiO, ThetaO, sigmaPhi=0.01, sigmaTheta=0.01, A0=1):
+    pT = (np.mod(Theta, 2*np.pi) - ThetaO)**2 / (2 * sigmaTheta**2)
+    pP = (np.mod(Phi, 2*pi) - PhiO)**2 / (2 * sigmaTheta**2)
+
+    return A0 *  np.exp(-pT - pP)
+
+#def PulseWidth(time, amplitude):
+    ¬

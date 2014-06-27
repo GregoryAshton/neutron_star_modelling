@@ -999,5 +999,41 @@ def nu_dot(file_name, ax=None, normalise=False, divisor=10, *args, **kwargs):
     
     return ax
 
+def Amplitude(file_name, Phi0, Theta0, sigmaPhi, sigmaTheta, 
+              ax=None, *args, **kwargs):
+    """ 
 
+
+    Parameters:
+    ----------
+    file_name: string referencing t0he h5py data file
+    ax: an axis instance to plot, if None a new instance is initiated
+    save_fig: Option to save the figure using the default save feature
+    normalise: option to normalise the plotted output, useful when comparing several 
+               different simulations
     
+    Note: One can also pass *args and **kwargs onto the matplotlib plot function
+
+    Returns:
+    --------
+    ax: the axis instance
+
+
+    """
+    if not ax:
+        fig, ax = plt.subplots()
+    out_EA = File_Functions.Euler_Angles_Import(file_name)
+    [time, w1, w2, w3, theta, phi, psi] = out_EA
+
+    PD = File_Functions.Parameter_Dictionary(file_name)
+    chi0 = np.radians(PD['chi0'])
+
+    Phi = Physics_Functions.Phi(theta, phi, psi, chi0, fix=True)
+    Theta = Physics_Functions.Theta(theta, psi, chi0)
+
+    Amplitude = Physics_Functions.Amplitude(Phi, Theta, Phi0, Theta0, 
+                                  sigmaTheta, sigmaPhi, A0=1) 
+   
+    ax.plot(time, Amplitude)
+
+    return ax

@@ -57,7 +57,7 @@ def simple_plot(file_name, tmax=None, tmin=None):
 
 
 def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0, 
-                   end_val=False, save_fig=False):
+                   end_val=False, save_fig=False, **kwargs):
     """
 
     Plot the input data after transforming to spherical polar coordinates
@@ -106,7 +106,7 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
 
     # Plot omega(t)
     ax1.set_xticklabels([])
-    ax1.plot(time, omega)
+    ax1.plot(time, omega, **kwargs)
     ax1.set_xlim(tmin, tmax)
 
     ax1.set_ylim(0, 1.1 * max(omega))
@@ -116,7 +116,7 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
 
     # Plot a(t)
     ax2.set_xticklabels([])
-    ax2.plot(time, a)
+    ax2.plot(time, a, **kwargs)
     #py.axhline(90,ls="--",color="k")
 
     ax2.set_ylim(0, 105)
@@ -127,7 +127,7 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
     ax2.set_xlim(tmin, tmax)
 
     # Plot varphi(t)
-    ax3.plot(time, varphi)
+    ax3.plot(time, varphi, **kwargs)
 
     #Ploptions
     #ax3.set_ylim(0,110)
@@ -797,7 +797,7 @@ def Observables_Plot(file_name):
 def Euler_Angles(file_name, axes=None, save_fig=False, *args, **kwargs):
     """ Plot the Euler angles in thee subplots """
 
-    if axes:
+    if axes != None:
         (ax1, ax2, ax3)= axes
     else:
         fig, (ax1, ax2, ax3) = plt.subplots(nrows=3)
@@ -910,9 +910,10 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
 
     return ax
 
-def timing_residual(file_name, order=2, ax=None, save_fig=False, *args, **kwargs):
+
+def timing_residual(file_name, order=2, ax=None, save_fig=False, 
+                    *args, **kwargs):
     """ 
-    
     Plot the timing residuals for the data given in file_name. 
     
     Parameters:
@@ -922,7 +923,7 @@ def timing_residual(file_name, order=2, ax=None, save_fig=False, *args, **kwargs
     ax: an axis instance to plot, if None a new instance is initiated
     save_fig: Option to save the figure using the default save feature
     
-    Note: One can also pass *args and **kwargs onto the matplotlib plot function
+    Note: *args and **kwargs are passed onto the matplotlib plot function
 
     Returns:
     --------
@@ -930,9 +931,9 @@ def timing_residual(file_name, order=2, ax=None, save_fig=False, *args, **kwargs
 
     """
 
-    time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
-    chi0 = np.radians(float(File_Functions.Parameter_Dictionary(file_name)['chi0']))
-    (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
+    out = File_Functions.Euler_Angles_Import(file_name)
+    [time, w1, w2, w3, theta, phi, psi] = out
+    chi0 = np.radians(File_Functions.Parameter_Dictionary(file_name)['chi0'])
 
     Tres = Physics_Functions.timing_residual(time, w1, w2, w3, 
                                              theta, phi, psi, chi0, 
@@ -941,13 +942,13 @@ def timing_residual(file_name, order=2, ax=None, save_fig=False, *args, **kwargs
     if not ax:
         fig, ax = plt.subplots()
 
-    ax.plot(t_scaled, Tres, *args, **kwargs)
+    ax.plot(time, Tres, *args, **kwargs)
     ax.set_ylabel(r"Timing residual", rotation='vertical')
-    ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+    ax.set_xlabel(r"time  [s]")
 
     return ax
 
-def nu_dot(file_name, ax=None, normalise=False, *args, **kwargs):
+def nu_dot(file_name, ax=None, normalise=False, divisor=10, *args, **kwargs):
     """ 
 
     Plot an approximation of nu_dot the Slowdown rate using the Lyne2010 method
@@ -969,13 +970,15 @@ def nu_dot(file_name, ax=None, normalise=False, *args, **kwargs):
 
     """
 
-    time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
+    out_EA = File_Functions.Euler_Angles_Import(file_name)
+    [time, w1, w2, w3, theta, phi, psi] = out_EA
+
     PD = File_Functions.Parameter_Dictionary(file_name)
-    chi0 = np.radians(float(PD['chi0']))
-    tauP = float(PD['tauP'])
+    chi0 = np.radians(PD['chi0'])
+    tauP = PD['tauP']
 
     out = Physics_Functions.nu_dot(time, w1, w2, w3, theta, phi, psi, chi0, 
-                                   tauP, divisor=10)
+                                   tauP, divisor=divisor)
 
     if not ax:
         fig, ax = plt.subplots()

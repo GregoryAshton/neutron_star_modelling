@@ -106,10 +106,10 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
         Ellipticity along the z axis
     epsA : float
         Magnetic deformation [Glampedakis & Jones, 2010]
-    chi0 : float
-        Initial polar angle of the magnetic dipole in degrees
     omega0 : float
         Initial magnitude of the spin vector
+    chi0 : float
+        Initial polar angle of the magnetic dipole in degrees
     a0 : float
         Initial polar angle of the spin vector in degrees
     T : float

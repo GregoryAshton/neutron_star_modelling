@@ -44,7 +44,7 @@ def Parameter_Dictionary(user_input):
         # Import the rest of the parameters
         f = f.split("_")
         for i in range(0, len(f), 2):
-            p_d[f[i]] = f[i + 1]
+            p_d[f[i]] = float(f[i + 1])
 
     elif type(user_input) is dict:
         p_d = user_input
@@ -72,7 +72,7 @@ def Parameter_Dictionary(user_input):
 
     omega0 = float(p_d["omega0"])
     epsA = float(p_d["epsA"])
-    p_d["tauP"] = str(2 * pi * pow(omega0 * epsI, -1))
+    p_d["tauP"] = 2 * pi * pow(omega0 * epsI, -1)
     if epsA == 0.0:
         pass
         #p_d["tauA"] = float("inf")

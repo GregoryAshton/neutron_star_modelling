@@ -489,6 +489,20 @@ No obvious way exists to define $\chi$ other than to assume it must not be align
 %\section{Catastrophic cancellation}
 %The ODEs defined in \eqref{eqn:ODEs} suffer a 
 
+\section{Pulse amplitude and width}
+We now have a model for the evolution of the magnetic dipole $\m$ in the inertial frame described by its angular components $\Theta$ and $\Phi$. We can now calculate the pulse amplitude as observed at $\Phi_{O}, \Theta_{O}$ by modelling the emmision region by a two dimensional Gaussian:
+\begin{equation}
+A(\Phi, \Theta)  = A_{0} \textrm{exp}\left(-\frac{\left(\mod_{2\pi}(\Phi)-\Phi_{O}\right)^{2}}{2\sigma_{\Phi}^{2}}-\frac{\left(\mod_{2\pi}(\Theta)-\Theta_{O}\right)^{2}}{2\sigma_{\Theta}^{2}}\right)
+\end{equation}•
+Taking a given numerical solution to the original ODEs and computing the angles $\Phi$ and $\Theta$ as a function of time then insering these into this expression gives the amplitude of the pulse as seen by the observer. 
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.5\textwidth]{AmplitudeModulation}
+\caption{}
+\label{fig: AmplitudeModulation}
+\end{figure}•
+
+
 \bibliographystyle{apalike}	
 \bibliography{../bibliography}
 \end{document}

@@ -269,4 +269,3 @@ def Amplitude(Phi, Theta, PhiO, ThetaO, sigmaPhi=0.01, sigmaTheta=0.01, A0=1):
     return A0 *  np.exp(-pT - pP)
 
 #def PulseWidth(time, amplitude):
-    ¬

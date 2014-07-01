@@ -1,3 +1,5 @@
+#!/usr/bin/python 
+
 from nsmod.switching_torque_with_Euler import main
 from nsmod import Plot
 import matplotlib.pyplot as plt
@@ -67,8 +69,8 @@ def CompareNudot(epsI1=0.0, epsI3=3.0e-3, epsA=5.0e-4 , omega0=10,
     plt.legend()
     plt.show()
     
-def CompareAmplitude(epsI1=0.0, epsI3=3.0e-3, epsA=5.0e-4 , omega0=10,
-                    error=1e-12, T=1e2 , chi0 = 70.0, AnomTorque=True,
+def CompareAmplitude(epsI1=0.0, epsI3=3.0e-3, epsA=5.0e-3 , omega0=200,
+                    error=1e-12, T=0.2e1 , chi0 = 70.0, AnomTorque=True,
                     a0=1.0, upsilon=0.8, n=10000, cleanup=False,
                     Phi0=180, Theta0=50, sigmaPhi=0.2, sigmaTheta=0.2
                     ):
@@ -79,10 +81,31 @@ def CompareAmplitude(epsI1=0.0, epsI3=3.0e-3, epsA=5.0e-4 , omega0=10,
     Phi0 = np.radians(Phi0)
     Theta0 = np.radians(Theta0)
     switching, noswitch = get_data(**main_args) 
-    #ax = Plot.Amplitude(switching, Phi0, Theta0, sigmaPhi, sigmaTheta,
-    #                          label="$\upsilon={:1.1f}$".format(upsilon))
-    ax = Plot.Amplitude(noswitch, Phi0, Theta0, sigmaPhi, sigmaTheta, ax=None, 
+
+    ax = Plot.Amplitude(switching, Phi0, Theta0, sigmaPhi, sigmaTheta,
+                              label="$\upsilon={:1.1f}$".format(upsilon))
+    ax = Plot.Amplitude(noswitch, Phi0, Theta0, sigmaPhi, sigmaTheta, ax=ax, 
                               label="$\upsilon=0.0$")
+    plt.legend()
+    plt.show()
+
+def ComparePulseWidth(epsI1=0.0, epsI3=3.0e-4, epsA=5.0e-5 , omega0=300,
+                    error=1e-12, T=0.1e3 , chi0 = 70.0, AnomTorque=True,
+                    a0=1.0, upsilon=0.8, n=5000000, cleanup=False,
+                    Phi0=180, Theta0=50, sigmaPhi=0.2, sigmaTheta=0.2, eta=0.03
+                    ):
+    main_args = locals()
+    for arg in ['Phi0', 'Theta0', 'sigmaPhi', 'sigmaTheta', 'eta']:
+        del main_args[arg]
+
+    Phi0 = np.radians(Phi0)
+    Theta0 = np.radians(Theta0)
+    switching, noswitch = get_data(**main_args) 
+
+    ax = Plot.PulseWidth(switching, Phi0, Theta0, sigmaPhi, sigmaTheta,  
+                          eta=eta, label="$\upsilon={:1.1f}$".format(upsilon), ls="-", marker="o")
+    ax = Plot.PulseWidth(noswitch, Phi0, Theta0, sigmaPhi, sigmaTheta, ax=ax, 
+                          eta=eta, label="$\upsilon=0.0$", ls="-", marker="o")
     plt.show()
 
 def get_data(epsI1=0.0, epsI3=3.0e-3, epsA=5.0e-4 , omega0=10,
@@ -106,6 +129,8 @@ def _setupArgs():
                         action="store_true", help=CompareNudot.__doc__)
     parser.add_argument("-a", "--amplitude", 
                         action="store_true", help=CompareAmplitude.__doc__)
+    parser.add_argument("-p", "--PulseWidth", 
+                        action="store_true", help=ComparePulseWidth.__doc__)
     return parser.parse_args()
 
 if __name__ == "__main__":
@@ -120,3 +145,5 @@ if __name__ == "__main__":
         CompareNudot()
     if args.amplitude:
         CompareAmplitude()
+    if args.PulseWidth:
+        ComparePulseWidth()

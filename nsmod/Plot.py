@@ -12,6 +12,7 @@ import File_Functions
 import Physics_Functions
 import Useful_Tools
 from Physics_Functions import Beta_Function
+from nsmod.Pulse_width_fitting import W50
 
 from matplotlib import rc_file, ticker
 rc_file("/home/greg/Neutron_star_modelling/matplotlibrc")
@@ -1002,15 +1003,20 @@ def nu_dot(file_name, ax=None, normalise=False, divisor=10, *args, **kwargs):
 def Amplitude(file_name, Phi0, Theta0, sigmaPhi, sigmaTheta, 
               ax=None, *args, **kwargs):
     """ 
-
+    Plot the amplitude using a 2D Gaussian beam model
 
     Parameters:
     ----------
-    file_name: string referencing t0he h5py data file
-    ax: an axis instance to plot, if None a new instance is initiated
-    save_fig: Option to save the figure using the default save feature
-    normalise: option to normalise the plotted output, useful when comparing several 
-               different simulations
+    Phi0, Theta0 : float
+        Observers angular position in the inertial frame
+    sigmaPhi, sigmaTheta : float
+        Pulse shape parameters
+    file_name: string 
+        Reference to the h5py data file
+    ax : matplotlib axis instance, optional
+        Axis to plot on
+    save_fig : bool, optional
+        Save the figure using the default save feature
     
     Note: One can also pass *args and **kwargs onto the matplotlib plot function
 
@@ -1034,6 +1040,60 @@ def Amplitude(file_name, Phi0, Theta0, sigmaPhi, sigmaTheta,
     Amplitude = Physics_Functions.Amplitude(Phi, Theta, Phi0, Theta0, 
                                   sigmaTheta, sigmaPhi, A0=1) 
    
-    ax.plot(time, Amplitude)
+    ax.plot(time, Amplitude, *args, **kwargs)
+    ax.set_xlabel("time [s]")
+    ax.set_ylabel("Amplitude")
+
+    return ax
+
+def PulseWidth(file_name, Phi0, Theta0, sigmaPhi, sigmaTheta,
+               eta=0.01, ax=None, *args, **kwargs):
+    """ 
+    Plot the pulse width using a 2D Gaussian beam model
+
+    Parameters:
+    ----------
+    Phi0, Theta0 : float
+        Observers angular position in the inertial frame
+    sigmaPhi, sigmaTheta : float
+        Pulse shape parameters
+    eta : float [0, 1]
+        Scaling of the free precession time scale to one in which the modulation
+        is negligible
+    file_name: string 
+        Reference to the h5py data file
+    ax : matplotlib axis instance, optional
+        Axis to plot on
+    save_fig : bool, optional
+        Save the figure using the default save feature
+    
+    Note: One can also pass *args and **kwargs onto the matplotlib plot function
+
+    Returns:
+    --------
+    ax: the axis instance
+
+
+    """    
+    
+    if not ax:
+        fig, ax = plt.subplots()
+    out_EA = File_Functions.Euler_Angles_Import(file_name)
+    [time, w1, w2, w3, theta, phi, psi] = out_EA
+
+    PD = File_Functions.Parameter_Dictionary(file_name)
+    chi0 = np.radians(PD['chi0'])
+    
+    Phi = Physics_Functions.Phi(theta, phi, psi, chi0, fix=True)
+    Theta = Physics_Functions.Theta(theta, psi, chi0)
+
+    Amplitude = Physics_Functions.Amplitude(Phi, Theta, Phi0, Theta0, 
+                                  sigmaTheta, sigmaPhi, A0=1) 
+
+    tCONS = eta * PD['tauP']
+
+    time_list, W50_list = W50(time, Amplitude, tCONS)
+
+    ax.plot(time_list, W50_list, *args, **kwargs)
 
     return ax

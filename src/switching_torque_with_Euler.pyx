@@ -50,7 +50,7 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     Psi = acos((mx * w[0] + mz * w[2] * (1 + epsI3)) *
                  pow(pow(w[0], 2) + pow(w[1], 2) + pow(w[2] * (1 + epsI3), 2), -0.5))
     
-    if Psi < max(chi, w[3]):
+    if Psi > chi:
         S = 1.0 - upsilon
     
     if AnomTorque == 1:

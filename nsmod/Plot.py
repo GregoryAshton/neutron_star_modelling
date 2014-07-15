@@ -15,7 +15,7 @@ from Physics_Functions import Beta_Function
 from nsmod.Pulse_width_fitting import W50
 
 from matplotlib import rc_file, ticker
-rc_file("/home/greg/Neutron_star_modelling/matplotlibrc")
+#rc_file("/home/greg/Neutron_star_modelling/matplotlibrc")
 
 SCI_FORMATTER = ticker.ScalarFormatter(useOffset=False,
                                        useMathText=True)
@@ -1095,5 +1095,8 @@ def PulseWidth(file_name, Phi0, Theta0, sigmaPhi, sigmaTheta,
     time_list, W50_list = W50(time, Amplitude, tCONS)
 
     ax.plot(time_list, W50_list, *args, **kwargs)
+
+    ax.set_xlabel('time')
+    ax.set_ylabel('$W_{50}$', rotation='vertical')
 
     return ax

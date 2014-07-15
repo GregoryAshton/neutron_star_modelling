@@ -90,8 +90,8 @@ def CompareAmplitude(epsI1=0.0, epsI3=3.0e-4, epsA=1e-5 , omega0=1,
     plt.show()
 
 def ComparePulseWidth(epsI1=0.0, epsI3=3.0e-4, epsA=1e-5 , omega0=1,
-                    error=1e-12, T=2e4 , chi0 = 70.0, AnomTorque=True,
-                    a0=10.0, upsilon=0.8, n=500000, cleanup=False,
+                    error=1e-12, T=3e4 , chi0 = 70.0, AnomTorque=True,
+                    a0=10.0, upsilon=0.8, n=700000, cleanup=False,
                     Phi0=180, Theta0=50, sigmaPhi=0.3, sigmaTheta=0.3, eta=0.01
                     ):
     main_args = locals()

@@ -2,7 +2,7 @@
 
 import numpy as np
 import os
-import nsmod_one_component_model
+import one_component_model
 import nsmod_two_component_model
 import nsmod_two_component_model2
 import nsmod_one_component_model_with_Euler
@@ -122,7 +122,7 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
         #return file_name
         os.remove(file_name)
 
-    nsmod_one_component_model.main(
+    one_component_model.main(
                       chi=np.radians(chi),
                       file_name=file_name,
                       n=int(n),

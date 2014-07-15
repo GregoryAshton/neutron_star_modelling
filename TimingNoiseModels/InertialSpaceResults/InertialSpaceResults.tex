@@ -452,18 +452,43 @@ With these values we have the following timescales
 \end{equation*}•
 
 No obvious way exists to define $\chi$ other than to assume it must not be aligned on grounds that we can observe the pulsar. Since this pulsar satisfies the region A conditions and is therefore subject to the critical of $\chi$ we again choose the two values of $\chi$ previously used.
+
 \FloatBarrier
-%\section{Torque switching effects}
-%\citet{Lyne2010} found strong evidence that a periodic switching in the rate of spin down $\dot\nu$ induces structure in the residual. Modeling this they found that for a strictly periodic switching the variations are precisely mirrored in the residual, if instead a random dither is introduced between switches the residuals take form very similar to those found in \citet{Hobbs2010}. The model assumes apriori that the switching occurs with a time scale of several 100 days, the switching itself is motivated by changes in the magnetosphere: enhances emmison correlates with larger values of $\dot\nu$. A mechanism is required to keep the magnetosphere in serveral meta-stable states with swithing occuring on a much shorter time scale than the period between swithces. \citet{Jones2010} % is that right?
-%proposed that if the star were to be precessing, its relative orientation to the angular momentum may bias it towards different magneospheric configurations. Stars born near the boundary between configurations will then periodially flip between them on the precession timescale which matches well with the observed switching times. In this section we aim to model this proposal by extending our model; this is done by adding a switching into the torque that depends on the angle $\Psi $ between $\m$ and the angular momentum. As previously shown this angle is bounded by $|\chi - \theta| < \Psi < \chi + \theta$ during a precessional cycle, it therefore has an average value of $\Psi_{\textrm{ave}}\max(\theta, \chi)$; while many different scenarios could be considered we choose the following: 
-%\begin{equation}
-%\boldsymbol{S}(\Psi, \chi, \theta, \upsilon) = \left\{
-%\begin{array}{ccc}
-%1 & \textrm{if} & \Psi > \Psi_{\textrm{ave}} \\
-%1 - \upsilon & \textrm{else} & 
-%\end{array}•\right. 
-%\end{equation}
-%where $\upsilon$ is a number between 0 and 1 parameterising the reduction in torque. 
+\section{Torque switching effects}
+
+\citet{Lyne2010} found strong evidence that a periodic switching in the rate of
+spin down $\dot\nu$ induces structure in the residual. Modeling this they found
+that for a strictly periodic switching the variations are precisely mirrored in
+the residual, if instead a random dither is introduced between switches the
+residuals take form very similar to those found in \citet{Hobbs2010}. The model
+assumes apriori that the switching occurs with a time scale of several 100
+days, the switching itself is motivated by changes in the magnetosphere:
+enhances emmison correlates with larger values of $\dot\nu$. A mechanism is
+required to keep the magnetosphere in serveral meta-stable states with swithing
+occuring on a much shorter time scale than the period between swithces.
+\citet{Jones2010} % is that right?
+proposed that if the star were to be precessing, its relative orientation to
+the angular momentum may bias it towards different magneospheric
+configurations. Stars born near the boundary between configurations will then
+periodially flip between them on the precession timescale which matches well
+with the observed switching times. In this section we aim to model this
+proposal by extending our model; this is done by adding a switching into the
+torque that depends on the angle $\Psi $ between $\m$ and the angular
+momentum. We define the sw
+
+As previously shown this angle is bounded by $|\chi - \theta| < \Psi
+< \chi + \theta$ during a precessional cycle, it therefore has an average
+value of $\Psi_{\textrm{ave}}\max(\theta, \chi)$; while many different
+scenarios could be considered we choose the following: 
+
+\begin{equation}
+\boldsymbol{S}(\Psi, \chi, \theta, \upsilon) = \left\{
+\begin{array}{ccc}
+1 & \textrm{if} & \Psi > \Psi_{\textrm{ave}} \\
+1 - \upsilon & \textrm{else} & 
+\end{array}•\right. 
+\end{equation}
+where $\upsilon$ is a number between 0 and 1 parameterising the reduction in torque. 
 %
 %To illustrate the effect this can have we use a value of $\upsilon=0.8$ 
 %
@@ -493,6 +518,7 @@ No obvious way exists to define $\chi$ other than to assume it must not be align
 We now have a model for the evolution of the magnetic dipole $\m$ in the inertial frame described by its angular components $\Theta$ and $\Phi$. We can now calculate the pulse amplitude as observed at $\Phi_{O}, \Theta_{O}$ by modelling the emmision region by a two dimensional Gaussian:
 \begin{equation}
 A(\Phi, \Theta)  = A_{0} \textrm{exp}\left(-\frac{\left(\mod_{2\pi}(\Phi)-\Phi_{O}\right)^{2}}{2\sigma_{\Phi}^{2}}-\frac{\left(\mod_{2\pi}(\Theta)-\Theta_{O}\right)^{2}}{2\sigma_{\Theta}^{2}}\right)
+\label{eqn: Amplitude}
 \end{equation}•
 Taking a given numerical solution to the original ODEs and computing the angles $\Phi$ and $\Theta$ as a function of time then insering these into this expression gives the amplitude of the pulse as seen by the observer. 
 \begin{figure}[ht]
@@ -502,6 +528,34 @@ Taking a given numerical solution to the original ODEs and computing the angles 
 \label{fig: AmplitudeModulation}
 \end{figure}•
 
+\paragraph{Pulse width}
+To measure the pulse width the data is dividided into sections short enough that free precession 
+modulation effects are negligible. The pulses are then assumed to be approximately Gaussian such
+that they can be described by
+\begin{equation}
+g(t) = a e^{-(t-b)^{2}/c^{2}}
+\end{equation}
+The full width at half maximum, or equivalently $W_{50}$ is then given by $W_{50}=c\sqrt{\ln{2}}$. 
+To measure $c$ for a single pulse we can integrate
+\begin{equation}
+\int_{-\infty}^{\infty}a e^{-(t-b)^{2}/c^{2}} dt = a |c| \sqrt{\pi}.
+\end{equation}
+If we then numerically integrate over $n$ pulses provided each pulse falls off sufficiently quickly 
+then we have
+\begin{equation}
+|c| = \frac{\int_{T_{\textrm{obs}}} A(t) dt}{n a \sqrt{\pi}}
+\end{equation}•
+Where $A(t)$ is the pulse amplitude over the observation time as calculted in equation 
+\eqref{eqn: Amplitude}. To implement this over an arbitary observation time requires the 
+calculation of the number of pulses and there amplitude $a$. The result of a particular 
+example is given in figure \ref{fig: PulseWidthModulation} 
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.5\textwidth]{Pulse_width_modulation}
+\caption{}
+\label{fig: PulseWidthModulation}
+\end{figure}•
 
 \bibliographystyle{apalike}	
 \bibliography{../bibliography}

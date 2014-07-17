@@ -1078,23 +1078,28 @@ def PulseWidth(file_name, Phi0, Theta0, sigmaPhi, sigmaTheta,
     
     if not ax:
         fig, ax = plt.subplots()
+
     out_EA = File_Functions.Euler_Angles_Import(file_name)
     [time, w1, w2, w3, theta, phi, psi] = out_EA
-
+    
+    omega = np.sqrt(w1**2 + w2**2 + w3**2) 
     PD = File_Functions.Parameter_Dictionary(file_name)
     chi0 = np.radians(PD['chi0'])
     
-    Phi = Physics_Functions.Phi(theta, phi, psi, chi0, fix=True)
+    #Phi = Physics_Functions.Phi(theta, phi, psi, chi0, fix=True)
     Theta = Physics_Functions.Theta(theta, psi, chi0)
+    Phi_dot = Physics_Functions.Phi_dot(omega, theta, phi, psi, chi0)
 
-    Amplitude = Physics_Functions.Amplitude(Phi, Theta, Phi0, Theta0, 
-                                  sigmaTheta, sigmaPhi, A0=1) 
+    #Amplitude = Physics_Functions.Amplitude(Phi, Theta, Phi0, Theta0, 
+    #                              sigmaTheta, sigmaPhi, A0=1) 
 
-    tCONS = eta * PD['tauP']
+    #tCONS = eta * PD['tauP']
 
-    time_list, W50_list = W50(time, Amplitude, tCONS)
+    #time_list, W50_list = W50(time, Amplitude, tCONS)
+    W50_list = Physics_Functions.W50(Phi_dot, Theta, Theta0, sigmaPhi,
+                                     sigmaTheta)
 
-    ax.plot(time_list, W50_list, *args, **kwargs)
+    ax.plot(time, W50_list, *args, **kwargs)
 
     ax.set_xlabel('time')
     ax.set_ylabel('$W_{50}$', rotation='vertical')

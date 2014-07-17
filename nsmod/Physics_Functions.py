@@ -268,4 +268,7 @@ def Amplitude(Phi, Theta, PhiO, ThetaO, sigmaPhi=0.01, sigmaTheta=0.01, A0=1):
 
     return A0 *  np.exp(-pT - pP)
 
-#def PulseWidth(time, amplitude):
+def W50(Phi_dot, Theta, Theta0, sigmaPhi=0.01, sigmaTheta=0.01):
+    """ Analytic calculation of the pulse width """
+    Theta_tilde = np.mod(Theta, 2*np.pi) - Theta0
+    return sigmaPhi * np.sqrt(np.log(2) - Theta_tilde) / (np.pi * Phi_dot)

@@ -242,21 +242,35 @@ def nu_dot(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=5):
     # Numerically intergrate Phi_dot to get a phase (initial conditon is Phi=0
     Phi_list = cumtrapz(y=Phi_dot_list, x=time, initial=0)
 
-
     # Convert T into an index range of time, note all time intervals should be uniform
-    T = tauP / divisor
+    if tauP < (time[-1] - time[0]):
+        T = tauP / divisor
+    else:
+        T = (time[-1] - time[0]) / divisor
     dt = time[1] - time[0]
     T_index_range = int(T / dt)
 
     dT = int(0.25 * T_index_range)
 
+    def get_nudot(time, Phi, tref):
+
+        timeprime = time - tref
+        poly, pcov = np.polyfit(timeprime, Phi, 3, cov=True)
+        return poly[1] / np.pi
+
+
     nu_dot_list = []
     time_list = []
     i=0
+    tref = time[0]
+
     while i < len(time)-T_index_range:
-        coefs = np.polyfit(time[i:i + T_index_range], Phi_list[i:i + T_index_range], 2)
-        nu_dot_list.append(coefs[0])
-        time_list.append(0.5*(time[i] + time[i+T_index_range])) 
+        time_mid = 0.5*(time[i] + time[i+T_index_range])
+        nu_dot = get_nudot(time[i:i + T_index_range], 
+                           Phi_list[i:i + T_index_range],
+                           tref)
+        nu_dot_list.append(nu_dot)
+        time_list.append(time_mid) 
     
         i += dT
 

@@ -80,7 +80,14 @@ def Parameter_Dictionary(user_input):
         p_d["tauA"] = str(2 * pi * pow(omega0 * epsA, -1))
         p_d["tauS"] = str(pow(2 * pi, 2) * pow(omega0 ** 2.0 * epsA, -1)
                                                         * 3 * c / (2 * R))
-        p_d["Bs"] = str(2 * np.sqrt(epsA * I0 * R * pow(c, 2)) / pow(R, 3))
+        Bs = (2 * np.sqrt(epsA * I0 * R * pow(c, 2)) / pow(R, 3))
+        p_d["Bs"] = str(Bs)
+        chi0 = np.radians(p_d['chi0'])
+        a0 = np.radians(p_d['a0'])
+        omega_dot0 = (- Bs**2 * R ** 6 * np.sin(a0 + chi0)**2 * omega0**3 / 
+                        (6 * I0 * c**3))
+        p_d['omega_dot0'] = omega_dot0
+
 
         # Need to import the beta function
         from Physics_Functions import Beta_Function

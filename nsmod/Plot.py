@@ -15,7 +15,7 @@ from Physics_Functions import Beta_Function
 from nsmod.Pulse_width_fitting import W50
 
 from matplotlib import rc_file, ticker
-#rc_file("/home/greg/Neutron_star_modelling/matplotlibrc")
+rc_file("/home/greg/Neutron_star_modelling/matplotlibrc")
 
 SCI_FORMATTER = ticker.ScalarFormatter(useOffset=False,
                                        useMathText=True)
@@ -531,7 +531,7 @@ def Simple_Plot_Transform(file_name, Option_Dictionary={}):
     # Get the paramters of the run
     Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
 
-    epsI = float(Parameter_Dictionary["epsI"])
+    epsI = float(Parameter_Dictionary["epsI3"])
     epsA = float(Parameter_Dictionary["epsA"])
     chi0 = float(Parameter_Dictionary["chi0"]) * pi / 180
     beta = Beta_Function(epsI, epsA, chi0)
@@ -770,7 +770,7 @@ def Observables_Plot(file_name):
     (time_2, omega_dot) = NLD_Functions.Dotted_Variable_Triaxial(file_name)
     nu_dot = [o * 2 * pi for o in omega_dot]
 
-    T_res = Physics_Functions.T_residual(time, w1, w2, w3)
+    timing_residual = Physics_Functions.timing_residual(time, w1, w2, w3)
 
     # Plotting
     ax1 = py.subplot(311)
@@ -786,7 +786,7 @@ def Observables_Plot(file_name):
     ax2.yaxis.set_label_coords(labelx, 0.5)
 
     ax3 = py.subplot(313)
-    ax3.plot(t_scaled, T_res)
+    ax3.plot(t_scaled, timing_residual)
     ax3.set_ylabel(r"$T_{\textrm{res}}$")
     ax3.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
     ax3.yaxis.set_label_coords(labelx, 0.5)
@@ -970,8 +970,8 @@ def nu_dot(file_name, ax=None, normalise=False, divisor=10, *args, **kwargs):
 
 
     """
-
-    out_EA = File_Functions.Euler_Angles_Import(file_name)
+    
+    out_EA = File_Functions.Euler_Angles_Import(file_name, time_offset=None)
     [time, w1, w2, w3, theta, phi, psi] = out_EA
 
     PD = File_Functions.Parameter_Dictionary(file_name)
@@ -985,19 +985,19 @@ def nu_dot(file_name, ax=None, normalise=False, divisor=10, *args, **kwargs):
         fig, ax = plt.subplots()
 
 
-    (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(out[0])
-
+    #(t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(out[0])
+    time = out[0]
     if normalise:
         nu_dot = out[1] / sum(out[1]**2)**0.5
     else:
         nu_dot = out[1]
 
-    ax.plot(t_scaled, nu_dot, *args, **kwargs)
+    ax.plot(time, nu_dot, *args, **kwargs)
 
-    ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+    #ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
     ax.set_ylabel(r"$\dot{\nu}$", rotation="horizontal", size=26)
 
-    
+    ax.set_ylim(ax.get_ylim()[0], max(ax.get_ylim()[1], 0))
     return ax
 
 def Amplitude(file_name, Phi0, Theta0, sigmaPhi, sigmaTheta, 
@@ -1042,7 +1042,7 @@ def Amplitude(file_name, Phi0, Theta0, sigmaPhi, sigmaTheta,
    
     ax.plot(time, Amplitude, *args, **kwargs)
     ax.set_xlabel("time [s]")
-    ax.set_ylabel("Amplitude")
+    ax.set_ylabel("Normalised Amplitude")
 
     return ax
 

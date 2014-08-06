@@ -46,12 +46,21 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     Ty_sd = -pre * epsA * w[1]
     Tz_sd = pre * epsA * mx * (w[0] * mz - w[2] * mx)
 
-    S = 1.0
-    Psi = acos((mx * w[0] + mz * w[2] * (1 + epsI3)) *
-                 pow(pow(w[0], 2) + pow(w[1], 2) + pow(w[2] * (1 + epsI3), 2), -0.5))
+    S = 1.0 
+    #Psi = acos((mx * w[0] + mz * w[2] * (1 + epsI3)) *
+    #             pow(pow(w[0], 2) + pow(w[1], 2) + pow(w[2] * (1 + epsI3), 2), -0.5))
     
-    if Psi > chi:
+    Theta = acos(sin(w[3]) * sin(w[5]) * mx + cos(w[3]) * mz)
+    #Theta_ave = 0.5 * (w[3] + chi + fabs(w[3] - chi))
+
+    #if w[3] < chi:
+        #S = 1.0 - upsilon
+
+    #if Psi >  max(chi, w[3]):
+    #    S = 1.0 -upsilon
+    if Theta < chi:
         S = 1.0 - upsilon
+    
     
     if AnomTorque == 1:
         Tx = S * (Tx_sd + epsA * (w[0] * mx + w[2] * mz) * w[1] * mz)
@@ -223,4 +232,5 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     f.create_dataset("theta", data=w4)
     f.create_dataset("phi", data=w5)
     f.create_dataset("psi", data=w6)
+    f.close()
     return file_name

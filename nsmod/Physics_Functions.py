@@ -255,8 +255,8 @@ def nu_dot(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=5):
     def get_nudot(time, Phi, tref):
 
         timeprime = time - tref
-        poly, pcov = np.polyfit(timeprime, Phi, 3, cov=True)
-        return poly[1] / np.pi
+        poly, pcov = np.polyfit(timeprime, Phi, 2, cov=True)
+        return poly[0] / np.pi
 
 
     nu_dot_list = []

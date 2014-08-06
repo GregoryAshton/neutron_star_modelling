@@ -84,8 +84,11 @@ def Parameter_Dictionary(user_input):
         p_d["Bs"] = str(Bs)
         chi0 = np.radians(p_d['chi0'])
         a0 = np.radians(p_d['a0'])
-        omega_dot0 = (- Bs**2 * R ** 6 * np.sin(a0 + chi0)**2 * omega0**3 / 
-                        (6 * I0 * c**3))
+        Sx = np.sin(chi0)
+        Cx = np.cos(chi0)
+        varphi = 0.0
+        alpha = np.arccos(Sx * np.sin(a0) * np.cos(varphi) + Cx * np.cos(a0))
+        omega_dot0 = -2/3. * omega0**3 * R/c  * np.sin(alpha)**2 * epsA
         p_d['omega_dot0'] = omega_dot0
 
 
@@ -162,8 +165,17 @@ def vprint(verbose, *args):
         vprint = lambda *a: None      # do-nothing function
 
 
-def Euler_Angles_Import(file_name):
-    """ Returns tuple of "(time, w1, w2, w3, theta, phi, psi) """    
+def Euler_Angles_Import(file_name, time_offset=None):
+    """ Returns tuple of "(time, w1, w2, w3, theta, phi, psi) 
+    
+    Parameters
+    ----------
+    file_name : str
+        String containing file to import from
+    time_offset : float [0, 1]
+        Removes the first fraction of data
+    
+    """    
 
     with Read_File(file_name) as f:
         time = np.array(f['time'].value)
@@ -173,7 +185,17 @@ def Euler_Angles_Import(file_name):
         theta = np.array(f['theta'].value)
         phi = np.array(f['phi'].value)
         psi = np.array(f['psi'].value)
-
+    
+    if time_offset:
+        idx = np.argmin(np.abs(time-time_offset))
+        time = time[idx:]
+        w1 = w1[idx:]
+        w2 = w2[idx:]
+        w3 = w3[idx:]
+        theta =theta[idx:]
+        phi = phi[idx:]
+        psi = psi[idx:]
+    
     return (time, w1, w2, w3, theta, phi, psi)
 
 

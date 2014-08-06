@@ -53,9 +53,9 @@ def CompareResiduals(epsI1=0.0, epsI3=3.0e-3, epsA=5.0e-4 , omega0=10,
     plt.legend()
     plt.show()
 
-def CompareNudot(epsI1=0.0, epsI3=3.0e-3, epsA=5.0e-4 , omega0=10,
-                    error=1e-12, T=1.0e3 , chi0 = 70.0, AnomTorque=True,
-                    a0=20.0, upsilon=1.0, n=10000, cleanup=False,
+def CompareNudot(epsI1=0.0, epsI3=2.0e-4, epsA=1.0e-5 , omega0=1e3,
+                    error=1e-15, T=100 , chi0=20.0, AnomTorque=True,
+                    a0=0.1, upsilon=0.5, n=500000, cleanup=False,
                     divisor=10):
     """ Compare the timing residual plots """
     main_args = locals()
@@ -63,13 +63,13 @@ def CompareNudot(epsI1=0.0, epsI3=3.0e-3, epsA=5.0e-4 , omega0=10,
     switching, noswitch = get_data(**main_args) 
     ax = Plot.nu_dot(switching, divisor=divisor,
                               label="$\upsilon={:1.1f}$".format(upsilon))
-    ax = Plot.nu_dot(noswitch, ax=ax, divisor=divisor, 
+    Plot.nu_dot(noswitch, divisor=divisor,  ax=ax,
                               label="$\upsilon=0.0$")
 
     plt.legend()
     plt.show()
     
-def CompareAmplitude(epsI1=0.0, epsI3=3.0e-4, epsA=1e-5 , omega0=1,
+def CompareAmplitude(epsI1=0.0, epsI3=3.0e-4, epsA=1e-2 , omega0=1,
                     error=1e-12, T=2e4 , chi0 = 70.0, AnomTorque=True,
                     a0=10.0, upsilon=0.8, n=500000, cleanup=False,
                     Phi0=180, Theta0=50, sigmaPhi=0.3, sigmaTheta=0.3,               

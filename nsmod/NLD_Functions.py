@@ -190,11 +190,11 @@ def Dotted_Variable_Triaxial(file_name, anom_torque=None):
     epsI1 = float(Parameter_Dictionary["epsI1"])
     epsI3 = float(Parameter_Dictionary["epsI3"])
     epsA = float(Parameter_Dictionary["epsA"])
-    chi = float(Parameter_Dictionary["chi"]) * py.pi / 180.0
+    chi0 = float(Parameter_Dictionary["chi0"]) * py.pi / 180.0
 
     if anom_torque is None:
         # Only check the dictionary if the user has not specified anom_torque
-        anom_torque = Parameter_Dictionary["anom_torque"]
+        anom_torque = Parameter_Dictionary["AnomTorque"]
 
     # Calculate the differentials from Goldreich equations
     omega_dot = []
@@ -202,7 +202,7 @@ def Dotted_Variable_Triaxial(file_name, anom_torque=None):
     # Note that the torque is T/Io in all of the following
     for i in xrange(len(time)):
         omega_vec = [x[i], y[i], z[i]]
-        T = Torque_over_Io(omega_vec, epsA, chi, anom_torque=anom_torque)
+        T = Torque_over_Io(omega_vec, epsA, chi0, anom_torque=anom_torque)
         a = py.dot(T, omega_vec)
         b = epsI1 * omega_vec[0] * T[0] * pow(1 + epsI1, -1)
         c = epsI3 * omega_vec[2] * T[2] * pow(1 + epsI3, -1)

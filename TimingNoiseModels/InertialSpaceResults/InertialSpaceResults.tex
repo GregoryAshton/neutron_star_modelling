@@ -1,86 +1,13 @@
-
-\documentclass[11pt]{article}
-
-% Geometry
-\usepackage{fullpage}
-
-% Ams math
-\usepackage{amsmath}
-
-% Include options such as \FloatBarrier
-\usepackage{placeins}
-
-
-% Include clickable links in the pdf
-%\usepackage{hyperref}
-
-% Packages for setting figures
-\usepackage{graphicx}
-\usepackage{caption}
-\usepackage{subfig}
-%\usepackage{subcaption}
-
-\captionsetup[subfloat]{%
-labelfont=bf,
-font=small,}
-
-
-% Tables
-\usepackage{multirow}
-
-\usepackage{enumerate}
-\usepackage{color}
-
-% Bibliography
-\usepackage{natbib}
-
-% Labels
-\numberwithin{equation}{section}
-\numberwithin{figure}{section}
-\numberwithin{table}{section}
-% http://tex.stackexchange.com/questions/42726/align-but-show-one-equation-number-at-the-end
-\newcommand\numberthis{\addtocounter{equation}{1}\tag{\theequation}}
-
-
-% Default image directory
-\graphicspath{ {../InertialSpaceResults/img/}}
-
-% tickz
-\usepackage{amsmath}
-\usepackage{tikz}
-
-% Alter some LaTeX defaults for better treatment of figures:
-    % See p.105 of "TeX Unbound" for suggested values.
-    % See pp. 199-200 of Lamport's "LaTeX" book for details.
-    %   General parameters, for ALL pages:
-    \renewcommand{\topfraction}{0.9}	% max fraction of floats at top
-    \renewcommand{\bottomfraction}{0.8}	% max fraction of floats at bottom
-    %   Parameters for TEXT pages (not float pages):
-    \setcounter{topnumber}{2}
-    \setcounter{bottomnumber}{2}
-    \setcounter{totalnumber}{4}     % 2 may work better
-    \setcounter{dbltopnumber}{2}    % for 2-column pages
-    \renewcommand{\dbltopfraction}{0.9}	% fit big float above 2-col. text
-    \renewcommand{\textfraction}{0.07}	% allow minimal text w. figs
-    %   Parameters for FLOAT pages (not text pages):
-    \renewcommand{\floatpagefraction}{0.7}	% require fuller float pages
-	% N.B.: floatpagefraction MUST be less than topfraction !!
-    \renewcommand{\dblfloatpagefraction}{0.7}	% require fuller float pages
-
-
-
-\begin{document}
-
-\newcommand{\spin}{\boldsymbol{\omega}}
-\newcommand{\m}{\hat{\boldsymbol{m}}}
-\newcommand{\J}{\boldsymbol{J}}
-\newcommand{\n}{\hat{\boldsymbol{n}}}
-\newcommand{\V}{\boldsymbol{v}}
+\documentclass[/home/greg/Thesis/main/main.tex]{subfiles}
 
 \title{Neutron star mechanics in the observers inertial frame}
 \author{}
+
+\begin{document}
+\graphicspath{{/home/greg/Neutron_star_modelling/TimingNoiseModels/InertialSpaceResults/img/}}
+
+
 \maketitle
-\section{Introduction}
 
 In the rotating body frame we can solve Euler's rigid body equations to
 calculate the motion of the spin vector $\spin$ as a function of time; this
@@ -209,7 +136,7 @@ For $\psi_0$, we  use that $\sin(\arccos(x)) = \sqrt{1 - x^{2}}$ giving:
 We now have a suitable set of initial conditions to solve the 6 ODEs in \eqref{eqn:ODEs}.
 
 \section{Biaxial body with no torque}
-
+We begin by introducing the 
 This system was studied by \citet{Jones2001} where it was  found that the
 angular momentum $\J$, deformation axis $\n_{d}$\footnote{for a biaxial body we
     set $\n_{d}$ to lie along the $z'$ axis of the body frame} and spin vector
@@ -257,7 +184,7 @@ It is of note that in these simulations $\theta$ is not constant, this is caused
 
 \FloatBarrier
 
-\subsection{Physical observables}
+\subsection{Physical observables: dynamics of the magnetic dipole}
 Having the Euler angles allows us to transform from the rotating frame into the inertial frame of an exterior observer. We observe pulsars from the electromagnetic radiation that streams out along open field lines, while the mechanism is poorly understood in this model we will assume a thin columnated beam is emitted along the magnetic dipole $\m$. %Talk here about limitations this imposes 
 In the body frame we set $\m$ at an angle $\chi$ to the $z'$ axis with unit vector $[\sin(\chi), 0, \cos(\chi)]$. Using the Euler angles to rotate this unit vector, the components in the inertial frame are given by:
 \begin{equation}
@@ -295,7 +222,7 @@ Taking a derivative of the phase:
 This is then the \emph{instantaneous electromagnetic frequency},  an observer will measure the time averaged value of $\dot{\Phi}$ as the 'spin frequency' of the star
 Note that this result is an extension of equation (43) from \cite{Jones2001} treating $\theta$ as a function of time instead of a constant. Jones et al. demonstrated that two distinct behaviours exist  for the time average of equation \eqref{eqn:Phi_dot}. The two cases are catergoried by $\theta > \chi$ or $\theta < \chi$; recall that for the biaxial star with no torque $\theta \approx a_{0}$.
 
-\subsection{Understanding the two cases}
+\paragraph{Understanding the two cases}
 To get a feeling for the mechanics we consider the decomposition of the angular velocity in equation \ref{eqn:decomp} into rotations about $\n_{J}$ and $\n_{d}$. Any vector (such as $\m$) in the body frame can be understood in the inertial frame as undergoing two motions: keeping $\phi$ fixed and increasing $\psi$ rotates the vector in a cone aboout the $\n_{d}$ axis, holding instead $\psi$ fixed and increasing $\phi$ sweeps the vector about a cone centered around the $\n_{J}$ axis.  Calling these cones the precession and spin cones respectively the resulting motion can be understood as the superposition of the two.  In figure \ref{fig:cones} an illustration is given of these cones projected into the reference plane for the three orderings of $\theta$ and $\chi$.  
 \begin{figure}[ht]
 \centering
@@ -318,7 +245,7 @@ The motion of the magnetic dipole about the precession cone evolves on a much lo
 \begin{figure}[ht]
 \centering
 	\subfloat[Variations in the spin frequency]{\includegraphics[width=0.7\textwidth]{frequency_variation_with_chi.pdf}} \\
-	\subfloat[Variations in polar angle]{\includegraphics[width=0.7\textwidth]{amplitude_variation_with_chi.pdf}}
+	\subfloat[Variations in polar angle]{\includegraphics[width=0.7\textwidth]{polar_angle_variation_with_chi.pdf}}
 \caption{}
 \label{fig:variations}
 \end{figure}
@@ -360,14 +287,69 @@ In figure \ref{fig:TR no torque} we plot the timing residuals as calculated in t
 
 The results show that the precession will induce a sinusoidal variation on the precession timescale, the magnitude is proportional to the angle $\chi$, there will also be a dependence on the initial angle $a_{0}$ as this is a geometric effect.
 
-\subsection{Slowdown Rate $\dot{\nu}$}
-The second observable which is often considered in characterising periodic patterns in pulsar signals is the slowdown rate. In this simple model the slowdown rate is given by $\ddot{\Phi}$, however calculating an analytic expression is highly non-trivial, although theoretically possible. Instead of relying on computational aids to achieve this we instead turn to the method prescribed by \citet{Lyne2010}: selecting short sections of data of length $T$ a quadratic is fitted allowing an estimation of $\dot{\nu}$, this process is repeated every $\sim T/4$ through the data set. We choose $T$ such that it is a fraction of the precession period over which we expect quantities to be modulated. To aid the eye the values have been normalised and plotted in figure \ref{fig:nu_dot no torque}. This has the advantage that any features resulting from the technique will also be picked up.
+\subsubsection{Slowdown Rate $\dot{\nu}$}
+The second observable which is often considered in characterising periodic patterns in pulsar signals is the slowdown rate. In this simple model the slowdown rate is given by $\ddot{\Phi}$, however calculating an analytic expression is highly non-trivial, although theoretically possible. Instead of relying on computational aids to achieve this we instead turn to the method prescribed by \citet{Lyne2010}: selecting short sections of data of length $T$ a quadratic is fitted allowing an estimation of $\dot{\nu}$, this process is repeated every $\sim T/4$ through the data set. We choose $T$ such that it is a fraction of the precession period over which we expect quantities to be modulated.
+
 \begin{figure}[ht]
 \centering
 	\includegraphics[width=0.7\textwidth]{nu_dot_no_torque.pdf}
 \caption{Slow down rate }
 \label{fig:nu_dot no torque}
 \end{figure}
+
+The variations seen here result from free precession. As the magnetic dipole performs a slow rotation about the deformation axis during
+half the cycle it counter-rotates and the other half it corotates with the rapid rotation about the angular momentum vector. The result 
+is a symmetric modulation of the spindown about zero.
+
+\subsubsection{Pulse amplitude}
+We now have a model for the evolution of the magnetic dipole $\m$ in the inertial frame described by its angular components $\Theta$ and $\Phi$. We can now calculate the pulse amplitude as observed at $\Phi_{O}, \Theta_{O}$ by modelling the emmision region by a two dimensional Gaussian:
+\begin{equation}
+A(\Phi, \Theta)  = A_{0} \textrm{exp}\left(-\frac{\tilde{\Phi}^{2}}{2\sigma_{\Phi}^{2}}-\frac{\tilde{\Theta}^{2}}{2\sigma_{\Theta}^{2}}\right)
+\label{eqn: Amplitude}
+\end{equation}•
+where $\tilde{\Phi}=\left(\mod_{2\pi}(\Phi)-\Phi_{O}\right)$ and similarly for $\tilde{\Theta}$.
+Taking a given numerical solution to the original ODEs and computing the angles $\Phi$ and $\Theta$ as a function of time then insering these into this expression gives the amplitude of the pulse as seen by the observer. 
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.5\textwidth]{amplitude_variation}
+\caption{}
+\label{fig: amplitude_variation}
+\end{figure}•
+
+\subsubsection{Pulse width}
+The modulation of the amplitude coincides with modulations of the pulse width.
+These have been measured with great accuracy by \citet{Lyne2010} and their
+correlation with pecieved changes in the spindown is key evidence for the two
+state switching model. We can extract the pulse width analytically from equation 
+\eqref{eqn: Amplitude} by noting that $\Theta$ varies on the slow precession
+timescale while $\Phi$ varies on the rapid spin timescale. We are looking to measure
+the variations with respect to the slow precession timescale so we can treat it
+as a constant. The full with at half maximum, corresponding to the $W_{50}$ value
+of \citet{Lyne2010} occurs when
+\begin{align}
+A(\Phi, \Theta) = A_{0} \frac{1}{2} 
+\end{align}
+The condition for a full width half maximum at a fixed value of $\tilde{\Theta}$ 
+is then
+\begin{align}
+\tilde{\Phi}_{50} = \pm\sigma_{\Phi}\left(\ln(2) - \frac{\tilde{\Theta}}{\sigma_{\Theta}^{2}}\right)^{1/2}
+\end{align}
+If $P$ is the period of the rapid spin motion, then the fraction $W_{50}/P$ must be equal
+the fraction of the cycle spent above the full width half maximum which is 
+given by $2\tilde{\Phi}_{50} / 2\pi$. Writing this in terms of the frequency $\dot{\Phi}$
+rather than period we have
+\begin{equation}
+W_{50} = \frac{1}{\pi\dot\Phi}\sigma_{\Phi}\left(\ln(2) -  \frac{\tilde{\Theta}}{\sigma_{\Theta}^{2}}\right)^{1/2}
+\label{eqn: pulse width}
+\end{equation}•
+
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=.5\textwidth]{Pulse_width_modulation}
+\caption{Pulse width as calculated by equation \eqref{eqn: pulse width} }
+\label{fig: PulseWidthModulation}
+\end{figure}•
 
 \section{Biaxial body with torque}
 The torque which produce the observed electromagnetic radiation will play an important role in determining the time variability of the observed pulse on earth. The torque is modelled as a magnetic dipole, denoted by $\m$, frozen into the star at an angle $\chi$ to the $z'$ axis in the $x'-z'$ plane. Following the work of \citet{Deutsch1955}, the torque is presented here in form found in \citet{Goldreich1970}.
@@ -400,7 +382,7 @@ In figure \ref{fig:variations with torque} we reproduce plots of figure \ref{fig
 \begin{figure}[ht]
 \centering
 	\subfloat[Variations in the spin frequency]{\includegraphics[width=0.7\textwidth]{frequency_variation_with_chi_inc_torque.pdf}} \\
-	\subfloat[Variations in polar angle]{\includegraphics[width=0.7\textwidth]{amplitude_variation_with_chi_inc_torque.pdf}}
+	\subfloat[Variations in polar angle]{\includegraphics[width=0.7\textwidth]{polar_angle_variation_with_chi_inc_torque.pdf}}
 \caption{}
 \label{fig:variations with torque}
 \end{figure}
@@ -418,8 +400,47 @@ Including the torque the timing residuals are plotted in figure \ref{fig:TR with
 \end{figure}
 
 \FloatBarrier
-\subsection{Slowdown Rate $\dot{\nu}$}
+\subsubsection{Spindown Rate $\dot{\nu}$}
+The strength of the torque used in this model is parameterised by $\epsilon_{A}$ as given
+in equation \eqref{eqn:torque}. From \citet{Shapiro83} we can write this in terms of the
+magnetic field strength 
+\begin{equation}
+B_{s} = \frac{2m}{R^{3}}
+\end{equation}•
+Considering a simple model of a dipole at an angle $\alpha$ to the spin axis that characteristic
+age of pulsar can be defined as
+\begin{equation}
+t_{\textrm{ch}} = -\frac{\omega}{\dot{\omega}} = \frac{6 I_{0} c^{3}}{B_{s}^{2}R^{6} \sin(\alpha)^{2}\omega_{0}^{2}}
+\end{equation}
+Rearranging this expression to solve for the spindown rate yields
+\begin{align}
+\dot\omega = - \omega \frac{B_{s}^{2}R^{6} \sin(\alpha)^{2}\omega_{0}^{2}}{6I_{0}c^{3}}
+\end{align}•
+We can write this in terms of the torque deformation
+\begin{align}
+\dot\omega(t) = - \frac{2}{3}\omega(t) \sin^{2}(\alpha) \omega_{0}^{2} \frac{R}{c}
+\label{eqn: EM spindown}
+\end{align}
 
+Pulsars, except in rare cases corresponding to globular clusters, have strictly 
+negative spindown rates resulting from the electromagnetic torque and 
+the emmision of gravitional radiation. To be consistent with observations then
+we should constrain outselves to solutions for which the symmetric variations
+about the mean spindown as induced by free precession are smaller than the 
+spindown given in \eqref{eqn: EM spindown}. From \citet{Jones2001} we can
+consider a vacuum point-dipole spin-down torque so that
+\begin{equation}
+\ddot{\Phi} = k \dot{\Phi} \sin^{2}\Theta
+\end{equation}
+then departure from a non-precessing power-law spin-down may be written
+\begin{align}
+\frac{\Delta\ddot{\Phi}}{\ddot{\Phi}} = \left(3 \frac{\Delta\dot{\Phi}}{\dot{\Phi}} + \frac{\Delta(\sin^{2}\Theta)}{\sin^{2}\Theta}\right)
+\end{align}
+It can be shown that 
+\begin{align}
+\frac{\Delta\dot{\Phi}}{\dot{\Phi}} & \approx \frac{\cos(\chi)}{\sin(\chi)}\sin(\psi) \epsilon_{I}\theta, &&
+\frac{\Delta(\sin^{2}\Theta)}{\sin^{2}\Theta} \approx \frac{2\theta\sin\chi\cos\chi\sin\psi}{\sin^{2}\chi - 2\theta\sin\chi\cos\chi\sin\psi}
+\end{align}•
 
 \begin{figure}[ht]
 \centering
@@ -429,6 +450,11 @@ Including the torque the timing residuals are plotted in figure \ref{fig:TR with
 \label{fig:nu_dot no torque}
 \end{figure}
 
+\FloatBarrier
+
+\subsubsection{Pulse amplitude}
+
+\subsubsection{Pulse width}
 
 
 \FloatBarrier
@@ -514,48 +540,7 @@ where $\upsilon$ is a number between 0 and 1 parameterising the reduction in tor
 %\section{Catastrophic cancellation}
 %The ODEs defined in \eqref{eqn:ODEs} suffer a 
 
-\section{Pulse amplitude and width}
-We now have a model for the evolution of the magnetic dipole $\m$ in the inertial frame described by its angular components $\Theta$ and $\Phi$. We can now calculate the pulse amplitude as observed at $\Phi_{O}, \Theta_{O}$ by modelling the emmision region by a two dimensional Gaussian:
-\begin{equation}
-A(\Phi, \Theta)  = A_{0} \textrm{exp}\left(-\frac{\left(\mod_{2\pi}(\Phi)-\Phi_{O}\right)^{2}}{2\sigma_{\Phi}^{2}}-\frac{\left(\mod_{2\pi}(\Theta)-\Theta_{O}\right)^{2}}{2\sigma_{\Theta}^{2}}\right)
-\label{eqn: Amplitude}
-\end{equation}•
-Taking a given numerical solution to the original ODEs and computing the angles $\Phi$ and $\Theta$ as a function of time then insering these into this expression gives the amplitude of the pulse as seen by the observer. 
-\begin{figure}[ht]
-\centering
-\includegraphics[width=.5\textwidth]{AmplitudeModulation}
-\caption{}
-\label{fig: AmplitudeModulation}
-\end{figure}•
 
-\paragraph{Pulse width}
-To measure the pulse width the data is dividided into sections short enough that free precession 
-modulation effects are negligible. The pulses are then assumed to be approximately Gaussian such
-that they can be described by
-\begin{equation}
-g(t) = a e^{-(t-b)^{2}/c^{2}}
-\end{equation}
-The full width at half maximum, or equivalently $W_{50}$ is then given by $W_{50}=c\sqrt{\ln{2}}$. 
-To measure $c$ for a single pulse we can integrate
-\begin{equation}
-\int_{-\infty}^{\infty}a e^{-(t-b)^{2}/c^{2}} dt = a |c| \sqrt{\pi}.
-\end{equation}
-If we then numerically integrate over $n$ pulses provided each pulse falls off sufficiently quickly 
-then we have
-\begin{equation}
-|c| = \frac{\int_{T_{\textrm{obs}}} A(t) dt}{n a \sqrt{\pi}}
-\end{equation}•
-Where $A(t)$ is the pulse amplitude over the observation time as calculted in equation 
-\eqref{eqn: Amplitude}. To implement this over an arbitary observation time requires the 
-calculation of the number of pulses and there amplitude $a$. The result of a particular 
-example is given in figure \ref{fig: PulseWidthModulation} 
-
-\begin{figure}[ht]
-\centering
-\includegraphics[width=.5\textwidth]{Pulse_width_modulation}
-\caption{}
-\label{fig: PulseWidthModulation}
-\end{figure}•
 
 \bibliographystyle{apalike}	
 \bibliography{../bibliography}

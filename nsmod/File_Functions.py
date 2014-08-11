@@ -73,29 +73,27 @@ def Parameter_Dictionary(user_input):
     omega0 = float(p_d["omega0"])
     epsA = float(p_d["epsA"])
     p_d["tauP"] = 2 * pi * pow(omega0 * epsI, -1)
-    if epsA == 0.0:
-        pass
-        #p_d["tauA"] = float("inf")
-    else:
+    if epsA != 0.0:
         p_d["tauA"] = str(2 * pi * pow(omega0 * epsA, -1))
         p_d["tauS"] = str(pow(2 * pi, 2) * pow(omega0 ** 2.0 * epsA, -1)
-                                                        * 3 * c / (2 * R))
-        Bs = (2 * np.sqrt(epsA * I0 * R * pow(c, 2)) / pow(R, 3))
-        p_d["Bs"] = str(Bs)
-        chi0 = np.radians(p_d['chi0'])
-        a0 = np.radians(p_d['a0'])
-        Sx = np.sin(chi0)
-        Cx = np.cos(chi0)
-        varphi = 0.0
-        alpha = np.arccos(Sx * np.sin(a0) * np.cos(varphi) + Cx * np.cos(a0))
-        omega_dot0 = -2/3. * omega0**3 * R/c  * np.sin(alpha)**2 * epsA
-        p_d['omega_dot0'] = omega_dot0
+                                                    * 3 * c / (2 * R))
+    Bs = (2 * np.sqrt(epsA * I0 * R * pow(c, 2)) / pow(R, 3))
+    p_d["Bs"] = str(Bs)
+    chi0 = np.radians(p_d['chi0'])
+    a0 = np.radians(p_d['a0'])
+    Sx = np.sin(chi0)
+    Cx = np.cos(chi0)
+    varphi = 0.0
+    alpha = np.arccos(Sx * np.sin(a0) * np.cos(varphi) + Cx * np.cos(a0))
+    omega_dot0 = -2/3. * omega0**3 * R/c  * np.sin(alpha)**2 * epsA
+    p_d['omega_dot0'] = omega_dot0
 
-
-        # Need to import the beta function
-        from Physics_Functions import Beta_Function
-        p_d["beta30"] = str(Beta_Function(epsI, epsA, 30 * pi / 180) * 180 / pi)
-        p_d["beta75"] = str(Beta_Function(epsI, epsA, 75 * pi / 180) * 180 / pi)
+    p_d['delta_omega_dot0_FP'] = epsI**2 * a0 * np.cos(chi0) * omega0**2 / (
+                                   np.sin(chi0))
+    # Need to import the beta function
+    from Physics_Functions import Beta_Function
+    p_d["beta30"] = str(Beta_Function(epsI, epsA, 30 * pi / 180) * 180 / pi)
+    p_d["beta75"] = str(Beta_Function(epsI, epsA, 75 * pi / 180) * 180 / pi)
 
     return p_d
 

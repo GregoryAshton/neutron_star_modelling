@@ -1,9 +1,11 @@
 
 DOWNLOADED = psrcat_pkg.tar
 ATNF_DATABASE = psrcat_tar
-DATA_FILE = name_p0_p1.txt
+DATA_FILE = name_p0_p1_AGE_BSURF.txt
+PSRCAT_FILE_PATH = /home/greg/Neutron_star_modelling/Period_PeriodDot_plot/psrcat_tar/psrcat.db
+SAVE_FIG = Period_PeriodDot.pdf
 
-all:  $(DATA_FILE)
+all:  $(DATA_FILE) $(ATNF_DATABASE) $(SAVE_FIG)
 
 .PHONY: clean
 
@@ -14,8 +16,11 @@ $(ATNF_DATABASE):
 	cd psrcat_tar && ls && . makeit
 
 $(DATA_FILE):
-	export PSRCAT_FILE=/home/greg/Neutron_star_modelling/Period_PeriodDot_plot/psrcat_tar/psrcat.db
-	./psrcat_tar/psrcat -c "name p0 p1" -l "p1 < 1.0" > name_p0_p1.txt
+	export PSRCAT_FILE=${PSRCAT_FILE_PATH}; \
+		./psrcat_tar/psrcat -c "name p0 p1 AGE BSURF" -l "p1<1" > ${DATA_FILE}
+
+$(SAVE_FIG):make_plot.py
+	python make_plot.py
 
 clean:
 	rm -f ${DOWNLOADED}

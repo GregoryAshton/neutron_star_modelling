@@ -13,33 +13,40 @@
 %% 
 
 \documentclass[20pt, a1paper, portrait, margin=0mm, innermargin=10mm,
-    titleinnersep=8mm,titletoblockverticalspace=0mm,blocktitleinnersep=8mm,
-    blocktitlewidthratio=08, blocktitlemaxwidth=25cm ,blockbodyinnersep=8mm,
+    titleinnersep=0mm, blocktitleinnersep=0mm,
+    blocktitlewidthratio=08, blocktitlemaxwidth=35cm ,blockbodyinnersep=8mm,
     blockverticalspace=10mm,colspace=5mm, subcolspace=0mm,noteinnersep=3mm]
-    {tikzposter}
+{tikzposter}
 
-% Header
-\title{Gravitational waves from Neutron stars}
-\author{Gregory Ashton, supervised by D.I. Jones \& R. Prix }
-\institute{University of Southampton}
-%\titlegraphic{LogoGraphic Inserted Here}
-
- %Choose Layout
+% Choose Layout
 \usetheme{Autumn}
 
 % Additonal packages
-%\usepackage[colalign]{myposter}
 \usepackage{wrapfig}
 \usepackage{floatflt}
 \usepackage{multicol}
 \usepackage{placeins}
+\usepackage[T1]{fontenc}
 
+% Set block style
 \useblockstyle[titlewidthscale=1, bodywidthscale=1, titlecenter,
-    titleoffsetx=0pt, titleoffsety=0pt, bodyoffsetx=0pt, bodyoffsety=40pt,
+    titleoffsetx=0pt, titleoffsety=0pt, bodyoffsetx=0pt, bodyoffsety=30pt,
     bodyverticalshift=0pt, roundedcorners=5, linewidth=0.4cm,
-    titleinnersep=1cm, bodyinnersep=1cm]{Default}
+    titleinnersep=10mm, bodyinnersep=10mm]{Default}
+
+\usetitlestyle[titletoblockverticalspace=10mm]{Filled}
 
 \tikzposterlatexaffectionproofoff
+
+
+% Header
+\title{\textcolor{colorThree}{\fontsize{2.3cm}{1em}\selectfont 
+       Gravitational Waves from Neutron Stars}}
+
+\author{Gregory Ashton, supervised by D.I. Jones \& R. Prix \\
+    {\Large G.Ashton@soton.ac.uk}}
+
+\institute{University of Southampton }
 
 \begin{document}
 
@@ -69,9 +76,9 @@ sheet is spacetime while the weights are large masses e.g. stars, black holes. T
 to each dynamically, this can be summarised as:
 \vspace{2mm}
 \begin{quotation}
-\textcolor{brown}{
-\emph{"Spacetime tells matter how to move; matter
-tells spacetime how to curve." - J. Wheeler}}
+    {
+\emph{\textbf{``Spacetime tells matter how to move; matter
+tells spacetime how to curve."} - J. Wheeler}}
 \end{quotation}
 \vspace{2mm}
 
@@ -121,12 +128,11 @@ roughly the size of Southampton.
 \end{wrapfigure}
 
 We see some neutron stars as pulses of electromagnetic light. This is caused by
-radiation streaming out in thin beams which flash over the earth like the
-beams from a lighthouse, illustrated on the left.
-Neutron stars contain lots of interesting physics such as massive magnetic
-fields and exotic forms of matter. Crucially, if they are misshapen then they may
-emit gravitational waves. 
-\vspace{2mm}
+radiation streaming out in thin beams which flash over the earth like the beams
+from a lighthouse, illustrated on the left.  Neutron stars contain lots of
+interesting physics such as superfluids and massive magnetic fields. Crucially,
+if they are misshapen then they may emit gravitational waves. 
+\vspace{2.3mm}
 }
 
 \end{columns}
@@ -167,16 +173,16 @@ return at the same time.
 \hspace{2mm}
 \begin{minipage}[t]{0.49\linewidth}
 
-The problem is that the difference between the two beams is very
-small.  To put it in perspective, its like trying to measure that a human being
-has grown by a single atom. We have built enourmous detectors in the hope of 
-measuring gravitational waves, below is the 4 km long LIGO detector in the USA.
+The problem is that the difference between the two beams is tiny.  To put
+it in perspective, it's like trying to measure if a human being has grown by a
+single atom. We have built enormous interferometers in the hope of measuring
+gravitational waves, for example here is one of the 4 km long LIGO detectors:
 \begin{tikzfigure}
-   \vspace{-8mm}
+   \vspace{-3mm}
 \centering
-\includegraphics[width=0.9\linewidth]{img/Hanford1_with_logo}
+\includegraphics[width=0.8\linewidth]{img/Hanford1_with_logo}
 \end{tikzfigure}
-\centerline{\Large Look out for results when the detectors turn on in 2016. }
+You can find out more about this project at: \textcolor{blue}{www.bit.do/LIGO}
 
 
 \end{minipage}
@@ -184,25 +190,24 @@ measuring gravitational waves, below is the 4 km long LIGO detector in the USA.
 
 \block[]{IV: Searching for signals from neutron stars}{
 
-\begin{wrapfigure}{r}{0.33\linewidth}
-    \vspace{-20mm}
+\begin{wrapfigure}{r}{0.355\linewidth}
+    \vspace{-33mm}
 \begin{tikzfigure}
 \centering
 \includegraphics[width=\linewidth]{img/CGW_example}
 \end{tikzfigure}
 \end{wrapfigure}
 
-The signals we are searching for will be hidden in the  detector noise from seismic
-activity and other sources. To search for it, we have to make a guess for what
-the signal will look like, this is called a template. The template is then
-compared to the data like in the graph on the right. This process relies on the
-ability of the template to match the signal in the data. Using
-the correct template is crucial to finding the signal.
-
-Unfortunately it is possible that real gravitational wave signals will contain
-noise from the neutron star itself.  This noise can look just like the detector
-noise. I am trying to test how bad this effect will be and develop methods
-to improve our chances of detection.
+The signals we are searching for will be hidden in the  detector noise from
+seismic activity and other sources. To search for it, we have to make an
+educated guess for what the signal will look like, this is called a template.
+The template is then compared to the data like in the graph on the right. This
+process relies on the ability of the template to match the signal in the data.
+Using the correct template is crucial to finding the signal. Unfortunately it
+is possible that real gravitational wave signals will contain noise from the
+neutron star itself.  This noise can look just like the detector noise. I am
+trying to test how bad this effect will be and develop methods to improve our
+chances of detection.
 
 }
 
@@ -211,30 +216,27 @@ to improve our chances of detection.
 \column{0.5}
 \block[]{V: Gravitational waves astronomy}{
 
-Aside from testing Einstein's general relativity, gravitational waves will allow
-us to explore the universe in a new way. Traditional astronomy observes
+Aside from testing Einstein's general relativity, gravitational waves will
+allow us to explore the universe in a new way. Traditional astronomy observes
 electromagnetic radiation from distant objects. This means we can only observe
 the outside of hot, light emitting objects. With gravitational wave astronomy
-we may be able to observe more of the many exotic and less explored areas
-of physics 
+we may be able to observe more of the difficult to explore areas of physics
 such as black holes, neutron stars, and maybe even the big bang. 
 
 }
 
 \column{0.5}
 \block[]{VI: Conclusions}{
-\vspace{10mm}
-    \centering
-    \Large
-We are trying to detect gravitational waves. Finding these is crucial evidence
-for Einsteins theory of gravity, general relativity. If you
-want to know more visit:
 
-\vspace{7mm}
-\centerline{
-\textcolor{blue}{www.bit.do/LIGO}
-}
-\vspace{10mm}
+Scientists from around the world are trying to detect gravitational waves.
+Finding these is crucial evidence for Einstein's theory of gravity, general
+relativity. Here in the gravity group of Southampton, we are helping by
+modelling neutron stars. We use these models to predict what the signals may
+look like. I am interested in finding out what happens when the signals include
+noise from the neutron star.
+
+
+\vspace{4.0mm}
 }
 \end{columns}
 

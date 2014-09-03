@@ -1,6 +1,7 @@
 \documentclass[/home/greg/Thesis/main/main.tex]{subfiles}
 
 % Default image directory
+\def\thisdir{/home/greg/Neutron_star_modelling/TimingNoiseModels/InTheRotatingFrame}
 \graphicspath{{/home/greg/Neutron_star_modelling/TimingNoiseModels/InTheRotatingFrame/img/}}
 
 \begin{document}
@@ -91,8 +92,8 @@ Magnetic dipole &  $\boldsymbol{m}$ & $m$ & $\chi$ & 0 \\ \hline
 
 \begin{figure}[ht]
 \centering
-    \input{sketch01}
-    \caption{Sketch of the  $\x-\z$ plane,  the magnetic dipole lies solely in
+\input{\thisdir/sketch01}
+\caption{Sketch of the  $\x-\z$ plane,  the magnetic dipole lies solely in
     this plane, it's azimuthal component is always zero.  Only the projection
 into this plane of the spin vector is shown, in general it has an azimuthal
 component given by $\phi$.}
@@ -497,7 +498,7 @@ A schematic of the various angles and axis is given in
 figure~\ref{fig: schematic}
 \begin{figure}[ht]
 \centering
-\input{BetaSketch}
+ \input{\thisdir/BetaSketch}
 \caption{Schematic of the two sets of axis for an arbitary $\beta$. Note that
 $\beta$ is defined to be positive for a right hand rotation about the $\y$ axis
 which is defined to be into the page.}
@@ -851,7 +852,7 @@ TBD
 
 \appendix
 \begin{subappendices}
-\include{Appendix}
+\input{\thisdir/Appendix}
 \end{subappendices}
 \biblio
 

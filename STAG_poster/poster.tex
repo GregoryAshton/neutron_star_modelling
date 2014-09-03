@@ -12,8 +12,8 @@
 %% LaTeX version 2013/12/01 or later.
 %% 
 
-\documentclass[20pt, a1paper, portrait, margin=10mm, innermargin=10mm,
-    titleinnersep=8mm,titletoblockverticalspace=10mm,blocktitleinnersep=8mm,
+\documentclass[20pt, a1paper, portrait, margin=0mm, innermargin=10mm,
+    titleinnersep=8mm,titletoblockverticalspace=0mm,blocktitleinnersep=8mm,
     blocktitlewidthratio=08, blocktitlemaxwidth=25cm ,blockbodyinnersep=8mm,
     blockverticalspace=10mm,colspace=5mm, subcolspace=0mm,noteinnersep=3mm]
     {tikzposter}
@@ -39,6 +39,7 @@
     bodyverticalshift=0pt, roundedcorners=5, linewidth=0.4cm,
     titleinnersep=1cm, bodyinnersep=1cm]{Default}
 
+\tikzposterlatexaffectionproofoff
 
 \begin{document}
 
@@ -56,21 +57,26 @@
 
 In 1916 Einstein formulated his theory of gravity, general relativity. Like all
 good theories it made several important predictions. All but one of these
-predictions have been tested and agree with the theory exceptionaly well. The
+predictions have been tested and agree with the theory exceptionally well. The
 final prediction left to test is the existence of \emph{gravitational waves}.
 
 
 General relativity unified the ideas of space and time into a single object
 which we call \emph{spacetime}. Spacetime is a dynamic object that can interact
 with matter. We can picture this by imagining a stretched rubber sheet on which
-we place heavy weights, this creates wells in the sheet. If we were to roll
-smaller objects over the sheet, the curvature due to the weights would cause
-their path to be bent. So the matter and the spacetime react to each other, J.
-Wheeler described this as: `\emph{Spacetime tells matter how to move; matter
-tells spacetime how to curve}'.
+we place heavy weights, this creates wells in the sheet. In this picture the rubber
+sheet is spacetime while the weights are large masses e.g. stars, black holes. The two react
+to each dynamically, this can be summarised as:
+\vspace{2mm}
+\begin{quotation}
+\textcolor{brown}{
+\emph{"Spacetime tells matter how to move; matter
+tells spacetime how to curve." - J. Wheeler}}
+\end{quotation}
+\vspace{2mm}
 
-\begin{wrapfigure}[6]{l}{0.4\linewidth}
-    \vspace{0mm}
+\begin{wrapfigure}[6]{l}{0.43\linewidth}
+    \vspace{-10mm}
 \begin{tikzfigure}
 \centering
 \includegraphics[width=\linewidth]{img/star_with_GW-crop}
@@ -107,7 +113,7 @@ makes them extremely dense. This is like compressing the sun into a sphere
 roughly the size of Southampton.
 \vspace{4mm}
 \begin{wrapfigure}[11]{l}{0.5\linewidth}
-    \vspace{-5mm}
+    \vspace{-15mm}
 \begin{tikzfigure}
 \centering
 \includegraphics[width=\linewidth]{img/star-crop}
@@ -118,19 +124,19 @@ We see some neutron stars as pulses of electromagnetic light. This is caused by
 radiation streaming out in thin beams which flash over the earth like the
 beams from a lighthouse, illustrated on the left.
 Neutron stars contain lots of interesting physics such as massive magnetic
-fields and exotic forms of matter. If they are mishapen then they may
+fields and exotic forms of matter. Crucially, if they are misshapen then they may
 emit gravitational waves. 
-\vspace{10mm}
+\vspace{2mm}
 }
 
 \end{columns}
 
 \block[]{III: Searching for gravitational waves}{
 
-\begin{minipage}[t]{0.54\linewidth}
+\begin{minipage}[t]{0.49\linewidth}
 
 A gravitational wave will periodically stretch and squeeze space in the two
-directions perpindicular to its direction of travel. In the figure below we 
+directions perpendicular to its direction of travel. In the figure below we 
 show this effect on a circle. 
 {
 \begin{tikzfigure}
@@ -140,7 +146,7 @@ show this effect on a circle.
 \end{tikzfigure}
 }
 
-\begin{wrapfigure}{r}{0.4\linewidth}
+\begin{wrapfigure}{r}{0.5\linewidth}
     \vspace{-10mm}
 \begin{tikzfigure}
 \centering
@@ -156,20 +162,21 @@ gravitational wave passed through during the experiment, they will not both
 return at the same time. 
 
 \end{minipage}
-\hspace{5mm}
+\hspace{2mm}
 \vrule{}
-\begin{minipage}[t]{0.44\linewidth}
+\hspace{2mm}
+\begin{minipage}[t]{0.49\linewidth}
 
-The problem is that the differences between the two beams are very
+The problem is that the difference between the two beams is very
 small.  To put it in perspective, its like trying to measure that a human being
 has grown by a single atom. We have built enourmous detectors in the hope of 
 measuring gravitational waves, below is the 4 km long LIGO detector in the USA.
 \begin{tikzfigure}
    \vspace{-8mm}
 \centering
-\includegraphics[width=.7\linewidth]{img/Hanford1_with_logo}
+\includegraphics[width=0.9\linewidth]{img/Hanford1_with_logo}
 \end{tikzfigure}
-Look out for results when the detectors turn on in 2016. 
+\centerline{\Large Look out for results when the detectors turn on in 2016. }
 
 
 \end{minipage}
@@ -204,7 +211,7 @@ to improve our chances of detection.
 \column{0.5}
 \block[]{V: Gravitational waves astronomy}{
 
-Aside from testing Einsteins general relativity, gravitational waves will allow
+Aside from testing Einstein's general relativity, gravitational waves will allow
 us to explore the universe in a new way. Traditional astronomy observes
 electromagnetic radiation from distant objects. This means we can only observe
 the outside of hot, light emitting objects. With gravitational wave astronomy

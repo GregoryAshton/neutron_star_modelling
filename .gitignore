@@ -11,6 +11,10 @@
 *.aux
 *.gz
 *.aux
+*.toc
+*.out
+*.snm
+*.nav
 *.ipynb
 *.bbl
 *.blg

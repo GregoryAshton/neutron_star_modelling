@@ -13,10 +13,8 @@
 %% 
 
 \documentclass[20pt, a1paper, portrait, margin=0mm, innermargin=10mm,
-    titleinnersep=0mm, blocktitleinnersep=0mm,
-    blocktitlewidthratio=08, blocktitlemaxwidth=35cm ,blockbodyinnersep=8mm,
-    blockverticalspace=10mm,colspace=5mm, subcolspace=0mm,noteinnersep=3mm]
-{tikzposter}
+               blockverticalspace=10mm,colspace=5mm, subcolspace=0mm]
+               {tikzposter}
 
 % Choose Layout
 \usetheme{Autumn}
@@ -119,7 +117,7 @@ They have a mass about that of our sun, but have a radius of about 10km, this
 makes them extremely dense. This is like compressing the sun into a sphere
 roughly the size of Southampton.
 \vspace{4mm}
-\begin{wrapfigure}[11]{l}{0.5\linewidth}
+\begin{wrapfigure}[8]{l}{0.5\linewidth}
     \vspace{-15mm}
 \begin{tikzfigure}
 \centering
@@ -190,7 +188,7 @@ You can find out more about this project at: \textcolor{blue}{www.bit.do/LIGO}
 
 \block[]{IV: Searching for signals from neutron stars}{
 
-\begin{wrapfigure}{r}{0.355\linewidth}
+\begin{wrapfigure}{r}{0.34\linewidth}
     \vspace{-33mm}
 \begin{tikzfigure}
 \centering
@@ -198,16 +196,17 @@ You can find out more about this project at: \textcolor{blue}{www.bit.do/LIGO}
 \end{tikzfigure}
 \end{wrapfigure}
 
-The signals we are searching for will be hidden in the  detector noise from
-seismic activity and other sources. To search for it, we have to make an
+The signals we are searching for will be hidden in the  \emph{detector noise}
+from seismic activity. To find them we, make an
 educated guess for what the signal will look like, this is called a template.
-The template is then compared to the data like in the graph on the right. This
+The template is compared to the data, like in the graph on the right. This
 process relies on the ability of the template to match the signal in the data.
 Using the correct template is crucial to finding the signal. Unfortunately it
-is possible that real gravitational wave signals will contain noise from the
-neutron star itself.  This noise can look just like the detector noise. I am
-trying to test how bad this effect will be and develop methods to improve our
-chances of detection.
+is possible that real gravitational wave signals will contain \emph{other
+noise} from the neutron star itself. This neutron star noise may look just
+like the detector noise making it hard to find the signal. I am trying to test
+how bad this effect will be and develop methods to improve our chances of
+detection.
 
 }
 

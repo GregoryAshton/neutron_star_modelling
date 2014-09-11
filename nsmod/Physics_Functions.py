@@ -95,6 +95,7 @@ def Fix_Varphi(varphi, epsilon=170.0, Angle_Type="Degrees"):
 
 def Beta_Function(epsI, epsA, chi):
     """ Returns beta the rotation of the effective MOI tensor """
+    print "BETA FUNCTION IS USED"
     if chi > 2 * pi:
         print "Assuming chi has been given in degrees rather than radians"
         chi = chi * pi / 180
@@ -218,7 +219,7 @@ def timing_residual(time, w1, w2, w3, theta, phi, psi, chi, order=2,
     else:
         return T_res
 
-def nu_dot(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=5):
+def nu_dot(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=7):
     """
     
     Calculate the spin down rate using the method precesribed by Lyne 2010 

@@ -91,9 +91,9 @@ def Parameter_Dictionary(user_input):
     p_d['delta_omega_dot0_FP'] = epsI**2 * a0 * np.cos(chi0) * omega0**2 / (
                                    np.sin(chi0))
     # Need to import the beta function
-    from Physics_Functions import Beta_Function
-    p_d["beta30"] = str(Beta_Function(epsI, epsA, 30 * pi / 180) * 180 / pi)
-    p_d["beta75"] = str(Beta_Function(epsI, epsA, 75 * pi / 180) * 180 / pi)
+    #from Physics_Functions import Beta_Function
+    #p_d["beta30"] = str(Beta_Function(epsI, epsA, 30 * pi / 180) * 180 / pi)
+    #p_d["beta75"] = str(Beta_Function(epsI, epsA, 75 * pi / 180) * 180 / pi)
 
     return p_d
 

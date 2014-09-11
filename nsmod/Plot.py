@@ -5,6 +5,7 @@ import pylab as py
 from matplotlib import pylab as plt
 from math import pi
 from matplotlib.patches import FancyArrowPatch
+from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 #from mpl_toolkits.mplot3d import proj3d
 
 # Import functions external files
@@ -112,7 +113,7 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
 
     ax1.set_ylim(0, 1.1 * max(omega))
     #py.yticks(fig1.get_yticks()[1:-1])
-    ax1.set_ylabel(r"$\omega$  [Hz] ", rotation="vertical")
+    ax1.set_ylabel(r"$\omega$  [rad/s] ", rotation="vertical")
     ax1.yaxis.set_label_coords(labelx, 0.5)
 
     # Plot a(t)
@@ -795,8 +796,9 @@ def Observables_Plot(file_name):
     py.show()
 
 
-def Euler_Angles(file_name, axes=None, save_fig=False, *args, **kwargs):
-    """ Plot the Euler angles in thee subplots """
+def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False, 
+                 *args, **kwargs):
+    """ Plot the Euler angles in three subplots """
 
     if axes != None:
         (ax1, ax2, ax3)= axes
@@ -818,12 +820,35 @@ def Euler_Angles(file_name, axes=None, save_fig=False, *args, **kwargs):
     #theta, phi, psi = Physics_Functions.Inertial_Frame(
     #                    time, np.array([w1, w2, w3]), epsI3)
 
+    # Plot the analytic solution from Jones 2001
+    if analytic:
+        parameter_dictionary = File_Functions.Parameter_Dictionary(file_name)
+        a0 = parameter_dictionary['a0']
+        omega0 = parameter_dictionary['omega0']
+        epsI3 = parameter_dictionary['epsI3']
+
+        COLOR = "r"
+        lw = 3
+
+        thetadot = 0
+        theta = time * thetadot + a0
+        ax1.plot(time, theta, ls="--", color=COLOR, lw=lw)
+
+        phidot = omega0
+        phi = np.degrees(phidot * time)
+        ax2.plot(time, phi, ls="--", color=COLOR, lw=lw)
+
+        psidot = -1 * epsI3 * phidot
+        psi = np.degrees(psidot * time) + 90.0 
+        ax3.plot(time, psi, ls="--", color=COLOR, lw=lw)
+
     # Plotting
     ax1.plot(time, theta, *args, **kwargs)
     ax1.set_ylabel(r"$\theta$ [deg]")
     ax1.set_xticklabels([])
     ax1.yaxis.set_label_coords(labelx, 0.5)
-    ax1.set_yticks(ax1.get_yticks()[1:])
+    ax1.yaxis.set_major_locator(MultipleLocator(0.5))
+    #ax1.set_yticks(ax1.get_yticks()[1:])
     #ax1.ticklabel_format(useOffset=False, axis='y')
 
     if abs(phi[-1])>10000:
@@ -946,7 +971,7 @@ def timing_residual(file_name, order=2, ax=None, save_fig=False,
     ax.plot(time, Tres, *args, **kwargs)
     ax.set_ylabel(r"Timing residual", rotation='vertical')
     ax.set_xlabel(r"time  [s]")
-
+    ax.axhline(0, ls="--", color="k", zorder=-100)
     return ax
 
 def nu_dot(file_name, ax=None, normalise=False, divisor=10, *args, **kwargs):
@@ -994,10 +1019,18 @@ def nu_dot(file_name, ax=None, normalise=False, divisor=10, *args, **kwargs):
 
     ax.plot(time, nu_dot, *args, **kwargs)
 
-    #ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+    ax.set_xlabel(r"time [s]")
     ax.set_ylabel(r"$\dot{\nu}$", rotation="horizontal", size=26)
-
     ax.set_ylim(ax.get_ylim()[0], max(ax.get_ylim()[1], 0))
+    nu0 = PD['omega_dot0'] / (2*np.pi)
+    ax.axhline(0, ls="--", color="k", zorder=-100)
+    Delta_nu0 = PD['delta_omega_dot0_FP'] / (2*np.pi)
+    #ax.axhline(nu0 + Delta_nu0)
+    #D1 = 3 * np.cos(chi0)/np.sin(chi0) * theta[0] * PD['epsI3']
+    #D2 = 2 * theta[0] * np.sin(chi0) * np.cos(chi0) * .5 / (
+    #         np.sin(chi0)**2 - 2 * theta[0] *  np.sin(chi0) * np.cos(chi0) * .5) 
+    #print D1*nu0, D2*nu0
+    #ax.axhline(nu0 + D2*nu0, color="r")
     return ax
 
 def Amplitude(file_name, Phi0, Theta0, sigmaPhi, sigmaTheta, 

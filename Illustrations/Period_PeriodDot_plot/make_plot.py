@@ -55,11 +55,12 @@ for B0 in B0s:
 # Add lines of constant characteristic age
 def Pdot(P, tau):
     return 0.5 * P/tau 
-taus = np.logspace(10, 16, 7)
+tau_years = np.logspace(1, 9, 9)
 text_X = 2e-4
-for tau in taus:
+for tau_year in tau_years:
+    tau = tau_year * (365. * 86400)
     rotation=28
-    power = np.log10(tau)
+    power = np.log10(tau_year)
     if power != int(power):
         print "pow = {} is not an int".format(power)
     ax.text(text_X, 2.5*Pdot(text_X, tau), 

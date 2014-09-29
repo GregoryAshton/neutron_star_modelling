@@ -14,6 +14,7 @@ p0 = np.genfromtxt(data[:, 1])
 p1 = np.genfromtxt(data[:, 2])
 Binary = data[:, 3] # If not "*" then it is a binary
 Type = data[:, 4]
+Age = np.genfromtxt(data[:, 5])
 
 # Convert null "*" to NaN
 
@@ -22,16 +23,25 @@ df = pd.DataFrame({'name' : name,
                    'p1' : p1,
                    'Binary' : Binary,
                    'Type' : Type,
+                   'Age' : Age,
                   })
-
 fig = plt.figure(figsize=(6,8))
 ax = fig.add_subplot(111)
 
 # Normal pulsars
 normal_df = df[(df.p0 > 1e-1) & (df.p1 > 0) & 
-               (df.Binary == "*") & (df.Type=="*")]
+               (df.Binary == "*") & (df.Type=="*")
+               & (df.Age > 1e5)]
 ax.scatter(normal_df.p0.values, normal_df.p1.values,
            s = 10, c='k', marker="o", label="Normal pulsars")
+
+# Young pulsars
+normal_df = df[(df.p0 > 1e-1) & (df.p1 > 0) & 
+               (df.Binary == "*") & (df.Type=="*")
+               & (df.Age < 1e5)]
+ax.scatter(normal_df.p0.values, normal_df.p1.values,
+           s = 10, c='cyan', marker="o", label="Young pulsars")
+
 
 # Millisecond pulsars
 MSP_df = df[(df.p0 < 1e-1) & (df.p1 < 1e-16) &

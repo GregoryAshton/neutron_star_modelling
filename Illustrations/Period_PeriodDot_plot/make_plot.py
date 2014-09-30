@@ -113,7 +113,7 @@ for tau_year in tau_years:
 
 ax.legend(loc=2, frameon=True, fontsize=14, numpoints=1)
 ax.set_xlabel("Period [s]")
-ax.set_ylabel("Period deviative")
+ax.set_ylabel("Period derivative")
 
 
 xlims = (1e-4, 300)

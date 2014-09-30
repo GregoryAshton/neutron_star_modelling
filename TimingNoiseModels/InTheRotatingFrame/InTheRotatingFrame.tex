@@ -10,11 +10,9 @@
 The rotation of a rigid body in the rotating reference frame is described by
 Euler's equations. To derive these, we begin with Euler's second law  for the
 angular momentum $\mathbf{L}$ in the inertial frame
-
 \begin{equation}
     \frac{d\mathbf{L}}{dt}=\mathbf{T},
 \end{equation}
-
 where $\mathbf{T}$ is the applied torque. The angular momentum can be written
 as $I \spin$, the product of the moment of inertia tensor and the spin vector.
 In the inertial frame both of these quantities vary in time; this does not lend
@@ -47,7 +45,7 @@ To model the spindown of a neutron star we include a the torque from a dipole
 $m$ frozen into the star in the $\x-\z$ plane at an angle $\chi$ to the $\z$
 axis. \citet{Deutsch1955} demonstrated such a dipole exerts a torque on the
 star which has two components. It is presented here in form found in
-\citet[hereafter G70]{Goldreich1970}.
+\citet{Goldreich1970}.
 \begin{equation}
 \boldsymbol{T}=\frac{2R}{3c} I_{0}\epsilon_{A}\omega^{2}
                (\spin \times \hat{\boldsymbol{m}})\times \hat{\boldsymbol{m}} 
@@ -67,10 +65,12 @@ The first term on the right hand side is often referred to as the \emph{spin
 down}, or \emph{braking} torque. As this suggests it is responsible for the
 power law retardation of spin frequency and has an associated timescale
 $\tau_{S}$. The second term is known as the \emph{anomalous} torque which acts
-on a timescale $\tau_{A}$. These time scales are given by 
+on a timescale $\tau_{A}$. The three timescales (including the precession timescale)
+in this problem are then given by
 \begin{equation}
+\tau_{P}=\frac{2\pi}{\epsilon_{I}\omega},  \;\;\;\;\;
 \tau_{A}=\frac{2\pi}{\epsilon_{A}\omega},  \;\;\;\;\; 
-\tau_{S}=\frac{3c}{2R}\frac{2\pi}{\epsilon_{A}\omega^{2}},
+\tau_{S}=\frac{3c}{2R}\frac{2\pi}{\epsilon_{A}\omega^{2}}.
 \label{eqn: torque timescales}
 \end{equation}
 By considering the ratio $\tau_{A}/\tau_{S} \sim v/c$ where $v$ is the equatorial
@@ -226,7 +226,7 @@ azimuth $0^{\circ}$.
 \FloatBarrier \subsection{NS A in region \texorpdfstring{$\tau_{S}\gg \tau_{P}$}{}}
 \label{sec: A_NA} 
 NSs in this region are described by the work of
-\citetalias{Goldreich1970}. In addressing the shortcomings of the analytic spherical solutions,
+\citet{Goldreich1970}. In addressing the shortcomings of the analytic spherical solutions,
 Goldreich considered a neutron star with a solid crust capable of supporting
 elastic strains. In order to find an analytic solution Goldreich assumed that
 the precession timescale was significantly shorter than the spin down
@@ -243,7 +243,7 @@ $\approx 55^{\circ}$.
 We first present results for all the spherical components during the spindown 
 in figure~\ref{fig: NS A_NA}. For the angle $\chi$ we use two values
 $30^{\circ}$ and $75^{\circ}$ and find that $a$ tends to either $0$ or $\pi/2$
-on the spindown timescale as suggested by \citetalias{Goldreich1970}.
+on the spindown timescale as suggested by \citet{Goldreich1970}.
 During this alignment, the spin magnitude decays
 and $\phi$ monotonically increases corresponding to the spin vector precessing
 about the $\z$ axis. 
@@ -390,7 +390,7 @@ angular momentum.
 
 \paragraph{Summary} We find that, without the anomalous torque, the numerical
 model agrees well with analytic results in the literature. Further, we give an
-interpretation of the critical value of $\chi$ found by \citetalias{Goldreich1970}.
+interpretation of the critical value of $\chi$ found by \citet{Goldreich1970}.
 
 \FloatBarrier
 \subsection{NS B in region \texorpdfstring{$\tau_{S}\sim \tau_{P}$}{}}

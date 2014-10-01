@@ -97,6 +97,15 @@ def Parameter_Dictionary(user_input):
 
     return p_d
 
+def PrintParameterDictionary(file_name):
+    pd = Parameter_Dictionary(file_name)
+    print "File: {}".format(file_name)
+    for key, val in pd.iteritems():
+        try:
+            formatted_val = "{:1.4e}".format(float(val))
+            print key, ":", formatted_val 
+        except ValueError:
+            print key, ":", val
 
 def One_Component_Import(file_name, nmax=None):
     """ Imports time and w1,w2,w3 from file_name """

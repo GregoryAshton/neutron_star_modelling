@@ -12,7 +12,8 @@ name_list = ["one_component_model",
              "nsmod_two_component_model",
              "nsmod_two_component_model2",
              "nsmod_one_component_model_with_Euler",
-             "switching_torque_with_Euler"
+             "switching_torque_with_Euler",
+             "one_component_model_with_Euler"
              ]
 extension_list = [Extension(name,
                 ["src/"+name+".pyx"],

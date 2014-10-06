@@ -10,7 +10,7 @@ import pynotify
 from File_Functions import vprint
 
 
-def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
+def Run(AnomTorque=True, chi0=None, epsI1=0.0, epsI3=None, epsA=None,
         omega0=None, t1=1e12, error=1e-12, n=1000, eta=0.0, verbose=True,
         a_int=50.0, phi0=None):
     """
@@ -40,16 +40,16 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
 
     file_name_list = []
 
-    if anom_torque is False:
+    if AnomTorque is False:
         file_name_list .append("no_anom_")
 
-    if type(chi) in [float, int, np.float32, np.float64]:
-        file_name_list.append("chi_{:.1f}".format(chi))
-    elif type(chi) is str:
-        file_name_list.append("chi_{}".format(chi))
-        chi = float(chi)
+    if type(chi0) in [float, int, np.float32, np.float64]:
+        file_name_list.append("chi0_{:.1f}".format(chi0))
+    elif type(chi0) is str:
+        file_name_list.append("chi0_{}".format(chi0))
+        chi0 = float(chi0)
     else:
-        print (" ERROR: You need to specify chi in degrees")
+        print (" ERROR: You need to specify chi0 in degrees")
         return
 
     if type(epsI1) in [float, int, np.float32, np.float64]:
@@ -123,19 +123,19 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
         os.remove(file_name)
 
     one_component_model.main(
-                      chi=np.radians(chi),
-                      file_name=file_name,
+                      chi0=np.radians(chi0),
+                      #file_name=file_name,
                       n=int(n),
                       epsA=epsA,
                       epsI1=epsI1,
                       epsI3=epsI3,
                       omega0=omega0,
-                      t1=t1,
+                      T=t1,
                       eta=eta,
-                      anom_torque=anom_torque,
+                      AnomTorque=AnomTorque,
+                      a0=np.radians(a_int),
                       error=float(error),
-                      a_int=np.radians(a_int),
-                      phi0=np.radians(phi0),
+                      #phi0=np.radians(phi0),
                       )
 
     return file_name
@@ -173,22 +173,22 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
     #file_name_list = []
 
     ## Errors may come out of this..
-    #if 'anom_torque' in Input_Dictionary:
-        #anom_torque = Input_Dictionary['anom_torque']
-        #if Input_Dictionary['anom_torque'] is False:
+    #if 'AnomTorque' in Input_Dictionary:
+        #AnomTorque = Input_Dictionary['AnomTorque']
+        #if Input_Dictionary['AnomTorque'] is False:
             #file_name_list .append("no_anom_")
     #else:
-        #anom_torque = True
+        #AnomTorque = True
 
     #if Input_Dictionary.get('no_anom'):
         #print ("no_anom in Input_Dictionary is no longer supported, please"
-              #" use anom_torque instead")
+              #" use AnomTorque instead")
 
     #try:
-        #chi_degrees = Input_Dictionary['chi']
-        #file_name_list.append("chi_" + str(Input_Dictionary['chi']))
+        #chi0_degrees = Input_Dictionary['chi0']
+        #file_name_list.append("chi0_" + str(Input_Dictionary['chi0']))
     #except KeyError:
-        #print " ERROR: You need to specify chi in the input dictionary"
+        #print " ERROR: You need to specify chi0 in the input dictionary"
         #return
 
     ## Triaxial test
@@ -258,7 +258,7 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
         #os.remove(file_name)
 
     #nsmod_one_component_model.main(
-                      #chi_degrees=float(chi_degrees),
+                      #chi0_degrees=float(chi0_degrees),
                       #file_name=file_name,
                       #n=n,
                       #epsA=float(epsA),
@@ -267,7 +267,7 @@ def Run(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
                       #omega0=float(omega0),
                       #t1=float(t1),
                       #eta=float(eta),
-                      #anom_torque=anom_torque,
+                      #AnomTorque=AnomTorque,
                       #error=float(error)
                       #)
 
@@ -286,7 +286,7 @@ def Run_Cython_Two_Component(Input_Dictionary):
     """ Function to run the two component model.
 
     Keyword arguments must be passed as a dictionary
-    chi:float [degrees] -- angle between magnetic dipole and z axis
+    chi0:float [degrees] -- angle between magnetic dipole and z axis
     epsI:float []-- elastic deformation
     epsA :float []-- magnetic deformation
     omega0 :float [Hz]-- initial spin period
@@ -309,20 +309,20 @@ def Run_Cython_Two_Component(Input_Dictionary):
     # Initiate the file_name list
     file_name_list = []
 
-    # Check the anom_torque condition
+    # Check the AnomTorque condition
     if Input_Dictionary.get('no_anom'):
         file_name_list .append("no_anom_")
-        anom_torque = False
+        AnomTorque = False
     else:
-        anom_torque = True
+        AnomTorque = True
 
     # At the moment these errors do not raise correctly.
 
     try:
-        chi_degrees = Input_Dictionary['chi']
-        file_name_list.append("chi_" + str(Input_Dictionary['chi']))
+        chi0_degrees = Input_Dictionary['chi0']
+        file_name_list.append("chi0_" + str(Input_Dictionary['chi0']))
     except KeyError:
-        print " ERROR: You need to specify chi in the input dictionary"
+        print " ERROR: You need to specify chi0 in the input dictionary"
         return
 
     try:
@@ -426,14 +426,14 @@ def Run_Cython_Two_Component(Input_Dictionary):
         os.remove(file_name)
 
     nsmod_two_component_model.main(
-        chi_degrees=float(chi_degrees),
+        chi0_degrees=float(chi0_degrees),
         file_name=file_name,
         epsA=float(epsA),
         epsI=float(epsI),
         n=n,
         omega0=float(omega0),
         t1=float(t1),
-        anom_torque=anom_torque,
+        AnomTorque=AnomTorque,
         error=float(error),
         Ishell=float(Ishell),
         Icore=float(Icore),
@@ -456,7 +456,7 @@ def Run_Cython_Two_Component2(Input_Dictionary):
     """ Function to run the two component model.
 
     Keyword arguments must be passed as a dictionary
-    chi:float [degrees] -- angle between magnetic dipole and z axis
+    chi0:float [degrees] -- angle between magnetic dipole and z axis
     epsI:float []-- elastic deformation
     epsA :float []-- magnetic deformation
     omega0 :float [Hz]-- initial spin period
@@ -479,20 +479,20 @@ def Run_Cython_Two_Component2(Input_Dictionary):
     # Initiate the file_name list
     file_name_list = []
 
-    # Check the anom_torque condition
+    # Check the AnomTorque condition
     if Input_Dictionary.get('no_anom'):
         file_name_list .append("no_anom_")
-        anom_torque = False
+        AnomTorque = False
     else:
-        anom_torque = True
+        AnomTorque = True
 
     # At the moment these errors do not raise correctly.
 
     try:
-        chi_degrees = Input_Dictionary['chi']
-        file_name_list.append("chi_" + str(Input_Dictionary['chi']))
+        chi0_degrees = Input_Dictionary['chi0']
+        file_name_list.append("chi0_" + str(Input_Dictionary['chi0']))
     except KeyError:
-        print " ERROR: You need to specify chi in the input dictionary"
+        print " ERROR: You need to specify chi0 in the input dictionary"
         return
 
     try:
@@ -573,7 +573,7 @@ def Run_Cython_Two_Component2(Input_Dictionary):
         os.remove(file_name)
 
     nsmod_two_component_model2.main(
-        chi_degrees=float(chi_degrees),
+        chi0_degrees=float(chi0_degrees),
         file_name=file_name,
         epsA=float(epsA),
         epsI=float(epsI),
@@ -598,7 +598,7 @@ def Run_Cython_Two_Component2(Input_Dictionary):
 
 
 
-def Run_with_Euler(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
+def Run_with_Euler(AnomTorque=True, chi0=None, epsI1=0.0, epsI3=None, epsA=None,
         omega0=None, t1=1e12, error=1e-12, n=1000, verbose=True, a_int=5.0,
         overwrite=False
         ):
@@ -606,10 +606,10 @@ def Run_with_Euler(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
     Run a simulation of the one component model solving both the body frame equations 
     and the Euler angle equations
 
-    :param anom_torque: If true will include the anomalous part of the torque equations
-    :type anom_torque: bool
-    :param chi: Angle in degrees made by the magenetic dipole with the body frame z axis
-    :type chi: float
+    :param AnomTorque: If true will include the anomalous part of the torque equations
+    :type AnomTorque: bool
+    :param chi0: Angle in degrees made by the magenetic dipole with the body frame z axis
+    :type chi0: float
     :param epsI1: Value of the deformation to the moment of inertia along the
                  1 - axis e.g :math:`I_{xx} = I_{0}(1+\epsilon_{I1})`
     :type epsI1: float
@@ -636,16 +636,16 @@ def Run_with_Euler(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
 
     file_name_list = []
 
-    if anom_torque is False:
+    if AnomTorque is False:
         file_name_list .append("no_anom_")
 
-    if type(chi) in [float, int, np.float32, np.float64]:
-        file_name_list.append("chi_{:.1f}".format(chi))
-    elif type(chi) is str:
-        file_name_list.append("chi_{}".format(chi))
-        chi = float(chi)
+    if type(chi0) in [float, int, np.float32, np.float64]:
+        file_name_list.append("chi0_{:.1f}".format(chi0))
+    elif type(chi0) is str:
+        file_name_list.append("chi0_{}".format(chi0))
+        chi0 = float(chi0)
     else:
-        print (" ERROR: You need to specify chi in degrees")
+        print (" ERROR: You need to specify chi0 in degrees")
         return
 
     if type(epsI1) in [float, int, np.float32, np.float64]:
@@ -711,7 +711,7 @@ def Run_with_Euler(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
 
 
     nsmod_one_component_model_with_Euler.main(
-      chi=chi,
+      chi0=chi0,
       file_name=file_name,
       n=int(n),
       epsA=epsA,
@@ -719,7 +719,7 @@ def Run_with_Euler(anom_torque=True, chi=None, epsI1=0.0, epsI3=None, epsA=None,
       epsI3=epsI3,
       omega0=omega0,
       t1=t1,
-      anom_torque=anom_torque,
+      AnomTorque=AnomTorque,
       error=float(error),
       a_int=a_int
       )

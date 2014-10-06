@@ -237,7 +237,7 @@ def FormatValue(key, val):
     if key in ["epsI1", "epsI3", "epsA", "omega0", "T"]:
         formatted_val = "{:.2e}".format(val)
     elif key in ["chi0", "a0"]:
-        formatted_val = "{:2.2f}".format(val)
+        formatted_val = "{:2.5f}".format(val)
     elif key in ["AnomTorque"]:
         formatted_val = "{:.0f}".format(val)
     elif key in ["upsilon", "eta"]:

@@ -151,6 +151,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     # We allow the user to give angles in degrees and convert here
     chi0 = np.deg2rad(chi0)
     a0 = np.deg2rad(a0)
+    print a0
 
     # Pass them to params list
     cdef double params[6]

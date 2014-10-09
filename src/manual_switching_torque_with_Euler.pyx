@@ -34,6 +34,8 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     epsI3 = (<double *> params)[3]
     AnomTorque = (<double *> params)[4]
     upsilon = (<double *> params)[5]
+    SwitchTime = (<double *> params)[6]
+    dt = (<double *> params)[7]
 
     # Calculate the torque
     mx = sin(chi)
@@ -47,18 +49,8 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     Tz_sd = pre * epsA * mx * (w[0] * mz - w[2] * mx)
 
     S = 1.0 
-    #Psi = acos((mx * w[0] + mz * w[2] * (1 + epsI3)) *
-    #             pow(pow(w[0], 2) + pow(w[1], 2) + pow(w[2] * (1 + epsI3), 2), -0.5))
-    
-    Theta = acos(sin(w[3]) * sin(w[5]) * mx + cos(w[3]) * mz)
-    #Theta_ave = 0.5 * (w[3] + chi + fabs(w[3] - chi))
 
-    #if w[3] < chi:
-        #S = 1.0 - upsilon
-
-    #if Psi >  max(chi, w[3]):
-    #    S = 1.0 -upsilon
-    if Theta < chi:
+    if t > SwitchTime:
         S = 1.0 - upsilon
     
     
@@ -100,7 +92,7 @@ cdef int jac (double t, double y[], double *dfdy,
 
 def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     a0=50., T=1.0e3, AnomTorque=True , upsilon=0.0, n=10000, error=1e-10,
-    cleanup=False):
+    cleanup=False, SwitchTime=100):
     """ One component NS with Euler angles and switching
     
     This solves the Euler equations for a single component NS and the 
@@ -139,7 +131,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     """
  
     (file_name, run_sim) = FileNamer(epsI1=epsI1, epsI3=epsI3, epsA=epsA,
-                          omega0=omega0, chi0=chi0, a0=a0, T=T,
+                          omega0=omega0, chi0=chi0, a0=a0, T=T, SwitchTime=SwitchTime,
                           AnomTorque=AnomTorque, n=n, upsilon=upsilon,
                           error=error, cleanup=cleanup)
     if not run_sim:
@@ -152,14 +144,19 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     chi0 = np.deg2rad(chi0)
     a0 = np.deg2rad(a0)
 
+    cdef double ti, dt
+    dt = float(T) / n
+
     # Pass them to params list
-    cdef double params[6]
+    cdef double params[8]
     params[0] = epsA
     params[1] = chi0
     params[2] = epsI1
     params[3] = epsI3
     params[4] = AnomTorque
     params[5] = upsilon
+    params[6] = SwitchTime
+    params[7] = dt
 
     # Initial values and calculate eta_relative
     cdef int i
@@ -193,7 +190,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
                     )
 
     cdef int status
-    cdef double ti, dt
+
 
     w1 = [w[0]]
     w2 = [w[1]]
@@ -202,7 +199,6 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     w5 = [w[4]]
     w6 = [w[5]]
     
-    dt = float(T) / n
     
     # Run saving at discrete time values
     for i from 1 <= i <= n:

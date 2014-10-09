@@ -234,7 +234,7 @@ def FormatValue(key, val):
     Note: None is returned if the key is not used in the filename, e.g 
           the error.
     """
-    if key in ["epsI1", "epsI3", "epsA", "omega0", "T"]:
+    if key in ["epsI1", "epsI3", "epsA", "omega0", "T", "SwitchTime"]:
         formatted_val = "{:.2e}".format(val)
     elif key in ["chi0", "a0"]:
         formatted_val = "{:2.5f}".format(val)

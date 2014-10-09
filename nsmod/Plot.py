@@ -532,10 +532,10 @@ def Simple_Plot_Transform(file_name, Option_Dictionary={}):
     # Get the paramters of the run
     Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
 
-    epsI = float(Parameter_Dictionary["epsI3"])
+    epsI3 = float(Parameter_Dictionary["epsI3"])
     epsA = float(Parameter_Dictionary["epsA"])
     chi0 = float(Parameter_Dictionary["chi0"]) * pi / 180
-    beta = Beta_Function(epsI, epsA, chi0)
+    beta = Beta_Function(epsI3, epsA, chi0)
 
     (w1_prime, w2_prime, w3_prime) = Physics_Functions.Cartesian_2_EBF(
                                                         w1, w2, w3, beta)
@@ -588,10 +588,10 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
     Parameter_Dictionary = \
         File_Functions.Parameter_Dictionary(file_name)
 
-    epsI = float(Parameter_Dictionary['epsI'])
+    epsI3 = float(Parameter_Dictionary['epsI3'])
     epsA = float(Parameter_Dictionary['epsA'])
     chi0 = float(Parameter_Dictionary['chi0']) * pi / 180
-    beta = Beta_Function(epsI, epsA, chi0)
+    beta = Beta_Function(epsI3, epsA, chi0)
     print
     print 'Beta  = {}s degrees for %s'.format(beta * 180 / pi,
             file_name)
@@ -635,7 +635,7 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
 
         ax2 = ax1.twinx()
 
-        varphi_prime = Physics_Functions.Fix_Phi(varphi_prime)
+        varphi_prime = Physics_Functions.Fix_Varphi(varphi_prime)
         if abs(varphi_prime[-1]) > 100:
 
             def Scale_Axis(axis):
@@ -708,7 +708,7 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
 
         # Check and fix rotations of 2pi in varphi
 
-        varphi_prime = Physics_Functions.Fix_Phi(varphi_prime)
+        varphi_prime = Physics_Functions.Fix_Varphi(varphi_prime)
 
         # Often varphi becomes very large in which case we scale the axis
 
@@ -937,7 +937,7 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
     return ax
 
 
-def timing_residual(file_name, order=2, ax=None, save_fig=False, 
+def timing_residual(file_name, order=3, ax=None, save_fig=False, 
                     *args, **kwargs):
     """ 
     Plot the timing residuals for the data given in file_name. 

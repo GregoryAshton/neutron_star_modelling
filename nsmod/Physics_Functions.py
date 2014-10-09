@@ -98,10 +98,10 @@ def Beta_Function(epsI, epsA, chi):
     print "BETA FUNCTION IS USED"
     if chi > 2 * pi:
         print "Assuming chi has been given in degrees rather than radians"
-        chi = chi * pi / 180
+        chi = np.radians(chi)
 
     a = epsA * epsA + epsI * epsI - 2 * epsA * epsI * np.cos(2 * chi)
-    beta = (np.arctan((epsI - epsA * np.cos(2 * chi) - np.sqrt(a)) /
+    beta = (np.arctan2((epsI - epsA * np.cos(2 * chi) - np.sqrt(a)),
                         (2 * epsA * np.sin(chi) * np.cos(chi))))
     return beta
 
@@ -208,6 +208,7 @@ def timing_residual(time, w1, w2, w3, theta, phi, psi, chi, order=2,
 
     # Fit polynomial to Phi or order order
     coefs = np.polyfit(time, Phi_list, order)
+
     # poly1d returns the polynomial we then evaluate this at time giving the fitted phi
     Phi_fit = np.poly1d(coefs)(time)
 

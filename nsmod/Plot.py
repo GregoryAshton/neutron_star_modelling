@@ -937,7 +937,7 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
     return ax
 
 
-def timing_residual(file_name, order=3, ax=None, save_fig=False, 
+def timing_residual(file_name, ax=None, save_fig=False, analytic=False, 
                     *args, **kwargs):
     """ 
     Plot the timing residuals for the data given in file_name. 
@@ -963,7 +963,7 @@ def timing_residual(file_name, order=3, ax=None, save_fig=False,
 
     Tres = Physics_Functions.timing_residual(time, w1, w2, w3, 
                                              theta, phi, psi, chi0, 
-                                             order=order)
+                                             order=3)
 
     if not ax:
         fig, ax = plt.subplots()
@@ -971,7 +971,14 @@ def timing_residual(file_name, order=3, ax=None, save_fig=False,
     ax.plot(time, Tres, *args, **kwargs)
     ax.set_ylabel(r"Timing residual", rotation='vertical')
     ax.set_xlabel(r"time  [s]")
-    ax.axhline(0, ls="--", color="k", zorder=-100)
+    ax.axhline(0, ls="-", color="k", zorder=-100)
+
+    if analytic == "FP":
+        ax.axhline(theta[0] * np.cos(chi0) / np.sin(chi0), ls="--", color="k",
+                   zorder=-100)
+        ax.axhline(-theta[0] * np.cos(chi0) / np.sin(chi0), ls="--", color="k",
+                   zorder=-100)
+
     return ax
 
 def nu_dot(file_name, ax=None, normalise=False, divisor=10, *args, **kwargs):

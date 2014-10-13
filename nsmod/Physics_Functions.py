@@ -169,7 +169,7 @@ def Theta(theta, psi, chi):
     """ See equation (52) of Jones 2001 """
     return np.arccos(sin(theta) * sin(psi) * sin(chi) + cos(theta) * cos(chi))  
 
-def timing_residual(time, w1, w2, w3, theta, phi, psi, chi, order=2,
+def timing_residual(time, w1, w2, w3, theta, phi, psi, chi, order=3,
                     full=False):
     """ 
 

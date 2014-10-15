@@ -6,6 +6,10 @@ import matplotlib.pyplot as plt
 import h5py
 import os
 
+def RemoveFileSuffix(file_name):
+    suffix = ".hdf5"
+    if file_name.endswith(suffix):
+        return file_name[:-5]
 
 def Save_Figure(file_path, type_of_plot, dest_dir="img", format_type=".pdf"):
     """ Saves the currently open figure with an appropriate name"""
@@ -15,7 +19,8 @@ def Save_Figure(file_path, type_of_plot, dest_dir="img", format_type=".pdf"):
     file_name = file_path.split("/")[-1]
     plot_file_name = "./{0}/{1}_{2}{3}".format(
                                         dest_dir, type_of_plot, 
-                                        file_name.rstrip(".hdf5"), format_type)
+                                        RemoveFileSuffix(file_name),
+                                        format_type)
  
     plt.tight_layout()                  
     plt.savefig(plot_file_name)
@@ -38,9 +43,9 @@ def Parameter_Dictionary(user_input):
         p_d = {}
 
         # Remove the file descriptor and the path directory
-        f = user_input.rstrip(".hdf5")
+        f = RemoveFileSuffix(user_input)
         f = f.split("/")[-1]
-
+        
         # Import the rest of the parameters
         f = f.split("_")
         for i in range(0, len(f), 2):
@@ -61,6 +66,7 @@ def Parameter_Dictionary(user_input):
         epsI3 = float(p_d["epsI3"])
         epsI1 = float(p_d["epsI1"])
         epsI = max(abs(epsI3), abs(epsI1))
+        print epsI, epsI3
     except KeyError:
         try:
             epsI = float(p_d["epsI"])

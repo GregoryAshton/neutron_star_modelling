@@ -58,44 +58,64 @@ def Parameter_Dictionary(user_input):
     c = 3e10
     R = 1e6
     I0 = 1e45
+
     # Compute a couple of often used variabes
-
-    # Test Biaxiality, note that the tauP does not make sense in the triaxial
-    # case, need to update this at some point
-    try:
-        epsI3 = float(p_d["epsI3"])
-        epsI1 = float(p_d["epsI1"])
-        epsI = max(abs(epsI3), abs(epsI1))
-        print epsI, epsI3
-    except KeyError:
-        try:
-            epsI = float(p_d["epsI"])
-            p_d["epsI1"] = "0.0"
-            p_d["epsI3"] = str(epsI)
-        except KeyError:
-            print " ERROR: No epsI specified"
-            return
-
-    omega0 = float(p_d["omega0"])
+    epsI3 = float(p_d["epsI3"])
+    epsI1 = float(p_d["epsI1"])
     epsA = float(p_d["epsA"])
-    p_d["tauP"] = 2 * pi * pow(omega0 * epsI, -1)
-    if epsA != 0.0:
-        p_d["tauA"] = str(2 * pi * pow(omega0 * epsA, -1))
-        p_d["tauS"] = str(pow(2 * pi, 2) * pow(omega0 ** 2.0 * epsA, -1)
-                                                    * 3 * c / (2 * R))
-    Bs = (2 * np.sqrt(epsA * I0 * R * pow(c, 2)) / pow(R, 3))
-    p_d["Bs"] = str(Bs)
+    omega0 = float(p_d["omega0"])
     chi0 = np.radians(p_d['chi0'])
     a0 = np.radians(p_d['a0'])
-    Sx = np.sin(chi0)
-    Cx = np.cos(chi0)
-    varphi = 0.0
-    alpha = np.arccos(Sx * np.sin(a0) * np.cos(varphi) + Cx * np.cos(a0))
-    omega_dot0 = -2/3. * omega0**3 * R/c  * np.sin(alpha)**2 * epsA
-    p_d['omega_dot0'] = omega_dot0
 
-    p_d['delta_omega_dot0_FP'] = epsI**2 * a0 * np.cos(chi0) * omega0**2 / (
+    P = 2*np.pi / omega0
+    p_d['P'] = P
+    
+    # tauP doesn't make sense with epsI1 != 0 so set it to zero
+    if epsI1==0:
+        tauP = 2 * pi * pow(omega0 * epsI3, -1)
+    else:
+        tauP = 0 
+    p_d["tauP"] = tauP
+
+    delta_omega_dot0_FP = epsI3**2 * a0 * np.cos(chi0) * omega0**2 / (
                                    np.sin(chi0))
+    p_d['delta_omega_dot0_FP'] = delta_omega_dot0_FP
+
+    theta = a0 # Approx true for FP
+    DeltaPhi_49 = theta / np.tan(chi0)
+    p_d['DeltaPhi_49'] = DeltaPhi_49
+
+    if epsA != 0.0:
+        Sx = np.sin(chi0)
+        Cx = np.cos(chi0)
+        varphi = 0.0
+        alpha = np.arccos(Sx * np.sin(a0) * np.cos(varphi) + Cx * np.cos(a0)) # Dodgy
+
+        tauA = 2 * pi * pow(omega0 * epsA, -1)
+        p_d["tauA"] = str(tauA)
+
+        tauS =  3 * c / (2 * R * epsA * omega0**2)
+        p_d["tauS"] = str(tauS)
+        
+
+        Bs = (2 * np.sqrt(epsA * I0 * R * pow(c, 2)) / pow(R, 3))
+        p_d["Bs"] = str(Bs)
+
+        omega_dot0 = -2 * R /(3. * c) * omega0**3 * np.sin(alpha)**2 * epsA
+        p_d['omega_dot0'] = omega_dot0
+
+        tauE = abs(omega0/omega_dot0)
+        p_d["tauE"] = tauE
+
+        EMtorqueAmplificationfactor = (tauP / P) * (tauP / tauE)
+        p_d['EMtorqueAmplificationfactor'] = EMtorqueAmplificationfactor
+
+        p_d['DeltaPhi_63'] = EMtorqueAmplificationfactor * DeltaPhi_49 / np.pi
+
+        p_d['DeltaPhi_75'] = tauP**2 * theta**2 / (4 * np.pi * tauE * P)
+
+
+    
     # Need to import the beta function
     #from Physics_Functions import Beta_Function
     #p_d["beta30"] = str(Beta_Function(epsI, epsA, 30 * pi / 180) * 180 / pi)
@@ -105,8 +125,8 @@ def Parameter_Dictionary(user_input):
 
 def PrintParameterDictionary(file_name):
     pd = Parameter_Dictionary(file_name)
-    print "File: {}".format(file_name)
-    for key, val in pd.iteritems():
+    #print "File: {}".format(file_name)
+    for key, val in sorted(pd.iteritems()):
         try:
             formatted_val = "{:1.4e}".format(float(val))
             print key, ":", formatted_val 

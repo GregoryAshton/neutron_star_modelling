@@ -959,7 +959,8 @@ def timing_residual(file_name, ax=None, save_fig=False, analytic=False,
 
     out = File_Functions.Euler_Angles_Import(file_name)
     [time, w1, w2, w3, theta, phi, psi] = out
-    chi0 = np.radians(File_Functions.Parameter_Dictionary(file_name)['chi0'])
+    PD = File_Functions.Parameter_Dictionary(file_name)
+    chi0 = np.radians(PD['chi0'])
 
     Tres = Physics_Functions.timing_residual(time, w1, w2, w3, 
                                              theta, phi, psi, chi0, 
@@ -973,12 +974,24 @@ def timing_residual(file_name, ax=None, save_fig=False, analytic=False,
     ax.set_xlabel(r"time  [s]")
     ax.axhline(0, ls="-", color="k", zorder=-100)
 
-    if analytic == "FP":
-        ax.axhline(theta[0] * np.cos(chi0) / np.sin(chi0), ls="--", color="k",
-                   zorder=-100)
-        ax.axhline(-theta[0] * np.cos(chi0) / np.sin(chi0), ls="--", color="k",
-                   zorder=-100)
+    if analytic:
+        DeltaPhi_49 = PD['DeltaPhi_49']
+        ax.axhline(DeltaPhi_49, ls="--", color="k", zorder=-100, 
+                   label="Equation (49)")
+        ax.axhline(-DeltaPhi_49, ls="--", color="k", zorder=-100)
+        try:
+            DeltaPhi_63 = PD['DeltaPhi_63']
+            ax.axhline(DeltaPhi_63, ls="--", color="r", zorder=-100, 
+                       label="Equation (63)")
+            ax.axhline(-DeltaPhi_63, ls="--", color="r", zorder=-100)
 
+            DeltaPhi_75 = PD['DeltaPhi_75']
+            ax.axhline(DeltaPhi_75, ls="--", color="b", zorder=-100,
+                       label="Equation (75)")
+            ax.axhline(-DeltaPhi_75, ls="--", color="b", zorder=-100)
+        except KeyError:
+            pass
+    
     return ax
 
 def nu_dot(file_name, ax=None, normalise=False, divisor=10, *args, **kwargs):

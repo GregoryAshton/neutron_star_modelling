@@ -74,7 +74,7 @@ cdef int jac (double t, double w[], double *dfdy,
 
 
 def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
-    a0=50., T=1.0e3, n=10000, error=1e-10, cleanup=True):
+    a0=50., T=1.0e3, n=10000, error=1e-10, cleanup=True, DryRun=False):
     """ One component NS with Euler angles and switching
     
     This solves the Euler equations for a single component NS and the 
@@ -111,7 +111,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     (file_name, run_sim) = FileNamer(epsI1=epsI1, epsI3=epsI3, epsA=epsA,
                           omega0=omega0, chi0=chi0, a0=a0, T=T,
                           n=n, error=error, cleanup=cleanup)
-    if not run_sim:
+    if not run_sim or DryRun:
         return file_name
 
     # We allow the user to give angles in degrees and convert here

@@ -136,7 +136,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
              np.sqrt(pow(sin(a0) * (1.0 + epsI1), 2) + 
                  pow(cos(a0) * (1.0 + epsI3), 2))))
     w[4] = 0.0
-    w[5] = 0.5 * np.pi 
+    w[5] = np.sign(a0) * 0.5 * np.pi 
 
     # Inititate the system and define the set of functions
     cdef gsl_odeiv2_system sys

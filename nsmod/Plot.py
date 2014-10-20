@@ -938,16 +938,24 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
 
 
 def timing_residual(file_name, ax=None, save_fig=False, analytic=False, 
-                    *args, **kwargs):
+                    tstart=None, tend=None, *args, **kwargs):
     """ 
     Plot the timing residuals for the data given in file_name. 
     
     Parameters:
     -----------
-    file_name: string referencing the h5py data file
-    order: order of polynomial to fit, must be either 2 or 3
-    ax: an axis instance to plot, if None a new instance is initiated
-    save_fig: Option to save the figure using the default save feature
+    file_name : 
+        String referencing the h5py data file
+    order : 
+        Order of polynomial to fit, must be either 2 or 3
+    ax: 
+        An axis instance to plot, if None a new instance is initiated
+    save_fig : 
+        Option to save the figure using the default save feature
+    analytic : bool
+        If true plot the analytic predictions of Jones 2001
+    tstart, tend : float
+        If given as floats the start and ends points to use
     
     Note: *args and **kwargs are passed onto the matplotlib plot function
 
@@ -961,6 +969,24 @@ def timing_residual(file_name, ax=None, save_fig=False, analytic=False,
     [time, w1, w2, w3, theta, phi, psi] = out
     PD = File_Functions.Parameter_Dictionary(file_name)
     chi0 = np.radians(PD['chi0'])
+
+    if tstart and tend:
+        idxs = (tstart < time) * (time < tend)
+    elif tstart:
+        idxs = time > tstart
+    elif tend:
+        idxs = time < tend     
+    
+    try:
+        time = time[idxs]
+        w1 = w1[idxs]
+        w2 = w2[idxs]
+        w3 = w3[idxs]
+        theta = theta[idxs]
+        phi = phi[idxs]
+        psi = psi[idxs]
+    except NameError:
+        pass
 
     Tres = Physics_Functions.timing_residual(time, w1, w2, w3, 
                                              theta, phi, psi, chi0, 

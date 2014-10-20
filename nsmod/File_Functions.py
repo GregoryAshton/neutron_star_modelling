@@ -5,6 +5,7 @@ from numpy import pi
 import matplotlib.pyplot as plt
 import h5py
 import os
+import Physics_Functions
 
 def RemoveFileSuffix(file_name):
     suffix = ".hdf5"
@@ -81,8 +82,16 @@ def Parameter_Dictionary(user_input):
                                    np.sin(chi0))
     p_d['delta_omega_dot0_FP'] = delta_omega_dot0_FP
 
-    theta = a0 # Approx true for FP
-    DeltaPhi_49 = theta / np.tan(chi0)
+    if epsA != 0.0:
+        beta = Physics_Functions.Beta_Function(epsI3, epsA, chi0)
+    else:
+        beta = 0
+    p_d['beta'] = beta
+
+    wobble_angle = a0 #- beta
+    p_d['wobble_angle'] = wobble_angle
+
+    DeltaPhi_49 = wobble_angle / np.tan(chi0)
     p_d['DeltaPhi_49'] = DeltaPhi_49
 
     if epsA != 0.0:
@@ -112,7 +121,7 @@ def Parameter_Dictionary(user_input):
 
         p_d['DeltaPhi_63'] = EMtorqueAmplificationfactor * DeltaPhi_49 / np.pi
 
-        p_d['DeltaPhi_75'] = tauP**2 * theta**2 / (4 * np.pi * tauE * P)
+        p_d['DeltaPhi_75'] = tauP**2 * wobble_angle**2 / (4 * np.pi * tauE * P)
 
 
     
@@ -263,11 +272,11 @@ def FormatValue(key, val):
     if key in ["epsI1", "epsI3", "epsA", "omega0", "T", "SwitchTime"]:
         formatted_val = "{:.2e}".format(val)
     elif key in ["chi0", "a0"]:
-        formatted_val = "{:2.5f}".format(val)
+        formatted_val = "{:1.2e}".format(val)
     elif key in ["AnomTorque"]:
         formatted_val = "{:.0f}".format(val)
     elif key in ["upsilon", "eta"]:
-        formatted_val = "{:.3f}".format(val)
+        formatted_val = "{:1.2e}".format(val)
     elif key in ["n"]:
         if val:
             formatted_val = "{:.0f}".format(val)

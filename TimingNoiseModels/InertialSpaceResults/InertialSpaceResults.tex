@@ -6,8 +6,8 @@
 \begin{document}
 \graphicspath{{/home/greg/Neutron_star_modelling/TimingNoiseModels/InertialSpaceResults/img/}}
 
-\newcommand{\Jr}{J_{\textrm{rot}}}
-\newcommand{\Ji}{J_{\textrm{in}}}
+\newcommand{\Jr}{\mathbf{J}_{\textrm{rot}}}
+\newcommand{\Ji}{\mathbf{J}_{\textrm{in}}}
 
 \section{Definitions}
 In chapter \ref{sec: neutron star dynamics in the rotating frame} we
@@ -62,7 +62,7 @@ in \eqref{eqn: ODEs}. These describe the evolution of the three Euler angles.
 \end{align*}
 
 These equations can be solved numerically using a time stepper, for now
-we will use the rkf45 stepper provided by GSL. % Need reference
+we will use the \texttt{rkf45} stepper provided by GSL. % Need reference
 %The rotation period of the star is several orders of magnitude smaller than the
 %precession period, as a result the Euler angles evolve on a much shorter time
 %scale than the body frame spin components. This is numerically expensive. To
@@ -95,55 +95,97 @@ such that $\spin(t=0)$ lies in the $x' - z'$ plane at an angle $a_{0}$ to the
 $z'$ axis. For a well defined moment of
 inertia and torque, this is sufficient to solve the rigid body equations. 
 
-To define the transformation to the inertial frame, we use a rotation matrix 
-$R(\theta, \phi, \psi)$ constructed from the Euler angles. Then the 
+We now need to consider the initial conditions for the right hand set of equations
+on \eqref{eqn: ODEs}. The Euler angles  define three rotations which we can 
+combine into a single rotation matrix $R(\theta, \phi, \psi)$. Following the
+\citet{Landau1969} convention this is given by 
+\begin{equation}
+R(\theta, \phi, \psi) = \left[ 
+\begin{array}{ccc}
+\cos\psi \cos\phi - \cos\theta \sin\phi \sin \psi &
+\cos\psi \sin \phi + \cos\theta \cos \psi \sin \psi &
+\sin \psi \sin\theta \\
+-\sin\psi \cos\phi - \cos\theta\sin\phi\cos\psi &
+-\sin\psi\sin\phi + \cos\theta\cos\phi\cos\psi &
+\cos\psi \sin\theta \\
+\sin\theta\sin\phi & 
+-\sin\theta \cos\phi & 
+\cos\theta 
+\end{array}
+\right]
+\label{eqn: rotation matrix}
+\end{equation}
+Then the 
 angular momentum vectors in the two frames are related by 
 \begin{equation}
 \Jr = R(\theta, \phi, \psi) \Ji .
 \label{eqn: transform}
 \end{equation}•
-The angular momentum in the rotating frame has an initial condition 
-set by 
+In the body frame, the moment of inertia is constant and since we have already set the 
+initial condition on $\spin$  in equation \eqref{eqn: spin init} the initial angular momentum is 
 \begin{equation}
   \Jr(t=0) = I \spin_0.
 \end{equation}
 If we set an initial condition on the angular momentum in the inertial frame,
-we uniquely define the initial Euler angles. We are free to set the initial
+we uniquely define the initial Euler angles. Therefore we choose to set the initial
 angular momentum in the inertial frame to lie along the inertial $z$ axis such
 that
 \begin{equation}
-  \Ji(t=0) = |J|\hat{z} 
+  \Ji(t=0) = |J| \mathbf{z}
 \end{equation}
-Normalising the two vectors in equation \eqref{eqn: transform} and rearranging
-gives the expression 
+Inserting the magnitude of the angular momentum as 
+$|\J| = |I \spin_{0}|=\omega_{0}\sqrt{(I_{xx}\sin a_{0})^{2} + (I_{zz}\cos a_{0})^{2}}$
+then from equation  \eqref{eqn: transform} we have
 \begin{equation}
-\left[ \begin{array}{c}
-\sin \psi_{0} \sin \theta_{0} \\
-\sin \psi_{0} \cos \theta_{0} \\
-\cos \theta_{0}
-\end{array}\right]
- = \frac{1}{\sqrt{(I_{xx}\sin a_{0})^{2} + (I_{zz}\cos a_{0})^{2}}} 
 \left[ \begin{array}{c}
 I_{xx}\sin a_{0} \\
 0 \\
 I_{zz} \cos a_{0}
+\end{array}\right] =
+\sqrt{(I_{xx}\sin a_{0})^{2} + (I_{zz}\cos a_{0})^{2}}
+\left[ \begin{array}{c}
+\sin \psi_{0} \sin \theta_{0} \\
+\cos \psi_{0} \sin \theta_{0} \\
+\cos \theta_{0}
 \end{array}\right].
+\label{eqn: 010203}
 \end{equation}•
 We have three equations for two unknowns. Our choice to set $\J$ along
 the $z$ axis leaves the initial value of $\phi$ a free variable; for simplicity
-we set it by $\phi_{0} = 0$. Inserting this and comparing the components
+we set it by $\phi_{0} = 0$. 
+Considering the third component in equation \eqref{eqn: 010203} and rearranging 
+yields
 \begin{equation}
 \theta_{0} = \arccos\left(\frac{I_{zz}\cos a_{0}}{ \sqrt{(I_{xx}\sin
         a_{0})^{2} + (I_{zz}\cos a_{0})^{2}}} \right).
 \label{eqn: theta init}
 \end{equation} 
 In the limit $\epsilon_{I} \ll 1$ we have that $\theta_{0} \approx a_{0}$.
-For $\psi_0$, we can use that $\sin(\arccos(x)) = \sqrt{1 - x^{2}}$ giving:
+For $\psi_0$, we rearrange the first component of equation \eqref{eqn: 010203} 
 \begin{equation}
-\psi_0 = \frac{\pi}{2}.
+\sin\psi_{0} =\frac{1}{ \sin\theta_{0}}\frac{ I_{xx}\sin a_{0}}{\sqrt{(I_{xx}\sin a_{0})^{2} + (I_{zz}\cos a_{0})^{2}}}
+\label{eqn: 8283}
 \end{equation}
-We now have a suitable set of initial conditions to solve the 6 ODEs in
-\eqref{eqn: ODEs}.
+We can simplify the first term by using the identity $\sin(\arccos(x)) = \sqrt{1 - x^{2}}$
+along with equation \eqref{eqn:  theta init} to give
+\begin{equation}
+\sin\theta_{0} = \left(\frac{(I_{xx}\sin a_{0})^{2}}
+                                      {(I_{xx}\sin a_{0})^{2} + (I_{zz}\cos a_{0})^{2}} \right)^{1/2}
+\end{equation}
+Inserting this into equation \eqref{eqn: 8283} and rearrange 
+\begin{align}
+\sin \psi_0 & = \frac{I_{xx} \sin a_{0}}{\left(I_{xx}^{2} \sin^{2} a_{0}\right)^{1/2}} \\
+ & = \frac{\sin a_{0} }{|\sin a_{0}|} \\ 
+& = \mathrm{sign}(a_{0}),
+\end{align}
+where by $\mathrm{sign}(x)$ we take the sign of $x$. Then for the initial condition we 
+have
+\begin{align}
+\psi_{0} & =\mathrm{sign}(a_{0}) \frac{\pi}{2}.
+\label{eqn: psi  init}
+\end{align}
+This result makes sense since inserting it into the second component of equation \eqref{eqn: 010203}
+balances  the right hand side.
 
 \section{Biaxial body with no torque}
 

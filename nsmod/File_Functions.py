@@ -86,9 +86,9 @@ def Parameter_Dictionary(user_input):
         beta = Physics_Functions.Beta_Function(epsI3, epsA, chi0)
     else:
         beta = 0
-    p_d['beta'] = beta
+    p_d['beta'] = np.degrees(beta)
 
-    wobble_angle = a0 #- beta
+    wobble_angle = a0 - beta
     p_d['wobble_angle'] = wobble_angle
 
     DeltaPhi_49 = wobble_angle / np.tan(chi0)
@@ -123,7 +123,15 @@ def Parameter_Dictionary(user_input):
 
         p_d['DeltaPhi_75'] = tauP**2 * wobble_angle**2 / (4 * np.pi * tauE * P)
 
+        if p_d.has_key('upsilon'):
+            upsilon = p_d['upsilon']
+            switching_period = p_d['T']
+            DeltaPhi_TS = (1/16.0) * upsilon * omega_dot0 * switching_period**2
+            p_d['DeltaPhi_TS'] = DeltaPhi_TS
 
+        alpha_spindown = P / tauS
+        p_d['alpha_spindown'] = alpha_spindown
+        p_d['DeltaPhi_49_SpindownTorque'] = alpha_spindown / np.tan(chi0)
     
     # Need to import the beta function
     #from Physics_Functions import Beta_Function
@@ -137,7 +145,7 @@ def PrintParameterDictionary(file_name):
     #print "File: {}".format(file_name)
     for key, val in sorted(pd.iteritems()):
         try:
-            formatted_val = "{:1.4e}".format(float(val))
+            formatted_val = "{:1.10e}".format(float(val))
             print key, ":", formatted_val 
         except ValueError:
             print key, ":", val
@@ -272,7 +280,7 @@ def FormatValue(key, val):
     if key in ["epsI1", "epsI3", "epsA", "omega0", "T", "SwitchTime"]:
         formatted_val = "{:.2e}".format(val)
     elif key in ["chi0", "a0"]:
-        formatted_val = "{:1.2e}".format(val)
+        formatted_val = "{:1.10e}".format(val)
     elif key in ["AnomTorque"]:
         formatted_val = "{:.0f}".format(val)
     elif key in ["upsilon", "eta"]:

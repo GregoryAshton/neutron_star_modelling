@@ -169,11 +169,11 @@ def Theta(theta, psi, chi):
     """ See equation (52) of Jones 2001 """
     return np.arccos(sin(theta) * sin(psi) * sin(chi) + cos(theta) * cos(chi))  
 
-def timing_residual(time, w1, w2, w3, theta, phi, psi, chi, order=3,
+def PhaseResidual(time, w1, w2, w3, theta, phi, psi, chi, order=3,
                     full=False):
     """ 
 
-    Calculate the timing residuals in the inertial frame using Phi_dot the 
+    Calculate the phase residuals in the inertial frame using Phi_dot the 
     instantaneous electromagnetic frequency. To understand the process it is 
     best to follow the source code.
 
@@ -213,12 +213,12 @@ def timing_residual(time, w1, w2, w3, theta, phi, psi, chi, order=3,
     Phi_fit = np.poly1d(coefs)(time)
 
     # Subtract the two to get a residual
-    T_res = Phi_list - Phi_fit
+    Phi_res = Phi_list - Phi_fit
 
     if full:
-        return T_res, coefs
+        return Phi_res, coefs
     else:
-        return T_res
+        return Phi_res
 
 def nu_dot(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=7):
     """

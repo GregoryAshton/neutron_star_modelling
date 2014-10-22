@@ -5,7 +5,7 @@ from numpy import pi
 import matplotlib.pyplot as plt
 import h5py
 import os
-import Physics_Functions
+import Physics_Functions, Useful_Tools
 
 def RemoveFileSuffix(file_name):
     suffix = ".hdf5"
@@ -180,6 +180,39 @@ def Two_Component_Import(file_name):
 
     return (time, w1, w2, w3, o1, o2, o3)
 
+def PropertiesTable(file_name, table_name):
+    """ Print a latex table of the NS properties used in a simulation
+
+    Parameters
+    ----------
+    file_name : str
+        Name of the simulation file
+    table_name : str
+        Name of the file to save data in, file will always be .tex
+    """
+
+    table_name = table_name.split(".")[0]
+
+    PD = Parameter_Dictionary(file_name)
+
+    table = (r""" \begin{{tabular}}{{ccl}}
+\multicolumn{{3}}{{c}}{{Simulation parameters}} \\
+\hline
+$\omega_0$  &=& {} rad/s\\
+$B_0$  &=& ${}$ G \\
+$\chi$  &=& {:2.2f}$^{{\circ}}$ \\
+$a_0$ &=& {:2.2f}$^{{\circ}}$ \\
+$\tilde{{\theta}}$ &= & {:2.2f}$^{{\circ}}$
+\end{{tabular}}
+    """).format(PD['omega0'], 
+                Useful_Tools.Texify_Float(PD['Bs'],3),
+                PD['chi0'],
+                PD['a0'],
+                np.degrees(PD['wobble_angle']))
+    
+    with open(table_name+".tex", "w+") as f:
+        f.write(table)
+    
 
 def Read_File(file_name):
     """

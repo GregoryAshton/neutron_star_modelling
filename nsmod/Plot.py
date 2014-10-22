@@ -771,7 +771,7 @@ def Observables_Plot(file_name):
     (time_2, omega_dot) = NLD_Functions.Dotted_Variable_Triaxial(file_name)
     nu_dot = [o * 2 * pi for o in omega_dot]
 
-    timing_residual = Physics_Functions.timing_residual(time, w1, w2, w3)
+    PhaseResidual = Physics_Functions.PhaseResidual(time, w1, w2, w3)
 
     # Plotting
     ax1 = py.subplot(311)
@@ -787,8 +787,8 @@ def Observables_Plot(file_name):
     ax2.yaxis.set_label_coords(labelx, 0.5)
 
     ax3 = py.subplot(313)
-    ax3.plot(t_scaled, timing_residual)
-    ax3.set_ylabel(r"$T_{\textrm{res}}$")
+    ax3.plot(t_scaled, PhaseResidual)
+    ax3.set_ylabel(r"$\Delta\Phi$")
     ax3.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
     ax3.yaxis.set_label_coords(labelx, 0.5)
 
@@ -937,10 +937,10 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
     return ax
 
 
-def timing_residual(file_name, ax=None, save_fig=False, analytic=False, 
+def PhaseResidual(file_name, ax=None, save_fig=False, analytic="", 
                     tstart=None, tend=None, *args, **kwargs):
     """ 
-    Plot the timing residuals for the data given in file_name. 
+    Plot the phase residuals for the data given in file_name. 
     
     Parameters:
     -----------
@@ -952,8 +952,8 @@ def timing_residual(file_name, ax=None, save_fig=False, analytic=False,
         An axis instance to plot, if None a new instance is initiated
     save_fig : 
         Option to save the figure using the default save feature
-    analytic : bool
-        If true plot the analytic predictions of Jones 2001
+    analytic : one of, or a list of, "49", "63", "75"
+        If given plot the analytic predictions of Jones 2001
     tstart, tend : float
         If given as floats the start and ends points to use
     
@@ -988,36 +988,34 @@ def timing_residual(file_name, ax=None, save_fig=False, analytic=False,
     except NameError:
         pass
 
-    Tres = Physics_Functions.timing_residual(time, w1, w2, w3, 
+    Pres = Physics_Functions.PhaseResidual(time, w1, w2, w3, 
                                              theta, phi, psi, chi0, 
                                              order=3)
-
+    Cycles = Pres / (2*np.pi)
     if not ax:
         fig, ax = plt.subplots()
 
-    ax.plot(time, Tres, *args, **kwargs)
-    ax.set_ylabel(r"Timing residual", rotation='vertical')
+    ax.plot(time, Cycles, *args, **kwargs)
+    ax.set_ylabel(r"Phase residual [cycles]", rotation='vertical')
     ax.set_xlabel(r"time  [s]")
     ax.axhline(0, ls="-", color="k", zorder=-100)
 
-    if analytic:
+    if "49" in analytic:
         DeltaPhi_49 = PD['DeltaPhi_49']
-        ax.axhline(DeltaPhi_49, ls="--", color="k", zorder=-100, 
-                   label="Equation (49)")
-        ax.axhline(-DeltaPhi_49, ls="--", color="k", zorder=-100)
-        try:
-            DeltaPhi_63 = PD['DeltaPhi_63']
-            ax.axhline(DeltaPhi_63, ls="--", color="r", zorder=-100, 
-                       label="Equation (63)")
-            ax.axhline(-DeltaPhi_63, ls="--", color="r", zorder=-100)
+        ax.axhline(DeltaPhi_49/(2*np.pi), ls="--", color="k", zorder=-100, 
+                   label="$|\Delta\Phi^{49}|$")
+        ax.axhline(-DeltaPhi_49/(2*np.pi), ls="--", color="k", zorder=-100)
+    if "63" in analytic:
+        DeltaPhi_63 = PD['DeltaPhi_63']
+        ax.axhline(DeltaPhi_63/(2*np.pi), ls="--", color="r", zorder=-100, 
+                   label="$|\Delta\Phi^{63}|$")
+        ax.axhline(-DeltaPhi_63/(2*np.pi), ls="--", color="r", zorder=-100)
+    if "75" in analytic:
+        DeltaPhi_75 = PD['DeltaPhi_75']
+        ax.axhline(DeltaPhi_75/(2*np.pi), ls="--", color="b", zorder=-100,
+                   label="$|\Delta\Phi^{75}|$")
+        ax.axhline(-DeltaPhi_75/(2*np.pi), ls="--", color="b", zorder=-100)
 
-            DeltaPhi_75 = PD['DeltaPhi_75']
-            ax.axhline(DeltaPhi_75, ls="--", color="b", zorder=-100,
-                       label="Equation (75)")
-            ax.axhline(-DeltaPhi_75, ls="--", color="b", zorder=-100)
-        except KeyError:
-            pass
-    
     return ax
 
 def nu_dot(file_name, ax=None, normalise=False, divisor=10, *args, **kwargs):

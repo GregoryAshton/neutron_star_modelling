@@ -36,6 +36,7 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     upsilon = (<double *> params)[5]
     SwitchTime = (<double *> params)[6]
     dt = (<double *> params)[7]
+    AnomTorqueSwitching = (<double *> params)[8]
 
     # Calculate the torque
     mx = sin(chi)
@@ -49,15 +50,17 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     Tz_sd = pre * epsA * mx * (w[0] * mz - w[2] * mx)
 
     S = 1.0 
+    SAnom = 1.0  
 
     if t > SwitchTime:
         S = 1.0 - upsilon
-    
+        SAnom = 1.0 - AnomTorqueSwitching * upsilon 
     
     if AnomTorque == 1:
-        Tx = S * (Tx_sd + epsA * (w[0] * mx + w[2] * mz) * w[1] * mz)
-        Ty = S * (Ty_sd + epsA * (w[0] * mx + w[2] * mz) * (w[2] * mx - w[0] * mz))
-        Tz = S * (Tz_sd - epsA * (w[0] * mx + w[2] * mz) * w[1] * mx)
+        Tx = S * Tx_sd + SAnom * ( epsA * (w[0] * mx + w[2] * mz) * w[1] * mz)
+        Ty = S * Ty_sd + SAnom * ( epsA * (w[0] * mx + w[2] * mz) * 
+                                                      (w[2] * mx - w[0] * mz))
+        Tz = S * Tz_sd - SAnom * ( epsA * (w[0] * mx + w[2] * mz) * w[1] * mx)
 
     else:
         Tx = S * Tx_sd
@@ -92,7 +95,7 @@ cdef int jac (double t, double y[], double *dfdy,
 
 def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     a0=50., T=1.0e3, AnomTorque=True , upsilon=0.0, n=10000, error=1e-10,
-    cleanup=False, SwitchTime=100, DryRun=False):
+    cleanup=False, SwitchTime=100, AnomTorqueSwitching=True, DryRun=False):
     """ One component NS with Euler angles and switching
     
     This solves the Euler equations for a single component NS and the 
@@ -126,6 +129,8 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     cleanup = bool
         If true old data files with the same file_name will be removed. If 
         False then the simulation will not run and simply return the file_name
+    AnomTorqueSwitching : bool
+        If true then switching also occurs in the anaomlous torque component.
     
     
     """
@@ -133,12 +138,14 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     (file_name, run_sim) = FileNamer(epsI1=epsI1, epsI3=epsI3, epsA=epsA,
                           omega0=omega0, chi0=chi0, a0=a0, T=T, SwitchTime=SwitchTime,
                           AnomTorque=AnomTorque, n=n, upsilon=upsilon,
-                          error=error, cleanup=cleanup)
+                          error=error, cleanup=cleanup, 
+                          AnomTorqueSwitching=AnomTorqueSwitching)
     if not run_sim or DryRun:
         return file_name
 
    # Convert python Bool to int
     AnomTorque = AnomTorque.real
+    AnomTorqueSwitching = AnomTorqueSwitching.real
 
     # We allow the user to give angles in degrees and convert here
     chi0 = np.deg2rad(chi0)
@@ -148,7 +155,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     dt = float(T) / n
 
     # Pass them to params list
-    cdef double params[8]
+    cdef double params[9]
     params[0] = epsA
     params[1] = chi0
     params[2] = epsI1
@@ -157,6 +164,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     params[5] = upsilon
     params[6] = SwitchTime
     params[7] = dt
+    params[8] = AnomTorqueSwitching
 
     # Initial values and calculate eta_relative
     cdef int i

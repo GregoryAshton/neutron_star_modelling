@@ -196,7 +196,7 @@ def PhaseResidual(time, w1, w2, w3, theta, phi, psi, chi, order=3,
 
     if order not in [2, 3]:
         print "ERROR: order must be either 2 or 3 other values are not used"
-        return
+    #    return
 
     # Calculate Phi_dot the instantaneous electromagnetic frequency
     #Phi_dot_list = Phi_dot(np.array([w1, w2, w3]), theta, phi, psi, chi)
@@ -207,7 +207,7 @@ def PhaseResidual(time, w1, w2, w3, theta, phi, psi, chi, order=3,
     Phi_list = Phi(theta, phi, psi, chi, fix=True)
 
     # Fit polynomial to Phi or order order
-    coefs = np.polyfit(time, Phi_list, order)
+    coefs, V = np.polyfit(time, Phi_list, order, cov=True)
 
     # poly1d returns the polynomial we then evaluate this at time giving the fitted phi
     Phi_fit = np.poly1d(coefs)(time)

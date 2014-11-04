@@ -114,7 +114,7 @@ def Parameter_Dictionary(user_input):
         p_d['omega_dot0'] = omega_dot0
 
         tauE = abs(omega0/omega_dot0)
-        p_d["tauE"] = tauE
+        p_d["tauE"] = tauE # Differs from tauS by alpha factor
 
         EMtorqueAmplificationfactor = (tauP / P) * (tauP / tauE)
         p_d['EMtorqueAmplificationfactor'] = EMtorqueAmplificationfactor
@@ -129,9 +129,9 @@ def Parameter_Dictionary(user_input):
             DeltaPhi_TS = (1/16.0) * upsilon * omega_dot0 * switching_period**2
             p_d['DeltaPhi_TS'] = DeltaPhi_TS
 
-        alpha_spindown = P / tauS
-        p_d['alpha_spindown'] = alpha_spindown
-        p_d['DeltaPhi_49_SpindownTorque'] = alpha_spindown / np.tan(chi0)
+        wobble_angle_spindown = (P / tauS) * (1 + 1.0/epsI3) 
+        p_d['wobble_angle_spindown'] = wobble_angle_spindown
+        p_d['DeltaPhi_49_SpindownTorque'] = wobble_angle_spindown / np.tan(chi0)
     
     # Need to import the beta function
     #from Physics_Functions import Beta_Function
@@ -314,7 +314,7 @@ def FormatValue(key, val):
         formatted_val = "{:.2e}".format(val)
     elif key in ["chi0", "a0"]:
         formatted_val = "{:1.10e}".format(val)
-    elif key in ["AnomTorque"]:
+    elif key in ["AnomTorque", "AnomTorqueSwitching"]:
         formatted_val = "{:.0f}".format(val)
     elif key in ["upsilon", "eta"]:
         formatted_val = "{:1.2e}".format(val)

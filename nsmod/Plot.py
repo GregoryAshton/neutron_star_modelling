@@ -990,7 +990,7 @@ def PhaseResidual(file_name, ax=None, save_fig=False, analytic="",
 
     Pres = Physics_Functions.PhaseResidual(time, w1, w2, w3, 
                                              theta, phi, psi, chi0, 
-                                             order=3)
+                                             order=4)
     Cycles = Pres / (2*np.pi)
     if not ax:
         fig, ax = plt.subplots()
@@ -1015,7 +1015,12 @@ def PhaseResidual(file_name, ax=None, save_fig=False, analytic="",
         ax.axhline(DeltaPhi_75/(2*np.pi), ls="--", color="b", zorder=-100,
                    label="$|\Delta\Phi^{75}|$")
         ax.axhline(-DeltaPhi_75/(2*np.pi), ls="--", color="b", zorder=-100)
-
+    if "49SD" in analytic:
+        DeltaPhi_49_SpindownTorque = PD['DeltaPhi_49_SpindownTorque']
+        ax.axhline(DeltaPhi_49_SpindownTorque/(2*np.pi), ls="--", color="k", 
+                   zorder=-100, label="$|\Delta\Phi^{49}|$")
+        ax.axhline(-DeltaPhi_49_SpindownTorque/(2*np.pi), ls="--", color="k",
+                   zorder=-100) 
     return ax
 
 def nu_dot(file_name, ax=None, normalise=False, divisor=10, *args, **kwargs):

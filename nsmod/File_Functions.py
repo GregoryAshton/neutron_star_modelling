@@ -82,17 +82,6 @@ def Parameter_Dictionary(user_input):
                                    np.sin(chi0))
     p_d['delta_omega_dot0_FP'] = delta_omega_dot0_FP
 
-    if epsA != 0.0:
-        beta = Physics_Functions.Beta_Function(epsI3, epsA, chi0)
-    else:
-        beta = 0
-    p_d['beta'] = np.degrees(beta)
-
-    wobble_angle = a0 - beta
-    p_d['wobble_angle'] = wobble_angle
-
-    DeltaPhi_49 = wobble_angle / np.tan(chi0)
-    p_d['DeltaPhi_49'] = DeltaPhi_49
 
     if epsA != 0.0:
         Sx = np.sin(chi0)
@@ -116,11 +105,26 @@ def Parameter_Dictionary(user_input):
         tauE = abs(omega0/omega_dot0)
         p_d["tauE"] = tauE # Differs from tauS by alpha factor
 
-        EMtorqueAmplificationfactor = (tauP / P) * (tauP / tauE)
-        p_d['EMtorqueAmplificationfactor'] = EMtorqueAmplificationfactor
 
-        p_d['DeltaPhi_63'] = EMtorqueAmplificationfactor * DeltaPhi_49 / np.pi
+    # Wobble angle calculation
 
+    if epsA != 0:
+        beta = Physics_Functions.Beta_Function(epsI3, epsA, chi0)
+        wobble_angle_spindown = (P / tauS) * (1 + 1.0/epsI3) 
+    else:
+        beta = 0
+        wobble_angle_spindown = 0
+
+    p_d['beta'] = np.degrees(beta)
+    p_d['wobble_angle_spindown'] = wobble_angle_spindown
+
+    wobble_angle = a0 - beta + wobble_angle_spindown
+    p_d['wobble_angle'] = wobble_angle
+
+    DeltaPhi_49 = wobble_angle / np.tan(chi0)
+    p_d['DeltaPhi_49'] = DeltaPhi_49
+
+    if epsA != 0.0:
         p_d['DeltaPhi_75'] = tauP**2 * wobble_angle**2 / (4 * np.pi * tauE * P)
 
         if p_d.has_key('upsilon'):
@@ -129,10 +133,13 @@ def Parameter_Dictionary(user_input):
             DeltaPhi_TS = (1/16.0) * upsilon * omega_dot0 * switching_period**2
             p_d['DeltaPhi_TS'] = DeltaPhi_TS
 
-        wobble_angle_spindown = (P / tauS) * (1 + 1.0/epsI3) 
-        p_d['wobble_angle_spindown'] = wobble_angle_spindown
         p_d['DeltaPhi_49_SpindownTorque'] = wobble_angle_spindown / np.tan(chi0)
-    
+
+        EMtorqueAmplificationfactor = (tauP / P) * (tauP / tauE)
+        p_d['EMtorqueAmplificationfactor'] = EMtorqueAmplificationfactor
+
+        p_d['DeltaPhi_63'] = EMtorqueAmplificationfactor * DeltaPhi_49 / np.pi
+
     # Need to import the beta function
     #from Physics_Functions import Beta_Function
     #p_d["beta30"] = str(Beta_Function(epsI, epsA, 30 * pi / 180) * 180 / pi)

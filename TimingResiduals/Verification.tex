@@ -1,0 +1,195 @@
+The effect of free-precession and the inclusion of an EM torque was
+considered analytically by \citet{Jones2001}. They calculated several useful
+results for the magnitude of variations in the residual; we can use these to
+verify our simulations. By simulating the residuals directly, we can improve
+on their results by understanding some of the more subtle features.
+
+\subsection{Understanding the wobble angle}
+\input{wobble_angle_discussion}
+
+\subsubsection{Effect of free precession on the phase residual: geometric effect}
+\citet{Jones2001} analysed the geometric effect that precession will have on
+the timing residual. This was done by considering the motion of the magnetic
+dipole in the inertial frame as the superposition of motions due to the fast
+rotation period and the slow precession. The results
+must be separated into two cases when $\theta > \chi$ and $\theta < \chi$. Of
+these two the authors argue that `the wobble angle  of rapidly rotating
+stars are limited to small values by the finite crustal breaking strain'. Therefore, 
+the second case $\theta < \chi$ holds greater physical relevance and so we 
+focus on this region of parameter space. The phase residual for such NSs was 
+shown to be given by  
+\begin{equation}
+    \Delta\Phi^{49}(t) = -\wobbleangle \cot\chi\cos(\dot{\psi t}),
+    \label{eqn: Jones 49}
+\end{equation}
+where the superscript here refers to the equation number from \citet{Jones2001}.
+For a freely precession star $\dot{\psi}=\epsI \f$ is the constant free
+precession frequency. Therefore, the magnitude of variations is given by 
+$|\Delta\Phi^{49}|=\wobbleangle \cot(\chi)$. 
+
+Equation \eqref{eqn: Jones 49} is calculated in the absence of any EM torque.
+Nevertheless, it is still appropriate when such a torque is applied provided
+that the geometric effect is stronger that any other (these are discussed in
+the next few sections). As such we begin by simulating a NS with the properties
+listed in table \ref{tab: 49 verification properties}. Nonphysical values of the
+rotation frequency and magnetic field have been used to aid the computational
+speed. The resulting phase residual, in cycles, is given in figure \ref{fig:
+PR 49}.
+
+%\begin{table}[ht]
+    %\centering
+    %\input{49_verification.tex}
+    %\caption{}
+    %\label{tab: 49 verification properties}
+%\end{table}
+
+%\begin{figure}[ht]
+%\centering
+	%\includegraphics[width=0.7\textwidth]{49_verification.pdf}
+%\caption{The phase residual in cycles for a simulated NS with the properties described in table \ref{tab: 49
+%verification properties}. This is used to illustrate the agreement with the magnitude
+%of variations from equation \eqref{eqn: Jones 49} taken from \citet{Jones2001}.}
+%\label{fig: TR 49}
+%\end{figure}
+
+\begin{figure}[htb]
+\begin{floatrow}
+\ffigbox{%
+\includegraphics[width=0.5\textwidth]{49_verification.pdf}
+}{%
+  \caption{The phase residual in cycles for a simulated NS with the properties described in table \ref{tab: 49
+verification properties}. This is used to illustrate the agreement with the magnitude
+of variations from equation \eqref{eqn: Jones 49} taken from \citet{Jones2001}.}%
+  \label{fig: PR 49}
+}
+\capbtabbox{%
+  \input{49_verification.tex}
+}{%
+  \caption{}%
+  \label{tab: 49 verification properties}
+}
+\end{floatrow}
+\end{figure}
+
+\FloatBarrier
+\subsubsection{Effect of free precession on the phase residual: effect of the 
+            electromagnetic torque}
+Considering a vacuum point-dipole spin-down torque (like the one introduced in 
+\ref{sec: defining the model}) \citet{Jones2001} found that the EM torque can
+amplify the geometric effect of equation \eqref{eqn: Jones 49}. The magnitude
+of variation due to EM torque is given by 
+\begin{equation}
+    |\Delta\Phi^{63}| = \frac{1}{\pi}\left(\frac{\tau_{P}}{P}\right)
+    \left(\frac{\tau_{P}}{\tau_{S}}\right) 
+                                    |\Delta\Phi^{49}|
+\label{eqn: Jones 63}
+\end{equation}
+The two ratios of time-scales define an `amplification factor'; this increases
+the magnitude of phase residuals for young pulsars with short periods.
+
+We simulate such a star using the properties in table \ref{tab: 63 verification
+properties} noting that the amplification factor is $\sim 3$ when including the
+factor of $\pi$. The resulting phase residual is plotted in figure \ref{fig: PR
+63} along with the magnitude of variations due to free precession along and the
+amplification due to the EM torque. The magnitude of the simulated
+phase-residuals are found to agree well with the analytic results of equation
+\eqref{eqn: Jones 63}.
+
+%\begin{table}[ht]
+%    \centering
+%    \input{63_verification.tex}
+%    \caption{}
+%    \label{tab: 63 verification properties}
+%\end{table}
+%
+%\begin{figure}[ht]
+%\centering
+%	\includegraphics[width=0.7\textwidth]{63_verification.pdf}
+%\caption{The phase residual in cycles for a simulated NS with the properties described in table \ref{tab: 49
+%verification properties}. This is used to illustrate the agreement with the magnitude
+%of variations from equation \eqref{eqn: Jones 49} taken from \citet{Jones2001}.}
+%\label{fig: TR 63}
+%\end{figure}
+
+\begin{figure}[htb]
+\begin{floatrow}
+\ffigbox{%
+\includegraphics[width=0.5\textwidth]{63_verification.pdf}
+}{%
+  \caption{The phase residual in cycles for a simulated NS with the properties described in table \ref{tab: 63
+verification properties}. This is used to illustrate the agreement with the magnitude
+of variations from equation \eqref{eqn: Jones 63} taken from \citet{Jones2001}.}%
+  \label{fig: PR 63}
+}
+\capbtabbox{%
+  \input{63_verification.tex}
+}{%
+  \caption{}%
+  \label{tab: 63 verification properties}
+}
+\end{floatrow}
+\end{figure}
+
+%In figure \ref{fig: TR no torque} we plot the timing residuals as calculated in
+%the torque free model for three values of $\chi$. It is worth noting that the
+%power law spin down assumes that the star is in fact spinning down; without the
+%torque this model can't not spin down. We can however interpret these results
+%as the effect of precession on timing residuals in the limit for which the
+%variation due to precession is much stronger than the spin down.
+%%\begin{figure}[ht]
+%%\centering
+%%	\includegraphics[width=0.7\textwidth]{Timing_residuals_no_torque.pdf}
+%%\caption{Plot of the timing residuals for three angles of $\chi$ in the torque
+%%         free model showing different types of behaviour. }
+%%\label{fig: TR no torque}
+%%\end{figure}
+%The results show that the precession induces a periodic variation on the
+%precession timescale, the magnitude is proportional to the angle $\chi$. We 
+%also find the results are dependant on the initial angle $a_{0}$.
+
+\subsubsection{Effect of free precession on phase residuals: orthogonal rotator}
+
+In analysing observations of free precession \citet{Jones2001} applied the
+model to PSR B1821-11: a pulsar with a strongly periodic residual that has been
+cited as a strong candidate for free precession \citet{Stairs2000}. From the
+variations in pulse shape an estimate can be made of the wobble angle
+$\wobbleangle \sim 3^{\circ}$. Finding that the amplification factor was
+important for this pulsar (it can be calculated to be $\approx 380$), 
+\citet{Jones2001} attempted to extract the wobble
+angle by inverting \eqref{eqn: Jones 65}. This yields a wobble angle that
+disagreed with the estimation from a pulse shape variations. The author
+concluded that the strong harmonic periodicity's suggested the dipole was
+nearly orthogonal e.g. $\chi \approx \pi/2$.  This required expansions of the
+phase modulation resulting in an estimate
+\begin{equation}
+    |\Delta\Phi^{75}| = \frac{1}{4\pi} \frac{\tau_{P}^{2}}{\tau_{S} P} \theta^{2}
+    \label{eqn: Jones 75}
+\end{equation}
+
+In figure \ref{fig: PR 75} we simulate the B1828-11 pulsar taking the values
+from \citet{Stairs2000} and modifying them to allow the simulation to complete
+in a reasonable time. The modification was setup such that the amplification
+factor remained the same along with the ratio of timescales. The properties
+of the simulation are given in \ref{tab: 75 verification properties}
+
+\begin{figure}[htb]
+\begin{floatrow}
+\ffigbox{%
+\includegraphics[width=0.5\textwidth]{75_verification.pdf}
+}{%
+  \caption{The phase residual in cycles for a simulated NS with the properties described in table \ref{tab: 75
+verification properties}. This is used to illustrate the agreement with the magnitude
+of variations from equation \eqref{eqn: Jones 75} taken from \citet{Jones2001}.}%
+  \label{fig: PR 75}
+}
+\capbtabbox{%
+  \input{75_verification.tex}
+}{%
+  \caption{}%
+  \label{tab: 75 verification properties}
+}
+\end{floatrow}
+\end{figure}
+
+
+

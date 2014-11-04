@@ -1,11 +1,11 @@
 \documentclass[/home/greg/Thesis/main/main.tex]{subfiles}
-\usepackage{floatrow}
-\newfloatcommand{capbtabbox}{table}[][\FBwidth]
+
 %\title{Neutron star mechanics in the observers inertial frame}
 %\author{}
 
 \begin{document}
 \graphicspath{{/home/greg/Neutron_star_modelling/TimingResiduals/img/}}
+\newcommand{\TimingResidualsDir}{/home/greg/Neutron_star_modelling/TimingResiduals}
 
 \newcommand{\Phiexact}{\Phi_{\mathrm{exact}}}
 \newcommand{\Phifit}{\Phi_{\mathrm{fit}}}
@@ -61,11 +61,11 @@ phase-residuals although to make contact with observational results we will
 require this re-scaling.
 
 \subsection{Verifying the simulated timing residuals}
-\input{Verification}
+\input{\TimingResidualsDir/Verification}
 
 \FloatBarrier
 \subsection{Single torque switching events}
-\input{SingleTorqueSwitchingEvents}
+\input{\TimingResidualsDir/SingleTorqueSwitchingEvents}
 
 \biblio
 \end{document}

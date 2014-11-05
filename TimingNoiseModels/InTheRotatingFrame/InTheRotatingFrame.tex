@@ -6,7 +6,7 @@
 \begin{document}
 
 \section{Defining the model}
-\ref{sec: defining the model}
+\label{sec: defining the model}
 
 The rotation of a rigid body in the rotating reference frame is described by
 Euler's equations. To derive these, we begin with Euler's second law  for the
@@ -456,6 +456,7 @@ discuss the differences this makes to the numerical solutions. Before doing
 this we consider the appropriate reference frame in which to view the system.
 
 \subsection{Effective body frame} 
+\label{sec: effective body frame}
 Working with a biaxial body and the Deutsch torque 
 \cite{Melatos2000} discovered non-trivial solutions where the spin axis aligns with
 an unknown angle between the magnetic dipole and the principle axis of the MOI.
@@ -515,6 +516,7 @@ $\hat{\boldsymbol{z}}$ axis. $\beta$ is then given by:
 =\arctan\left( \frac{ \epsilon_{I}-\epsilon_{A}\cos(2\chi)- 
               \sqrt{\epsilon_{A}^{2}+\epsilon_{I}^{2}-2\epsilon_{A}\epsilon_{I}\cos(2\chi)}}
               {2\epsilon_{A}\sin\chi \cos\chi}\right).
+\label{eqn: beta}
 \end{equation}•
 A schematic of the various angles and axis is given in
 figure~\ref{fig: schematic}

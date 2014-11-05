@@ -239,10 +239,12 @@ def nu_dot(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=7):
 
 
     # Calculate Phi_dot the instantaneous electromagnetic frequency
-    Phi_dot_list = Phi_dot(np.array([w1, w2, w3]), theta, phi, psi, chi)
+    #Phi_dot_list = Phi_dot(np.array([w1, w2, w3]), theta, phi, psi, chi)
 
-    # Numerically intergrate Phi_dot to get a phase (initial conditon is Phi=0
-    Phi_list = cumtrapz(y=Phi_dot_list, x=time, initial=0)
+    ## Numerically intergrate Phi_dot to get a phase (initial conditon is Phi=0
+    #Phi_list = cumtrapz(y=Phi_dot_list, x=time, initial=0)
+
+    Phi_list = Phi(theta, phi, psi, chi, fix=True)
 
     # Convert T into an index range of time, note all time intervals should be uniform
     if tauP < (time[-1] - time[0]):

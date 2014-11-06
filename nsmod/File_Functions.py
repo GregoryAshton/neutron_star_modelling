@@ -87,7 +87,7 @@ def Parameter_Dictionary(user_input):
         Sx = np.sin(chi0)
         Cx = np.cos(chi0)
         varphi = 0.0
-        alpha = np.arccos(Sx * np.sin(a0) * np.cos(varphi) + Cx * np.cos(a0)) # Dodgy
+        alpha = chi0 #np.arccos(Sx * np.sin(a0) * np.cos(varphi) + Cx * np.cos(a0)) # Dodgy
 
         tauA = 2 * pi * pow(omega0 * epsA, -1)
         p_d["tauA"] = str(tauA)
@@ -101,6 +101,8 @@ def Parameter_Dictionary(user_input):
 
         omega_dot0 = -2 * R /(3. * c) * omega0**3 * np.sin(alpha)**2 * epsA
         p_d['omega_dot0'] = omega_dot0
+        nu_dot0 = -1/(3 * np.pi) * (R/c) * omega0**3 * np.sin(alpha)**2 * epsA 
+        p_d['nu_dot0'] = nu_dot0
 
         tauE = abs(omega0/omega_dot0)
         p_d["tauE"] = tauE # Differs from tauS by alpha factor

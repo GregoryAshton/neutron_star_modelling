@@ -937,7 +937,7 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
     return ax
 
 
-def PhaseResidual(file_name, ax=None, save_fig=False, analytic="", 
+def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="", 
                     tstart=None, tend=None, *args, **kwargs):
     """ 
     Plot the phase residuals for the data given in file_name. 
@@ -990,7 +990,7 @@ def PhaseResidual(file_name, ax=None, save_fig=False, analytic="",
 
     Pres = Physics_Functions.PhaseResidual(time, w1, w2, w3, 
                                              theta, phi, psi, chi0, 
-                                             order=4)
+                                             order=order)
     Cycles = Pres / (2*np.pi)
     if not ax:
         fig, ax = plt.subplots()
@@ -1023,7 +1023,8 @@ def PhaseResidual(file_name, ax=None, save_fig=False, analytic="",
                    zorder=-100) 
     return ax
 
-def nu_dot(file_name, ax=None, normalise=False, divisor=10, *args, **kwargs):
+def nu_dot(file_name, ax=None, normalise=False, divisor=10, 
+           analytic="", *args, **kwargs):
     """ 
 
     Plot an approximation of nu_dot the Slowdown rate using the Lyne2010 method
@@ -1071,11 +1072,25 @@ def nu_dot(file_name, ax=None, normalise=False, divisor=10, *args, **kwargs):
     ax.set_xlabel(r"time [s]")
     ax.set_ylabel(r"$\dot{\nu}$", rotation="horizontal", size=26)
     ax.set_ylim(ax.get_ylim()[0], max(ax.get_ylim()[1], 0))
-    if PD.has_key('omega_dot0'):
-        nu0 = PD['omega_dot0'] / (2*np.pi)
     ax.axhline(0, ls="--", color="k", zorder=-100)
-    Delta_nu0 = PD['delta_omega_dot0_FP'] / (2*np.pi)
-    #ax.axhline(nu0 + Delta_nu0)
+
+    # Plot analytic calcualtions
+    if PD.has_key('nu_dot0'):
+        nu_dot0 = PD['nu_dot0'] 
+    else: 
+        nu_dot0 = 0
+
+    if "EM" in analytic:
+        ax.axhline(nu_dot0, label=r"$\dot{\nu}_{\mathrm{EM}}$",
+                   color="r")
+
+    if "FP" in analytic:
+        Delta_nu0 = PD['delta_omega_dot0_FP'] / (2*np.pi)
+        ax.axhline(nu_dot0 + Delta_nu0, label=r"$\Delta\dot{\nu}_{\mathrm{FP}}$")
+        ax.axhline(nu_dot0 - Delta_nu0)
+        ax.fill_between(time, nu_dot0-Delta_nu0, nu_dot0 + Delta_nu0, color="b", 
+                        alpha=0.2)
+
     #D1 = 3 * np.cos(chi0)/np.sin(chi0) * theta[0] * PD['epsI3']
     #D2 = 2 * theta[0] * np.sin(chi0) * np.cos(chi0) * .5 / (
     #         np.sin(chi0)**2 - 2 * theta[0] *  np.sin(chi0) * np.cos(chi0) * .5) 

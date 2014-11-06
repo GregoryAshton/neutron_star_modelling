@@ -187,7 +187,7 @@ have
 This result makes sense since inserting it into the second component of equation \eqref{eqn: 010203}
 balances  the right hand side.
 
-\section{Biaxial body with no torque}
+\section{Verifying Euler angles for a torque free biaxial body}
 
 The precession of a spinning biaxial body free from torques can be described as
 the superposition of two rotations.  The fast rotation due to the spin of the
@@ -240,7 +240,7 @@ the results hold.  Over sufficiently long time scale these errors can
 accumulate and eventually lead to a complete loss of numerical accuracy. We
 must therefore be vigilant to ensure this does not occur when considering
 realistic values.
-\begin{figure}[ht]
+\begin{figure}[htb]
     \centering
 \subfloat[Spherical components in the body frame]
          {\includegraphics[width=0.7\textwidth]
@@ -329,10 +329,11 @@ while the polar angle is
 
 Given a solution of equations \eqref{eqn: ODEs} we can use these two equations
 to describe the evolution of the magnetic dipole orientation in the inertial
-frame (its magnitude is assumed to be fixed). We will now go on to discuss how
-this can be related to physical observables.
-
-\subsubsection{Instantaneous electromagnetic frequency}
+frame (its magnitude is assumed to be fixed). \citet{Jones2001} demonstrated
+that \eqref{eqn: Phi} described the phase of the magnetic dipole and hence 
+also the phase of observed pulsations. In addition, the polar angle $\Theta$
+describes will describe the amplitude of the beam dependant on the relative 
+position of the observer.
 
 An observer sees a pulse from the NS every time the column from the magnetic
 dipole passes through their location. For the frequency of pulsations, we are
@@ -354,11 +355,14 @@ Differentiating the phase with respect to time we have
 
 This is then the \emph{instantaneous electromagnetic frequency}, an observer
 will measure the time averaged value of $\dot{\Phi}$ as the `spin frequency' of
-the star. Recalling that for a biaxial star with no torque $\theta$ is constant,
-\citet{Jones2001} found the averaged frequency split into the cases 
-$\theta > \chi$ and $\theta < \chi$.
+the star. 
 
-\paragraph{Understanding the two cases}
+Recalling that for a biaxial star with no torque $\theta$ is constant,
+\citet{Jones2001} found the motion of $\m$ depended on the orderings
+$\theta > \chi$ and $\theta < \chi$. We now repeat their description of the
+motion of $\m$ in the inertial frame.
+
+\subsection{Understanding the motion of $\m$ in the inertial frame}
 To get a feeling for the mechanics we can decompose the rotation vector into 
 rotations about the angular momentum and rotation about the deformation axis:
 \begin{equation}
@@ -401,12 +405,12 @@ always pulsate once every spin period, but the long precession will modulate
 the average value on the precession timescale. Because of the large difference
 in timescales, the motion of $\m$ can be considered as the slow evolution of a
 third cone swept out by $\m$ about $\J$ which we will call the dipole cone. The
-half angle made by this cone is exactly the polar angle $\Theta$ calculated
-in equation \eqref{eqn: Theta}. The frequency with which $\m$ rotates around
+half angle made by this cone is exactly the polar angle $\Theta$ calculated in
+equation \eqref{eqn: Theta}. The frequency with which $\m$ rotates around
 dipole cone is given by equation \eqref{eqn: Phi_dot}. In figures \ref{fig:
-variations}(a) and (b) the polar angle and frequency modulations are plotted for
-three particular cases, with reference to these plots we now discuss the three
-cases:
+polar angle variations} and \ref{fig: frequency variations} the polar angle and
+frequency modulations are plotted for three particular cases, with reference to
+these plots we now discuss the three cases:
 
 \begin{itemize}
 \item The $\chi = \theta/2$ case: the precession cone is narrow and does not
@@ -440,12 +444,16 @@ the half angle of the dipole cone increases.
 
 \begin{figure}[ht]
 \centering
-	\subfloat[Variations in polar angle]
-  {\includegraphics[width=0.7\textwidth]{polar_angle_variation_with_chi.pdf}}\\
-	\subfloat[Variations in the spin frequency]
-  {\includegraphics[width=0.7\textwidth]{frequency_variation_with_chi.pdf}} 
-\caption{}
-\label{fig: variations}
+  \includegraphics[width=0.5\textwidth]{polar_angle_variation_with_chi.pdf}
+\caption{Variations in polar angle due to free precession}
+\label{fig: polar angle variations}
+\end{figure}
+
+\begin{figure}[ht]
+\centering
+  \includegraphics[width=0.5\textwidth]{frequency_variation_with_chi.pdf} 
+\caption{Variations in the spin frequency due to free precession}
+\label{fig: frequency variations}
 \end{figure}
 
 \FloatBarrier

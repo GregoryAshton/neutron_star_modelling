@@ -15,8 +15,9 @@ def Texify_Float(f, n=1, power=True):
     power = Bool ~ Whether to produce a *10^{x} or just a regular number"""
 
     f = float(f)
-    if power:
-        f_power = int(py.log10(Round_To_n(f, 0)))
+    f_power = int(py.log10(Round_To_n(f, 0)))
+
+    if power and f_power not in  [-1, 0, 1, 2]:
         f_SF = Round_To_n(f, n) * pow(10, -f_power)
         return r" %s\times 10^{%s} " % (f_SF, f_power)
     else:

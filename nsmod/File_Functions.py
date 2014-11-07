@@ -211,13 +211,16 @@ $\omega_0$  &=& {} rad/s\\
 $B_0$  &=& ${}$ G \\
 $\chi$  &=& {:2.2f}$^{{\circ}}$ \\
 $a_0$ &=& {:2.2f}$^{{\circ}}$ \\
-$\tilde{{\theta}}$ &= & {:2.2f}$^{{\circ}}$
+$\tilde{{\theta}}$ &= & {:2.2f}$^{{\circ}}$ \\
+$\mathcal{{A}}_{{\mathrm{{EM}}}}$ &= & ${}$
 \end{{tabular}}
     """).format(PD['omega0'], 
                 Useful_Tools.Texify_Float(PD['Bs'],3),
                 PD['chi0'],
                 PD['a0'],
-                np.degrees(PD['wobble_angle']))
+                np.degrees(PD['wobble_angle']),
+                Useful_Tools.Texify_Float(PD['EMtorqueAmplificationfactor'])
+                )
     
     with open(table_name+".tex", "w+") as f:
         f.write(table)

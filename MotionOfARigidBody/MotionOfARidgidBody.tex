@@ -31,8 +31,13 @@ of the moment of inertia by
 For such a system, the Euler rigid body equations have an
 exact solution with $\Omega_{3}=$ const and the other components are given by
 \begin{align}
-    \Omega_{1} = \left(\Omega^{2} - \Omega_{3}^{2}\right)^{1/2}\cos\left(\epsI \Omega_{3} t\right),\\
-    \Omega_{2} = \left(\Omega^{2} - \Omega_{3}^{2}\right)^{1/2}\sin\left(\epsI \Omega_{3} t\right),
+    \Omega_{1} &= A\cos\left(\epsI \Omega_{3} t\right),\\
+    \Omega_{2} &= A\sin\left(\epsI \Omega_{3} t\right),
+\end{align}
+where the constant can be written as
+\begin{align}
+    A & = \left(\Omega^{2} - \Omega_{3}^{2}\right)^{1/2}\\
+      & = \left(\frac{M^{2} - M_{3}^{2}}{I_{0}^{2}}\right)^{1/2}
 \end{align}
 where $\Omega^{2}$ is also a constant since there is no torque. In the rotating
 body frame this solution demonstrates that the spin-vector will precess in a
@@ -48,31 +53,126 @@ constant during a precessional period and can be calculated as follows:
 \begin{figure}[htb]
 \centering
 \includegraphics[width=0.4\textwidth]{\MotionOfARigidBodyDir/../Illustrations/SphereEllipse/SphereEllipseBiaxial}
-\caption{}
-\label{}
+\caption{A slice through the $z-x$ in momentum space showing the sphere described
+by the conservation of angular momentum and ellisoid due to the conservation of
+energy. Since both of these conservation laws must be satisfied, this restricts
+the motion of $\mathbf{M}$ to intersection. For this biaxial body the intersection
+is a circle about the $\z$ axis, as a result the momentum vector traces out a
+cone of half angle~$\theta$ about this axis.}
+\label{fig: sphere ellispod biaxial}
 \end{figure}
 
 From equation \eqref{eqn: ellipse} we can rearrange
 \begin{align}
     M_{3}^{2} & = (1+\epsI)\left(2EI_{0} - M_{1}^{2} - M_{2}^{2}\right) \\
-              & = I_{0} (1+\epsI)\left(2E - I_{0}\left(\Omega^{2} - \Omega_{3}^{2}\right)\right)
+              & = (1+\epsI)\left(2EI_{0} - \left(M^{2} - M_{3}^{2}\right)\right)
 \end{align}
-and similarly
+Expanding and solving for $M_{3}^{2}/M^{2}$ 
 \begin{align}
-    M^{2} & = M_{1}^{2} + M_{2}^{2} + M_{3}^{2} \\
-          & = I_{0}^{2}\left(\Omega_{1}^{2} + \Omega_{2}^{2}\right) 
-    + I_{0}(1 + \epsI)\left(2E - I_{0}\left(\Omega^{2} - \Omega_{3}^{2}\right)\right)\\
-          & = I_{0}^{2}\left(\Omega^{2} - \Omega^{3}\right)
-    + I_{0}(1 + \epsI)\left(2E - I_{0}\left(\Omega^{2} - \Omega_{3}^{2}\right)\right)\\
-    & = I_{0}\left(2E + \epsI \left(2E - I_{0}\left(\Omega^{2} - \Omega^{2}_{3}\right)\right)\right)
+    \frac{M_{3}^{2}}{M^{2}} = \frac{1+\epsI}{\epsI}\left(1 - \frac{2EI_{0}}{M^{2}}\right)
 \end{align}
 Then we can write the polar angle as
 \begin{equation}
-    \sin\theta = \left(\frac{(1+\epsI)\left(2E - I_{0}\left(\Omega^{2} - \Omega_{3}^{2}\right)\right)}
-        {2E + \epsI\left(2E - I_{0}(\Omega^{2} - \Omega_{3}^{2})\right)}
-    \right)
+    \sin\theta = \left(\frac{1+\epsI}{\epsI}\left(1 - \frac{2EI_{0}}{M^{2}}\right)\right)^{1/2}
+    \label{eqn: sin theta biaxial}
 \end{equation}
+The term in brackets contains the ratio of the square of smallest semi-axis of
+the ellisoid and the radius of the sphere. That is
+\begin{align}
+    \frac{2EI_{0}}{M^{2}} = \left(\frac{\sqrt{2EI_{0}}}{M}\right)^{2}
+\end{align}
+This provides an intuitive way to think about the wobble angle: as the smallest
+semi-axis of the ellipse approaches the radius of the sphere $\sqrt{2EI_{0}}\rightarrow M$
+then $\theta$ tends to zero. That is, the circles of intersection between the
+sphere and ellipse close up around the $z$ axis.
 
+\section{Torque free triaxial body}
+Let us now consider the case of a triaxial body with moments of inertia in the
+body frame satisifying
+\begin{equation}
+    I_{1} < I_{2} < I_{3}
+\end{equation}
+As described by the \citet{Landau1969} the motion of $\mathbf{M}$ is
+described by the intersection of the sphere and now triaxial ellipsoid
+with semiaxis $\sqrt{2EI_{1}}, \sqrt{2EI_{2}}$ and $\sqrt{2EI_{3}}$. These 
+intersection are complicated but a sketch is provided in figure \ref{fig: sphere ellispoid triaxial}.
+
+% Add description - copy from elsewhere?
+
+Solutions to the components of $\Omega_{i}$ in the rotating frame are given 
+by \citet{Landau1969} in terms of Jacobian elliptic functions. For definiteness
+the suppose that $M^{2} > 2EI_{2}$ such that the momentum precesses about the
+$\z$ axis. If this inequality is reversed then the momentum will precess
+about the $\x$ axis. As such as should therefore define the angle $\theta$ 
+by replacing 3 with 1 in equation \eqref{eqn: sin theta}. As we swap the 
+$1$ and $3$ suffixes in the following formulae.
+\begin{equation}
+    \Omega_{3} = \sqrt{\frac{M^{2} - 2EI_{1}}{I_{3}\left(I_{3} - I_{1}\right)}} dn(\tau | k^{2}).
+\end{equation}
+$dn(\tau| k^{2})$ is the elliptic function, with the dimensionless time variable
+$\tau$ given by 
+\begin{equation}
+    \tau = t\sqrt{(\frac{I_{3} - I_{2})(M^{2} - 2EI_{1})}{I_{1}I_{2}I_{3}}}
+\end{equation}
+and the elliptic parameter $k^{2}$ is bounded by $[0, 1]$ and given by 
+\begin{equation}
+    k^{2} = \frac{(I_{2} - I_{1})(2EI_{3} - M^{2})}{(I_{3}-I_{2})(M^{2} - 2EI_{1})}
+    \label{eqn: k2}
+\end{equation}
+The polar angle in the triaxial case can then be written
+\begin{align}
+    \sin\theta & = \frac{M_{3}}{M} \\
+               & = \frac{I_{3}\Omega_{3}}{M} \\
+               & = \sqrt{\frac{I_{3}(1 - 2EI_{1}/M^{2})}{\left(I_{3} - I_{1}\right)}} dn(\tau | k^{2})
+\end{align}
+The coefficients of the elliptic integral is constructed from constants, so only
+the elliptic function $dn(\tau| k^{2})$ contributes to the time dependance of the
+polar angle. This
+is a periodic function and in $\tau$ the period is $4K$ where $K$ is a complete
+elliptic integral of the first kind; a definitioin is given in \citet{Landau1969}
+but not reproduced here since it is not required.
+
+We should note that the motion of $\Omega$ is periodic: after one period the 
+spin-vector returns to its original position in the body frame. However, the 
+axisymmetric body itself will not return to its original position in the
+inertial frame as described by \citet{Landau1969}.
+
+In the body frame then the polar angle is a periodic function of the precession
+phase. It therefore does stricly make sence to define it as a wobble angle
+since it is not constant. Nevertheless, we would like to define an averaged 
+wobble angle particuarly in the case where the variations from this average are
+small. This happens when 
+\begin{equation}
+    |I_{2} - I_{1}| \ll |I_{3} - I_{2}|
+\end{equation}
+such the the body is close to biaxial. In such a case from equation \eqref{eqn: k2} 
+we have that $k^{2} \ll 1$ and therefore we may use the approximation
+\begin{equation}
+    dn(\tau| k^{2}) \approx 1 - \frac{1}{2}k^{2} \sin^{2}\tau
+\end{equation}
+see \citet{Abramowitz1964} for details. Time averaging over a single period
+in $\tau$ we have
+\begin{align}
+    \frac{1}{4K}\int_{0}^{4K} 1 - \frac{1}{2}k^{2} \sin^{2}\tau d\tau & =
+    \frac{1}{4K}\left[\tau  - \frac{k^{2}}{4}\left(\tau - \sin\tau\cos\tau\right) \right]_{0}^{4K} \\
+    & = \left(1 - \frac{k^{2}}{4}\right)
+\end{align}
+Therefore we can define the averaged polar angle as
+\begin{align}
+\bar{\sin\theta} & = \frac{1}{4K}\int_{0}^{4K}\sin\theta d\tau \\
+                 & = \sqrt{\frac{I_{3}(1 - 2EI_{1}/M^{2})}{\left(I_{3} - I_{1}\right)}}
+                     \left(1 - \frac{k^{2}}{4}\right)
+\label{eqn: bar sin theta triaxial}
+\end{align}
+Firstly we can check the consistency of this with equation \eqref{eqn: sin theta biaxial}:
+taking the limit in which the triaxial body become biaxial, that is when
+\begin{align}
+    I_{2}  = I_{1} = I_{0} &&& I_{3} = I_{0}(1 + \epsI)
+\end{align}
+then $k^{2} = 0$ and we recover precisely the constant polar angle for the biaxial
+case.
+
+\subsection{ }
 \biblio
 \end{document}
 

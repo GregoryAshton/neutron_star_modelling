@@ -20,3 +20,7 @@
 *.blg
 *.bak
 *.txt
+
+# Image files
+*.ppm
+*.pbm

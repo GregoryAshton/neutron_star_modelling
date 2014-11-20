@@ -142,6 +142,8 @@ def Parameter_Dictionary(user_input):
 
         p_d['DeltaPhi_63'] = EMtorqueAmplificationfactor * DeltaPhi_49 / np.pi
 
+        p_d['delta_omega_dot0_FP_EM'] = delta_omega_dot0_FP * EMtorqueAmplificationfactor / np.pi
+
     # Need to import the beta function
     #from Physics_Functions import Beta_Function
     #p_d["beta30"] = str(Beta_Function(epsI, epsA, 30 * pi / 180) * 180 / pi)

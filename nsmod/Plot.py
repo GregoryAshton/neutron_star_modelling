@@ -1091,7 +1091,16 @@ def nu_dot(file_name, ax=None, normalise=False, divisor=10,
         ax.fill_between(time, nu_dot0-Delta_nu0, nu_dot0 + Delta_nu0, color="b", 
                         alpha=0.2)
 
-    #D1 = 3 * np.cos(chi0)/np.sin(chi0) * theta[0] * PD['epsI3']
+    if "58" in analytic:
+        c = "green"
+        Delta_nu0_58 = PD['delta_omega_dot0_FP_EM'] / (2*np.pi)
+        ax.axhline(nu_dot0 + Delta_nu0_58, color=c, label=r"$|\Delta\dot{\nu}|^{58}_{\mathrm{FP}}$")
+        ax.axhline(nu_dot0 - Delta_nu0_58, color=c)
+        ax.fill_between(time, nu_dot0-Delta_nu0_58, nu_dot0 + Delta_nu0_58, color=c, 
+                        alpha=0.2)
+    
+    ax.set_xlim(time[0], time[-1])
+   #D1 = 3 * np.cos(chi0)/np.sin(chi0) * theta[0] * PD['epsI3']
     #D2 = 2 * theta[0] * np.sin(chi0) * np.cos(chi0) * .5 / (
     #         np.sin(chi0)**2 - 2 * theta[0] *  np.sin(chi0) * np.cos(chi0) * .5) 
     #print D1*nu0, D2*nu0

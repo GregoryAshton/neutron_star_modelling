@@ -1,7 +1,9 @@
 \documentclass[/home/greg/Thesis/main/main.tex]{subfiles}
 
 \begin{document}
+
 \graphicspath{{/home/greg/Neutron_star_modelling/SpindownRate/img/}}
+\inputpath{/home/greg/Neutron_star_modelling/SpindownRate/}
 
 \section{Physical observables: spin-down rate $\dot{\nu}$}
 
@@ -19,19 +21,25 @@ modulated.
 
 \subsection{Spin-down variations due to free-precession}
 Without an EM torque, the average spin-down rate should be zero. However, if
-the body undergoes free precession, this will produce periodic variations. The
-magnitude of these can be calculated by differentiating equation (49) from 
-\citet{Jones2001} twice to give
+the body undergoes free precession, this will produce periodic variations. We can
+calculate these by differentiating equation \eqref{eqn: Jones 49} twice; the magnitude
+of the variations is then given by
 \begin{equation}
-    \Delta\ddot{\Phi}_{\mathrm{FP}} =\dot{\psi}^{2} \theta \cot\chi. 
+    |\Delta\ddot{\Phi}|_{\mathrm{FP}} =\dot{\psi}^{2} \theta \cot\chi. 
     \label{eqn: spin-down variations FP}
 \end{equation}
+A caveat that should be mentioned is that equation \eqref{eqn: Jones 49} was 
+derived in the limit $\theta \ll \chi$; we return to this in section \ref{sec:
+double peaked spin-down values}.
 
 
 \begin{figure}[ht]
 \centering
 	\includegraphics[width=0.5\textwidth]{nu_dot_no_torque.pdf}
-\caption{Slow down rate }
+\caption{Modulations in the spin-down rate due to free precesion. The solid black
+         line is the numerical solution. In blue we show the analytic 
+         preduction of the magnitude of modulations due to free-precession as
+         given by equation \eqref{eqn: spin-down variations FP}}
 \label{fig: nu_dot no torque}
 \end{figure}
 
@@ -60,8 +68,15 @@ time. As a result we estimate the spin-down rate by the initial value:
     \dot{\nu}_{0} = -\frac{1}{3\pi}\frac{R \Omega_{0}^{3}}{c} \sin^{2}\alpha \epsA
     \label{eqn: spin-down initial EM}
 \end{equation}
-In general we can approximate $\alpha\approx\chi$ to get a handle for the 
-magnitude of $\dot{nu}_{0}$.
+Here $\alpha$ is the angle between the spin-vector and the magnetic dipole. For
+small wobble angles, the angle $\hat{\theta}$ (see figure \ref{fig: reference plane})
+is vanishingly small and so we can approximate $\alpha \approx \chi$ such that
+the spin-down is 
+\begin{equation}
+    \dot{\nu}_{0} = -\frac{1}{3\pi}\frac{R \Omega_{0}^{3}}{c} \sin^{2}\chi \epsA
+    \label{eqn: spin-down initial EM chi}
+\end{equation}
+
 
 In figure \ref{fig: nu_dot with torque} we plot a typical spin-down calculation
 showing the non-zero average spin-down due to EM torque along with the 
@@ -69,9 +84,94 @@ variations due to precession.
 \begin{figure}[ht]
 \centering
 	\includegraphics[width=0.5\textwidth]{nu_dot_with_torque.pdf}
-\caption{Spin-down rate when including the EM torque}
+\caption{Modulation in the spin-down rate due to precession. The solid black line
+indicates the numerical solution including a torque; the solid red line indicates
+the approximate average spin-down rate due to the EM toque as calculated
+from equation \eqref{eqn: spin-down initial EM chi}; and the blue region indicates
+the modulation about the average spin-down due to precession.}
 \label{fig: nu_dot with torque}
 \end{figure}
+
+\subsection{EM torque amplification of the precession spin-down modulation}
+In section \ref{sec: Effect of free precession on the phase residual: effect of the 
+electromagnetic torque} we discussed how \citet{Jones2001} had calculated that
+for some choice of parameters, the EM torque can amplify the effect of precession
+of the timing residuals. We now show that a similar effect occurs for the 
+spin-down modulation. Starting with a vacuum point-dipole spin-down torque
+\begin{equation}
+    \ddot{\Phi} = k\dot{\Phi}^{3}\sin^{2}\alpha,
+\end{equation}
+then \citet{Jones2001} demonstrated that the magnitude of modulations of the 
+spin-down rate is
+\begin{equation}
+    |\Delta\ddot{\Phi}|^{58} \approx -2k\Omega^{3} \theta \sin\chi \cos\chi 
+\end{equation}
+here the superscript refers to the relevant equation in \citet{Jones2001}. Taking
+this expression, we now show that it can be rewritten
+\begin{align}
+    |\Delta\ddot{\Phi}|^{58} 
+    & \approx 2k\Omega^{3} \theta \sin\chi \cos\chi & \\
+    & \approx 2 \frac{\ddot{\Phi}}{\sin^{2}\alpha} \theta \sin\chi\cos\chi &
+    \mathrm{if }\; \alpha \approx \chi \\
+    & \approx 2 \ddot{\Phi}\theta \cot\chi & 
+    \tauS = \left| \dot{\Phi} / \ddot{\Phi}\right| \\
+    & \approx 2 \frac{\dot{\Phi}}{\tauS} \theta \cot\chi &
+    P/\tauP = \dot{\psi}/\dot{\Phi} \\
+    & \approx 2 \dot{\psi}^{2}\left(\frac{\tauP}{P}\right) \frac{1}{\dot{\psi}} \frac{1}{\tauS} \theta \cot \chi & \dot{\psi} = \frac{2\pi}{\tauP} \\
+    & \approx \frac{1}{\pi}\dot{\psi}^{2}\left(\frac{\tauP}{P}\right)\left(\frac{\tauP}{\tauS}\right) \theta \cot\chi
+    \label{eqn: spin-down variations FP EM}
+\end{align}
+Here we have shown that, just like for the timing residuals, the EM torque can
+amplify the spin-down modulation by a factor $\mathcal{A}_{\mathrm{EM}}$ as defined
+in equation \eqref{eqn: EM amplification}.
+
+In figure \ref{fig: nu_dot with torque EM} we plot the results of a simulation
+for which this amplifcation factor is greater than unity. This shows that the
+spindown variations are given by \ref{eqn: spin-down variations FP EM} rather
+than \eqref{eqn: spin-down variations FP}.
+
+%\begin{figure}[ht]
+%\centering
+%	\includegraphics[width=0.5\textwidth]{nu_dot_with_torque_EM_amplification.pdf}
+%\caption{EM amplification of the modulation in the spin-down rate due to precession. 
+%    The solid black line
+%indicates the numerical solution including a torque; the solid red line indicates
+%the approximate average spin-down rate due to the EM toque as calculated
+%from equation \eqref{eqn: spin-down initial EM chi}; the blue region indicates
+%the modulation about the average spin-down due to precession from equation 
+%\eqref{eqn: spin-down variations FP} while the green region indicates the modulation 
+%about as calculated from equation \eqref{eqn: spin-down variations FP EM}.}
+%\label{fig: nu_dot with torque EM}
+%\end{figure}
+
+\begin{figure}[htb]
+\begin{floatrow}
+\ffigbox{%
+\includegraphics[width=0.5\textwidth]{nu_dot_with_torque_EM_amplification.pdf}
+}{%
+  \caption{EM amplification of the modulation in the spin-down rate due to precession. 
+    The solid black line
+indicates the numerical solution including a torque; the solid red line indicates
+the approximate average spin-down rate due to the EM toque as calculated
+from equation \eqref{eqn: spin-down initial EM chi}; the blue region indicates
+the modulation about the average spin-down due to precession from equation 
+\eqref{eqn: spin-down variations FP} while the green region indicates the modulation 
+about as calculated from equation \eqref{eqn: spin-down variations FP EM}.}
+\label{fig: nu_dot with torque EM}%
+  \label{fig: nu_dot with torque EM}
+}
+\capbtabbox{%
+  \input{nu_dot_with_torque_EM_amplification.tex}
+}{%
+  \caption{}%
+  \label{tab:}
+}
+\end{floatrow}
+\end{figure}
+
+\FloatBarrier
+\subsection{Double peaked spin-down values}
+\label{sec: double peaked spin-down values}
 
 
 %\subsubsection{Pulse amplitude}

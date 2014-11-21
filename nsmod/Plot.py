@@ -1071,8 +1071,8 @@ def nu_dot(file_name, ax=None, normalise=False, divisor=10,
 
     ax.set_xlabel(r"time [s]")
     ax.set_ylabel(r"$\dot{\nu}$", rotation="horizontal", size=26)
-    ax.set_ylim(ax.get_ylim()[0], max(ax.get_ylim()[1], 0))
-    ax.axhline(0, ls="--", color="k", zorder=-100)
+    #ax.set_ylim(ax.get_ylim()[0], max(ax.get_ylim()[1], 0))
+    #ax.axhline(0, ls="--", color="k", zorder=-100)
 
     # Plot analytic calcualtions
     if PD.has_key('nu_dot0'):

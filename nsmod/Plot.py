@@ -1023,7 +1023,7 @@ def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="",
                    zorder=-100) 
     return ax
 
-def nu_dot(file_name, ax=None, normalise=False, divisor=10, 
+def SpindownRate(file_name, ax=None, normalise=False, divisor=10, 
            analytic="", *args, **kwargs):
     """ 
 

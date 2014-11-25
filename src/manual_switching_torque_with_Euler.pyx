@@ -35,8 +35,7 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     AnomTorque = (<double *> params)[4]
     upsilon = (<double *> params)[5]
     SwitchTime = (<double *> params)[6]
-    dt = (<double *> params)[7]
-    AnomTorqueSwitching = (<double *> params)[8]
+    AnomTorqueSwitching = (<double *> params)[7]
 
     # Calculate the torque
     mx = sin(chi)
@@ -155,7 +154,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     dt = float(T) / n
 
     # Pass them to params list
-    cdef double params[9]
+    cdef double params[8]
     params[0] = epsA
     params[1] = chi0
     params[2] = epsI1
@@ -163,8 +162,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     params[4] = AnomTorque
     params[5] = upsilon
     params[6] = SwitchTime
-    params[7] = dt
-    params[8] = AnomTorqueSwitching
+    params[7] = AnomTorqueSwitching
 
     # Initial values and calculate eta_relative
     cdef int i

@@ -36,6 +36,8 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     upsilon = (<double *> params)[5]
     SwitchTime = (<double *> params)[6]
     AnomTorqueSwitching = (<double *> params)[7]
+    SpindownTorqueSwitching = (<double *> params)[8]
+
 
     # Calculate the torque
     mx = sin(chi)
@@ -48,23 +50,23 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     Ty_sd = -pre * epsA * w[1]
     Tz_sd = pre * epsA * mx * (w[0] * mz - w[2] * mx)
 
-    S = 1.0 
+    SSpin = 1.0 
     SAnom = 1.0  
 
     if t > SwitchTime:
-        S = 1.0 - upsilon
+        SSpin = 1.0 - SpindownTorqueSwitching * upsilon
         SAnom = 1.0 - AnomTorqueSwitching * upsilon 
     
     if AnomTorque == 1:
-        Tx = S * Tx_sd + SAnom * ( epsA * (w[0] * mx + w[2] * mz) * w[1] * mz)
-        Ty = S * Ty_sd + SAnom * ( epsA * (w[0] * mx + w[2] * mz) * 
-                                                      (w[2] * mx - w[0] * mz))
-        Tz = S * Tz_sd - SAnom * ( epsA * (w[0] * mx + w[2] * mz) * w[1] * mx)
+        Tx = SSpin * Tx_sd + SAnom * ( epsA * (w[0] * mx + w[2] * mz) * w[1] * mz)
+        Ty = SSpin * Ty_sd + SAnom * ( epsA * (w[0] * mx + w[2] * mz) * 
+                                                        (w[2] * mx - w[0] * mz))
+        Tz = SSpin * Tz_sd - SAnom * ( epsA * (w[0] * mx + w[2] * mz) * w[1] * mx)
 
     else:
-        Tx = S * Tx_sd
-        Ty = S * Ty_sd
-        Tz = S * Tz_sd
+        Tx = SSpin * Tx_sd
+        Ty = SSpin * Ty_sd
+        Tz = SSpin * Tz_sd
 
 
     #  Define the three ODEs in f[] as functions of the above variables
@@ -94,7 +96,9 @@ cdef int jac (double t, double y[], double *dfdy,
 
 def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     a0=50., T=1.0e3, AnomTorque=True , upsilon=0.0, n=10000, error=1e-10,
-    cleanup=False, SwitchTime=100, AnomTorqueSwitching=True, DryRun=False):
+    cleanup=False, SwitchTime=100, AnomTorqueSwitching=True,
+    SpindownTorqueSwitching=True,
+    DryRun=False):
     """ One component NS with Euler angles and switching
     
     This solves the Euler equations for a single component NS and the 
@@ -138,13 +142,15 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
                           omega0=omega0, chi0=chi0, a0=a0, T=T, SwitchTime=SwitchTime,
                           AnomTorque=AnomTorque, n=n, upsilon=upsilon,
                           error=error, cleanup=cleanup, 
-                          AnomTorqueSwitching=AnomTorqueSwitching)
+                          AnomTorqueSwitching=AnomTorqueSwitching,
+                          SpindownTorqueSwitching=SpindownTorqueSwitching)
     if not run_sim or DryRun:
         return file_name
 
    # Convert python Bool to int
     AnomTorque = AnomTorque.real
     AnomTorqueSwitching = AnomTorqueSwitching.real
+    SpindownTorqueSwitching = SpindownTorqueSwitching.real
 
     # We allow the user to give angles in degrees and convert here
     chi0 = np.deg2rad(chi0)
@@ -154,7 +160,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     dt = float(T) / n
 
     # Pass them to params list
-    cdef double params[8]
+    cdef double params[9]
     params[0] = epsA
     params[1] = chi0
     params[2] = epsI1
@@ -163,6 +169,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     params[5] = upsilon
     params[6] = SwitchTime
     params[7] = AnomTorqueSwitching
+    params[8] = SpindownTorqueSwitching
 
     # Initial values and calculate eta_relative
     cdef int i

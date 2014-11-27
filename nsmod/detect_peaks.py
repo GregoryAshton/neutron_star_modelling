@@ -173,3 +173,21 @@ def _plot(x, mph, mpd, threshold, edge, valley, ax, ind):
                      % (mode, str(mph), mpd, str(threshold), edge))
         # plt.grid()
         plt.show()
+
+def GetRange(x, show=False):
+    """ Get the range of variations in an oscillating plot 
+
+    This is an extension to the code above from Marcos D. 
+
+    """
+
+    maximums = detect_peaks(x, mph=0, mpd=20, show=show)
+    minimums = detect_peaks(x, mph=0, mpd=20, valley=True, show=show)
+
+    max_residuals = x[maximums]
+    min_residuals = x[minimums]
+
+    ave_max = np.average(max_residuals) 
+    ave_min = np.average(min_residuals)
+
+    return ave_max - ave_min

@@ -12,6 +12,7 @@ import pandas as pd
 from scipy.optimize import curve_fit
 import TNtools as TN
 import sys
+from matplotlib.ticker import MultipleLocator, FormatStrFormatter
 
 TN.PlotDefaults()
 
@@ -38,6 +39,16 @@ def Plot(data, ax=None, **kwargs):
         df = data
 
     ax.plot(df.MJD.values, df.W10_ms.values, "-o", **kwargs)
+
+    majorLocator   = MultipleLocator(250)
+    majorFormatter = FormatStrFormatter('%d')
+    minorLocator   = MultipleLocator(50)
+
+    ax.xaxis.set_major_locator(majorLocator)
+    ax.xaxis.set_major_formatter(majorFormatter)
+    ax.xaxis.set_minor_locator(minorLocator)
+    for tick in ax.xaxis.get_major_ticks():
+                tick.label.set_fontsize(18) 
     ax.set_xlabel("MJD")
     ax.set_ylabel("$W_{10}$ (ms)")
 

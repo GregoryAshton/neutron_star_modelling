@@ -330,7 +330,7 @@ def FormatValue(key, val):
         formatted_val = "{:.2e}".format(val)
     elif key in ["chi0", "a0"]:
         formatted_val = "{:1.10e}".format(val)
-    elif key in ["AnomTorque", "AnomTorqueSwitching"]:
+    elif key in ["AnomTorque", "SpindownTorqueSwitching", "AnomTorqueSwitching"]:
         formatted_val = "{:.0f}".format(val)
     elif key in ["upsilon", "eta"]:
         formatted_val = "{:1.2e}".format(val)

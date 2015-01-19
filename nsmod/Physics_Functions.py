@@ -147,9 +147,11 @@ def equations(omega, theta, phi, psi):
     psi_dot = omega[2] - phi_dot * cos(theta)
     return theta_dot, phi_dot, psi_dot
 
-def Phi_dot(omega, theta, phi, psi, chi):
+def Phi_dot(theta, phi, psi, chi, theta_dot=None, phi_dot=None, 
+            psi_dot=None, omega=None):
     """ """
-    theta_dot, phi_dot, psi_dot = equations(omega, theta, phi, psi)
+    if omega!=None:
+        theta_dot, phi_dot, psi_dot = equations(omega, theta, phi, psi)
     return phi_dot +  sin(chi) * ( 
             (psi_dot * (cos(theta) * sin(chi) - sin(psi) * sin(theta) * cos(chi)) +
              theta_dot * cos(psi) * (sin(psi) * sin(chi) * sin(theta) - cos(chi) * cos(theta))) /
@@ -199,7 +201,7 @@ def PhaseResidual(time, w1, w2, w3, theta, phi, psi, chi, order=3,
     #    return
 
     # Calculate Phi_dot the instantaneous electromagnetic frequency
-    #Phi_dot_list = Phi_dot(np.array([w1, w2, w3]), theta, phi, psi, chi)
+    #Phi_dot_list = Phi_dot(theta, phi, psi, chi, omega=np.array([w1, w2, w3]))
 
     # Numerically intergrate Phi_dot to get a phase (initial conditon is Phi=0
     #Phi_list = cumtrapz(y=Phi_dot_list, x=time, initial=0)
@@ -239,7 +241,7 @@ def nu_dot(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=7):
 
 
     # Calculate Phi_dot the instantaneous electromagnetic frequency
-    #Phi_dot_list = Phi_dot(np.array([w1, w2, w3]), theta, phi, psi, chi)
+    #Phi_dot_list = Phi_dot(theta, phi, psi, chi, omega=np.array([w1, w2, w3]))
 
     ## Numerically intergrate Phi_dot to get a phase (initial conditon is Phi=0
     #Phi_list = cumtrapz(y=Phi_dot_list, x=time, initial=0)
@@ -289,4 +291,4 @@ def Amplitude(Phi, Theta, PhiO, ThetaO, sigmaPhi=0.01, sigmaTheta=0.01, A0=1):
 def W50(Phi_dot, Theta, Theta0, sigmaPhi=0.01, sigmaTheta=0.01):
     """ Analytic calculation of the pulse width """
     Theta_tilde = np.mod(Theta, 2*np.pi) - Theta0
-    return sigmaPhi * np.sqrt(np.log(2) - Theta_tilde) / (np.pi * Phi_dot)
+    return sigmaPhi * np.sqrt(np.log(2) - Theta_tilde/sigmaTheta**2) / (np.pi * Phi_dot)

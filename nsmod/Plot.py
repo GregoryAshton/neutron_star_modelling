@@ -1195,7 +1195,7 @@ def PulseWidth(file_name, Phi0, Theta0, sigmaPhi, sigmaTheta,
     
     #Phi = Physics_Functions.Phi(theta, phi, psi, chi0, fix=True)
     Theta = Physics_Functions.Theta(theta, psi, chi0)
-    Phi_dot = Physics_Functions.Phi_dot(omega, theta, phi, psi, chi0)
+    Phi_dot = Physics_Functions.Phi_dot(theta, phi, psi, chi0, omega=omega)
 
     #Amplitude = Physics_Functions.Amplitude(Phi, Theta, Phi0, Theta0, 
     #                              sigmaTheta, sigmaPhi, A0=1) 

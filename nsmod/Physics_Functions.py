@@ -288,7 +288,25 @@ def Amplitude(Phi, Theta, PhiO, ThetaO, sigmaPhi=0.01, sigmaTheta=0.01, A0=1):
 
     return A0 *  np.exp(-pT - pP)
 
-def W50(Phi_dot, Theta, Theta0, sigmaPhi=0.01, sigmaTheta=0.01):
-    """ Analytic calculation of the pulse width """
-    Theta_tilde = np.mod(Theta, 2*np.pi) - Theta0
-    return sigmaPhi * np.sqrt(np.log(2) - Theta_tilde/sigmaTheta**2) / (np.pi * Phi_dot)
+def W50(Phi_dot, Theta, ThetaO, p=2, sigmaPhi=0.01, sigmaTheta=0.01):
+    """ Analytic calculation of the pulse width 
+    
+    Parameters
+    ----------
+    Phi_dot, Theta : array_like
+        The physical parameters as defined in Jones 2001
+    ThetaO : float
+        The value, in radians of the observers Theta position
+    p : float
+        The fractional amount of beam width. E.g W_50 is p=2, W_10 is p=10
+    sigmaPhi, sigmaTheta : float
+        The beam widths in the two directions
+
+    Returns
+    -------
+    Beam width at p
+    """
+    Theta_tilde = np.mod(Theta, np.pi) - ThetaO
+    inner = np.log(p) - Theta_tilde/sigmaTheta**2
+    inner[inner<0] = 0
+    return sigmaPhi * np.sqrt(inner) / (np.pi * Phi_dot)

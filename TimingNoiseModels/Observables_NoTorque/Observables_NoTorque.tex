@@ -244,10 +244,10 @@ realistic values.
     \centering
 \subfloat[Spherical components in the body frame]
          {\includegraphics[width=0.7\textwidth]
-         {{Spherical_Plot_chi0_8.00e+01_omega0_1.00e+01_epsI3_1.00e-03_n_10000_a0_1.50e+01_T_5.00e+03_upsilon_0.00e+00_epsA_0.00e+00_epsI1_0.00e+00_AnomTorque_1}.pdf}} \\
+         {{Spherical_Plot_SpindownTorqueSwitching_1_chi0_8.0000000000e+01_omega0_1.00e+01_epsI3_1.00e-03_AnomTorqueSwitching_1_n_10000_a0_1.5000000000e+01_T_5.00e+03_upsilon_0.00e+00_epsA_0.00e+00_epsI1_0.00e+00_AnomTorque_1}.pdf}} \\
 \subfloat[Euler angles ]
          {\includegraphics[width=0.7\textwidth]
-         {{Euler_Angles_chi0_8.00e+01_omega0_1.00e+01_epsI3_1.00e-03_n_10000_a0_1.50e+01_T_5.00e+03_upsilon_0.00e+00_epsA_0.00e+00_epsI1_0.00e+00_AnomTorque_1}.pdf}}
+         {{Euler_Angles_SpindownTorqueSwitching_1_chi0_8.0000000000e+01_omega0_1.00e+01_epsI3_1.00e-03_AnomTorqueSwitching_1_n_10000_a0_1.5000000000e+01_T_5.00e+03_upsilon_0.00e+00_epsA_0.00e+00_epsI1_0.00e+00_AnomTorque_1}.pdf}}
 \caption{Solution to the differential equations in \eqref{eqn: ODEs} for a
 canonical biaxial NS with a deformation of $\epsilon_{I3} = 10^{-3}$. The red
 dashed line is the analytic calculation found by \citet{Jones2001} for the
@@ -377,6 +377,7 @@ illustration is given of these cones
 projected into the reference plane for the three possible orderings of $\theta$
 and $\chi$. 
 
+\graphicspath{{/home/greg/Neutron_star_modelling/Illustrations/Cones/}}
 \begin{figure}[ht]
 \centering
 	\subfloat[$\theta > \chi$]{\includegraphics[width=0.33\textwidth]{chi_less_theta.pdf}}
@@ -391,6 +392,7 @@ precession cone rotates in the opposing direction to the spin cone for oblate
 bodies.}
 \label{fig: cones}
 \end{figure}
+\graphicspath{{/home/greg/Neutron_star_modelling/TimingNoiseModels/Observables_NoTorque/img/}}
 
 The motion of the magnetic dipole about the precession cone evolves on a much
 longer timescale than its motion about the spin cone; as a result the star will
@@ -502,7 +504,7 @@ as the effect of precession on timing residuals in the limit for which the
 variation due to precession is much stronger than the spin down.
 \begin{figure}[ht]
 \centering
-	\includegraphics[width=0.7\textwidth]{Timing_residuals_no_torque.pdf}
+	\includegraphics[width=0.7\textwidth]{Phase_residuals_no_torque.pdf}
 \caption{Plot of the timing residuals for three angles of $\chi$ in the torque
          free model showing different types of behaviour. }
 \label{fig: TR no torque}
@@ -526,7 +528,7 @@ is a fraction of the precession period over which we expect quantities to be
 modulated.
 \begin{figure}[ht]
 \centering
-	\includegraphics[width=0.9\textwidth]{nu_dot_no_torque.pdf}
+	\includegraphics[width=0.9\textwidth]{Spindown_no_torque.pdf}
 \caption{Slow down rate }
 \label{fig: nu_dot no torque}
 \end{figure}
@@ -543,69 +545,126 @@ spindown. The observed spikes are numerical errors.
 
 \subsubsection{Pulse amplitude}
 Assuming a fixed magnitude of the magnetic dipole, the pulse amplitude will 
-depend on the orientation of the magnetic dipole to the observer. It will be 
+depend on the orientation of the magnetic dipole to the observer and the
+beam geometry. It will be 
 maximal when pointing directly at the observer and presumably fall off as the
 angle between the two grows. To model this we take an observers position as 
-$\Phi_{O}, \Theta_{O}$ and then assume the emission region follows
-a two dimensional Gaussian:
+$\Phi_{O}, \Theta_{O}$ and then assume the beam geometry follows
+Gaussian profile with a single conal emmision. This could later be adapated
+to include a coral emmision.
+
+For such a model of the the beam geometry, the pulse amplitude will vary with the 
+angular separation of the vector from the center of the star to the observer and the
+magnetic dipole vector. BY considering the intersection of these vectors with
+the unit sphere, the angular separation can be shown to be
+\newcommand{\ThetaO}{\Theta_{\mathrm{obs}}}
+\newcommand{\PhiO}{\Phi_{\mathrm{obs}}}
+\newcommand{\sigmaB}{\sigma_{B}}
 \begin{equation}
-A(\Phi, \Theta) = A_{0} \textrm{exp} \left(
-                         -\frac{\tilde{\Phi}^{2}}{2\sigma_{\Phi}^{2}}
-                         -\frac{\tilde{\Theta}^{2}}{2\sigma_{\Theta}^{2}}
-                                     \right)
-\label{eqn: Amplitude}
-\end{equation}•
-where $\tilde{\Phi}=\mod_{2\pi}(\Phi)-\Phi_{O}$ and 
-$\tilde{\Theta}=\mod_{\pi}(\Theta) - \Theta_{O}$. Computing the angles $\Phi$ and $\Theta$ from numerical
-solutions of the original ODEs and using the above emission model gives 
-the pulse amplitude as seen be an observer. An example of a solution showing
-the individual pulses along with the modulation due to free precession is
-given in figure \ref{fig: amplitude_variation}
+\Delta\sigma = \cos^{-1}\left(\sin(\Theta)\sin(\ThetaO) +
+                             \cos(\Theta)\cos(\ThetaO)\cos(\Phi - \PhiO)\right) 
+\label{eqn: angular sep}
+\end{equation}
+Then the amplitude of the pulse will be given by 
+\begin{equation}
+A(\Theta, \Phi, \ThetaO, \PhiO, \sigmaB) = 
+A_{0} \exp\left(-\frac{\Delta\sigma^{2}(\Theta, \Phi, \ThetaO, \PhiO)}{2\sigmaB^{2}}\right)
+\label{eqn: beam amplitude}
+\end{equation}
+where $A_{0}$ is some constant amplitude, $\sigmaB$ is a measure of the 
+angular beam width.
+
+In figure \ref{fig: amplitude_variation} an illustration is given of variations 
+in amplitude from a torque-free pulsar with some arbitary paramaters. This is
+intended to demonstrate the fast rotation frequency of individual pulses, along
+with the longer modulation of the precession.
 \begin{figure}[htb]
 \centering
 \includegraphics[width=.75\textwidth]{amplitude_variation}
 \caption{Amplitude variation using a 2D Gaussian emission.}
-\label{fig: amplitude_variation}
+\label{fig: amplitude variation}
 \end{figure}•
+
+%\begin{equation}
+%A(\Phi, \Theta) = A_{0} \textrm{exp} \left(
+%                         -\frac{\tilde{\Phi}^{2}}{2\sigma_{\Phi}^{2}}
+%                         -\frac{\tilde{\Theta}^{2}}{2\sigma_{\Theta}^{2}}
+%                                     \right)
+%\label{eqn: Amplitude}
+%\end{equation}•
+%where $\tilde{\Phi}=\mod_{2\pi}(\Phi)-\Phi_{O}$ and 
+%$\tilde{\Theta}=\mod_{\pi}(\Theta) - \Theta_{O}$. Computing the angles $\Phi$ and $\Theta$ from numerical
+%solutions of the original ODEs and using the above emission model gives 
+%the pulse amplitude as seen be an observer. An example of a solution showing
+%the individual pulses along with the modulation due to free precession is
+%given in figure \ref{fig: amplitude_variation}
 
 \FloatBarrier
 \subsubsection{Pulse width}
-The modulation of the amplitude coincides with modulations of the pulse width.
+The amplitude modulations coincide with variations of the pulse width.
 These have been measured with great accuracy by \citet{Lyne2010} and their
-correlation with perceived changes in the spindown is key evidence for the two
-state switching model. We can extract the pulse width analytically from
-equation \eqref{eqn: Amplitude} by noting that $\Theta$ varies on the slow
-precession timescale while $\Phi$ varies on the rapid spin timescale. We are
-looking to measure the variations with respect to the slow precession timescale
-so we can treat it as a constant. The full with at half maximum, corresponding
-to the $W_{50}$ value of \citet{Lyne2010} occurs when
-\begin{align}
-A(\Phi, \Theta) = A_{0} \frac{1}{2} 
-\end{align}
-The condition for a full width half maximum at a fixed value of $\tilde{\Theta}$ 
-is then
-\begin{align}
-\tilde{\Phi}_{50} = \pm\sigma_{\Phi}\left(\ln(2) 
-          - \frac{\tilde{\Theta}}{\sigma_{\Theta}^{2}}\right)^{1/2}
-\end{align}
-If $P$ is the period of the rapid spin motion, then the fraction $W_{50}/P$
-must be equal the fraction of the cycle spent above the full width half maximum
-which is given by $2\tilde{\Phi}_{50} / 2\pi$. Writing this in terms of the
-frequency $\dot{\Phi}$ rather than period we have
-\begin{equation}
-W_{50} = \frac{1}{\pi\dot\Phi}\sigma_{\Phi}\left(\ln(2) 
-     - \frac{\tilde{\Theta}}{\sigma_{\Theta}^{2}}\right)^{1/2}
-\label{eqn: pulse width}
-\end{equation}•
+correlation with changes in the spindown is key evidence for the two
+state switching model. We  will now extract the pulse width analytically from
+equation \eqref{eqn: amplitude variation}.
 
-In figure \ref{fig: PulseWidthModulation} we plot the pulse width as a function
-of time for a canonical pulsar with $\chi=70^{\deg}$. 
+To do this we first note that $\Theta$ varies on the slow
+precession timescale, while $\Phi$ varies on the rapid spin timescale. We are
+looking to measure the variations with respect to the slow precession timescale.
+
+The pulse width is measured by the time spent about some fractional amount $p$
+of the full pulse amplitude. The condition for when the beam width is greater
+than this fraction is
+\begin{align}
+A(\Phi, \Theta, \ThetaO, \PhiO, \sigmaB) > A_{0} \frac{1}{p}.
+\end{align}
+Substituting equation \eqref{eqn: amplitude variatiion} and rearranging yeilds
+\begin{equation}
+\cos(\Phi - \PhiO) > \frac{\cos\left(\sqrt{2\sigmaB^{2} \ln(p)}\right) - \sin(\Theta)\sin(\Theta)}
+                          {\cos(\Theta)\cos(\ThetaO)}
+\label{eqn: 6737}
+\end{equation}
+Since we expect $\Theta$ to slowly vary, we can over short enough time periods
+think of it as a constant. Then the whole right hand side of the previous
+equations is a constant. Lets consider a single rotation with the magnetic dipole
+starting and ending in the antipodal point to the observers position. Then 
+$\Phi - \PhiO$ increase beween $-\pi$ and $\pi$ during this rotation.
+
 \begin{figure}[ht]
 \centering
-\includegraphics[width=.5\textwidth]{Pulse_width_modulation}
-\caption{Pulse width as calculated by equation \eqref{eqn: pulse width} }
+\includegraphics[width=.5\textwidth]{CosineIllustration.pdf}
+\caption{Illustration of the inequality in equation \eqref{eqn: 6737}, the 
+         shaded region indicated when the inequality is satisfied.}
 \label{fig: PulseWidthModulation}
 \end{figure}•
+
+
+a single rotation of the star, this condition will be satisfied at two times 
+
+
+%The condition for a full width half maximum at a fixed value of $\tilde{\Theta}$ 
+%is then
+%\begin{align}
+%\tilde{\Phi}_{50} = \pm\sigma_{\Phi}\left(\ln(2) 
+%          - \frac{\tilde{\Theta}}{\sigma_{\Theta}^{2}}\right)^{1/2}
+%\end{align}
+%If $P$ is the period of the rapid spin motion, then the fraction $W_{50}/P$
+%must be equal the fraction of the cycle spent above the full width half maximum
+%which is given by $2\tilde{\Phi}_{50} / 2\pi$. Writing this in terms of the
+%frequency $\dot{\Phi}$ rather than period we have
+%\begin{equation}
+%W_{50} = \frac{1}{\pi\dot\Phi}\sigma_{\Phi}\left(\ln(2) 
+%     - \frac{\tilde{\Theta}}{\sigma_{\Theta}^{2}}\right)^{1/2}
+%\label{eqn: pulse width}
+%\end{equation}•
+%
+%In figure \ref{fig: PulseWidthModulation} we plot the pulse width as a function
+%of time for a canonical pulsar with $\chi=70^{\deg}$. 
+%\begin{figure}[ht]
+%\centering
+%\includegraphics[width=.5\textwidth]{Pulse_width_modulation}
+%\caption{Pulse width as calculated by equation \eqref{eqn: pulse width} }
+%\label{fig: PulseWidthModulation}
+%\end{figure}•
 
 \FloatBarrier
 

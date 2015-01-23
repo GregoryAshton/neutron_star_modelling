@@ -1107,7 +1107,7 @@ def SpindownRate(file_name, ax=None, normalise=False, divisor=10,
     #ax.axhline(nu0 + D2*nu0, color="r")
     return ax
 
-def Amplitude(file_name, Phi0, Theta0, sigmaPhi, sigmaTheta, 
+def Amplitude(file_name, Phi0, Theta0, sigmaB, 
               ax=None, *args, **kwargs):
     """ 
     Plot the amplitude using a 2D Gaussian beam model
@@ -1145,7 +1145,7 @@ def Amplitude(file_name, Phi0, Theta0, sigmaPhi, sigmaTheta,
     Theta = Physics_Functions.Theta(theta, psi, chi0)
 
     Amplitude = Physics_Functions.Amplitude(Phi, Theta, Phi0, Theta0, 
-                                  sigmaTheta, sigmaPhi, A0=1) 
+                                            sigmaB, A0=1) 
    
     ax.plot(time, Amplitude, *args, **kwargs)
     ax.set_xlabel("time [s]")
@@ -1195,7 +1195,7 @@ def PulseWidth(file_name, Phi0, Theta0, sigmaPhi, sigmaTheta,
     
     #Phi = Physics_Functions.Phi(theta, phi, psi, chi0, fix=True)
     Theta = Physics_Functions.Theta(theta, psi, chi0)
-    Phi_dot = Physics_Functions.Phi_dot(theta, phi, psi, chi0, omega=omega)
+    Phi_dot = Physics_Functions.Phi_dot(omega, theta, phi, psi, chi0)
 
     #Amplitude = Physics_Functions.Amplitude(Phi, Theta, Phi0, Theta0, 
     #                              sigmaTheta, sigmaPhi, A0=1) 

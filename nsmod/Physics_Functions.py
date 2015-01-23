@@ -147,9 +147,12 @@ def equations(omega, theta, phi, psi):
     psi_dot = omega[2] - phi_dot * cos(theta)
     return theta_dot, phi_dot, psi_dot
 
-def Phi_dot(theta, phi, psi, chi, theta_dot=None, phi_dot=None, 
-            psi_dot=None, omega=None):
-    """ """
+def Phi_dot(omega, theta, phi, psi, chi, theta_dot=None, phi_dot=None, 
+            psi_dot=None):
+    """ 
+
+    Explicitly pass omega=None to use theta_dot, phi_dot
+    """
     if omega!=None:
         theta_dot, phi_dot, psi_dot = equations(omega, theta, phi, psi)
     return phi_dot +  sin(chi) * ( 
@@ -282,11 +285,11 @@ def nu_dot(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=7):
 
     return np.array([time_list, nu_dot_list])
 
-def Amplitude(Phi, Theta, PhiO, ThetaO, sigmaPhi=0.01, sigmaTheta=0.01, A0=1):
-    pT = (np.mod(Theta, 2*np.pi) - ThetaO)**2 / (2 * sigmaTheta**2)
-    pP = (np.mod(Phi, 2*pi) - PhiO)**2 / (2 * sigmaTheta**2)
-
-    return A0 *  np.exp(-pT - pP)
+def Amplitude(Phi, Theta, PhiO, ThetaO, sigmaB=0.01, A0=1):
+    DeltaSigma = np.arccos(np.sin(Theta)*np.sin(ThetaO) + 
+                           np.cos(Theta)*np.cos(ThetaO)*np.cos(np.abs(Phi - PhiO)))
+    # Is this real? 
+    return A0 *  np.exp(-DeltaSigma**2 / (2*sigmaB**2))
 
 def W50(Phi_dot, Theta, ThetaO, p=2, sigmaPhi=0.01, sigmaTheta=0.01):
     """ Analytic calculation of the pulse width 

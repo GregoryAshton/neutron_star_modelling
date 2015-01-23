@@ -1153,15 +1153,15 @@ def Amplitude(file_name, Phi0, Theta0, sigmaB,
 
     return ax
 
-def PulseWidth(file_name, Phi0, Theta0, sigmaPhi, sigmaTheta,
+def PulseWidth(file_name, Theta0, sigmaB, p=50,
                eta=0.01, ax=None, *args, **kwargs):
     """ 
     Plot the pulse width using a 2D Gaussian beam model
 
     Parameters:
     ----------
-    Phi0, Theta0 : float
-        Observers angular position in the inertial frame
+    Theta0 : float
+        Observers angular position in the inertial frame in radians
     sigmaPhi, sigmaTheta : float
         Pulse shape parameters
     eta : float [0, 1]
@@ -1189,13 +1189,13 @@ def PulseWidth(file_name, Phi0, Theta0, sigmaPhi, sigmaTheta,
     out_EA = File_Functions.Euler_Angles_Import(file_name)
     [time, w1, w2, w3, theta, phi, psi] = out_EA
     
-    omega = np.sqrt(w1**2 + w2**2 + w3**2) 
     PD = File_Functions.Parameter_Dictionary(file_name)
     chi0 = np.radians(PD['chi0'])
     
     #Phi = Physics_Functions.Phi(theta, phi, psi, chi0, fix=True)
     Theta = Physics_Functions.Theta(theta, psi, chi0)
-    Phi_dot = Physics_Functions.Phi_dot(omega, theta, phi, psi, chi0)
+    Phi_dot = Physics_Functions.Phi_dot(np.array([w1, w2, w3]), 
+                                             theta, phi, psi, chi0)
 
     #Amplitude = Physics_Functions.Amplitude(Phi, Theta, Phi0, Theta0, 
     #                              sigmaTheta, sigmaPhi, A0=1) 
@@ -1203,12 +1203,12 @@ def PulseWidth(file_name, Phi0, Theta0, sigmaPhi, sigmaTheta,
     #tCONS = eta * PD['tauP']
 
     #time_list, W50_list = W50(time, Amplitude, tCONS)
-    W50_list = Physics_Functions.W50(Phi_dot, Theta, Theta0, sigmaPhi,
-                                     sigmaTheta)
+    Wp_list = Physics_Functions.Wp(Phi_dot, Theta, Theta0, sigmaB, p)
 
-    ax.plot(time, W50_list, *args, **kwargs)
+
+    ax.plot(time, Wp_list, *args, **kwargs)
 
     ax.set_xlabel('time')
-    ax.set_ylabel('$W_{50}$', rotation='vertical')
+    ax.set_ylabel('$W_{p}$', rotation='vertical')
 
     return ax

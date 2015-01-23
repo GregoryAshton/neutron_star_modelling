@@ -291,7 +291,7 @@ def Amplitude(Phi, Theta, PhiO, ThetaO, sigmaB=0.01, A0=1):
     # Is this real? 
     return A0 *  np.exp(-DeltaSigma**2 / (2*sigmaB**2))
 
-def W50(Phi_dot, Theta, ThetaO, p=2, sigmaPhi=0.01, sigmaTheta=0.01):
+def Wp(Phi_dot, Theta, ThetaO, sigmaB, p=50):
     """ Analytic calculation of the pulse width 
     
     Parameters
@@ -300,16 +300,16 @@ def W50(Phi_dot, Theta, ThetaO, p=2, sigmaPhi=0.01, sigmaTheta=0.01):
         The physical parameters as defined in Jones 2001
     ThetaO : float
         The value, in radians of the observers Theta position
+    sigmaB : float
+        Measure of the angular beam width
     p : float
-        The fractional amount of beam width. E.g W_50 is p=2, W_10 is p=10
-    sigmaPhi, sigmaTheta : float
-        The beam widths in the two directions
+        The percentage amount of beam width
 
     Returns
     -------
     Beam width at p
     """
-    Theta_tilde = np.mod(Theta, np.pi) - ThetaO
-    inner = np.log(p) - Theta_tilde/sigmaTheta**2
-    inner[inner<0] = 0
-    return sigmaPhi * np.sqrt(inner) / (np.pi * Phi_dot)
+    A = np.cos(np.sqrt(2 * sigmaB**2 * np.log(100./p))) 
+    B = (A-np.sin(Theta) * np.sin(ThetaO)) / (np.cos(Theta) * np.cos(ThetaO))
+    C = np.pi * Phi_dot
+    return (1 - np.arccos(B) ) / C 

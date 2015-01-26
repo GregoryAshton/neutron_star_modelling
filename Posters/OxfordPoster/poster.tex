@@ -25,7 +25,7 @@
 \usepackage{multicol}
 \usepackage{placeins}
 \usepackage[T1]{fontenc}
-\usepackage{natbib}
+\usepackage{amsmath}
 
 % Set block style
 \useblockstyle[titlewidthscale=1, bodywidthscale=1, titlecenter,
@@ -64,30 +64,33 @@
 \newcommand{\mycolwidth}{0.5}
 \column{\mycolwidth}
 \block[]{I: Motivations}{
-Astrophysics contains a huge number of interesting observed phenomena, let alone
+Astrophysics is full of interesting and observed phenomena, let alone
 those that we have yet to see. The problem we often have is that 
 that our observations are in a low signal to noise regime; this can mean
-several models can explain the observed data. 
+it is difficult to choose between which of several models explains what we have 
+observed.
 
-In this poster we discuss a method for quantitatively assessing how well several
-models fit some data. The aim being to decide, eventually, given the observed 
-data which astrophysical model do we think is most likely.
+\hspace{2mm} In this poster we discuss a method for quantitatively assessing
+how well several models fit some data. The aim being to decide, given the
+observed data, which astrophysical model is most likely.
 
 }
-
 
 
  % SECOND column
 \column{\mycolwidth}
 
 \block{II: Bayesian Data Analysis}{
-While many methods exist for comparing some models, an intuitive approach can
-be found by using Bayes rule
+We have some data, and several models $\{M_{1}, \dots, M_{n}\}$ which 
+could explain it. An intuitive approach to decide between them be found
+by writing Bayes rule for the $i^{th}$ model given some data:
+\setlength\abovedisplayskip{3pt plus 1pt minus 1pt}
+\setlength\belowdisplayskip{3pt plus 1pt minus 1pt}
 \begin{equation}
-    p(\model|\data) = p(\data|\model) \frac{p(\model)}{p(\data)}
+    p(M_{i}|\data) = p(\data|M_{i}) \frac{p(M_{i})}{p(\data)},
     \label{eqn: bayes}
 \end{equation}
-where by $P(\model|\data)$ we mean "The probability of $\model$, given that 
+where by $P(M_{i}|\data)$ we mean "The probability of the model, given that 
 we have observed some $\data$.
 
 }
@@ -95,17 +98,20 @@ we have observed some $\data$.
 \end{columns}
 
 \block{III: Model comparison}{
-The issue with Bayes rule as written in eqn.(\ref{eqn: bayes}) is that 
+The issue with Bayes rule as written in eqn.~(\ref{eqn: bayes}) is that 
 $p(\data)$ is often difficult, or even impossible to define. Instead, we can
 compare two models, say $M_{A}$ and $M_{B}$ by looking at the ratio
+\setlength\abovedisplayskip{1pt plus 1pt minus 1pt}
+\setlength\belowdisplayskip{1pt plus 1pt minus 1pt}
+\vspace{-4mm}
 \begin{equation}
     \frac{p(M_{A}|\data)}{p(M_{B}|\data)} = 
-    \frac{p(\data| M_{B})}{p(\data|M_{A})}
-    \frac{p(M_{A})}{p(M_{B})}
+    \frac{p(\data| M_{B})}{p(\data|M_{A})} \times
+    \frac{p(M_{A})}{p(M_{B})}.
 \end{equation}
-This ratio can directly be interpreted as the 'odds ratio', or how much more
-we should believe model $A$ of $B$ given the data. The last fraction reflects
-our prior knowledge about the two models. Unless we have a strong reason to
+This ratio can directly be interpreted as the `odds ratio', or how much more
+we should believe model $A$ over $B$ \emph{given} the data. The last fraction reflects
+our `prior' knowledge about the two models. Unless we have a strong reason to
 believe otherwise this is generally set to unity: $p(M_{A}) = p(M_{B})$.
 }
 
@@ -114,30 +120,38 @@ believe otherwise this is generally set to unity: $p(M_{A}) = p(M_{B})$.
 \column{\mycolwidth}
 
 \block{IV: Signals in noise}{
-The key to data analysis is to define our 'likelihood' function: the
-probability of the data given the model $p(\mathrm{data}|\mathrm{model})$. To 
-calculate this we must first assume that the observed data is the sum of a
-a deterministic signal and a central Gaussian noise process. That is we can
-write the observed data as
+To compute the odds ratio between two models, we need to first define our 
+`likelihood' function $p(\mathrm{data}|M_{i})$: \emph{the probability of the 
+data given the model}. To 
+calculate this, we first calculate the conditional probablity distribution for
+all the parameters.
+
+For signals in noise we assume that the observed data is the sum of
+a deterministic signal and a central Gaussian noise process:
+\setlength\abovedisplayskip{10pt plus 1pt minus 1pt}
+\setlength\belowdisplayskip{10pt plus 1pt minus 1pt}
 \begin{equation}
     W(t) = f(t; \vec{\theta}) + n(t; \sigma).
 \end{equation}
-Here $f(t; \vec{\theta})$ is the signal model with parameters $\vec{\theta}$,
+Here $f(t; \vec{\theta})$ is the \emph{signal function} with parameters $\vec{\theta}$,
 while $n(t; \sigma)$ is the noise process with strength $\sigma$. 
 If we subtract the signal model (with the correct parameters) from the observed
-data we should be left with Gaussian noise:
+data we \emph{will} be left with Gaussian noise:
 $W(t) - f(t; \vec{\theta}) = n(t; \sigma)$.
-Then the probability of a single observed data point at $t_{i}$
+Then the probability of a single observed data point at $t_{i}$ is given by
 \begin{equation}
-    p(W(t_{i})|\mathrm{model}, \vec{\theta}, \sigma) = \frac{1}{\sqrt{2\pi\sigma}}e^{-\frac{(W(t_{i}) - f(t_{i})}{2\sigma^{2}}}
+    p(W(t_{i})|M_{i}, \vec{\theta}, \sigma) = 
+       \frac{1}{\sqrt{2\pi\sigma}}\exp\left\{-\frac{(W(t_{i}) - f(t_{i})}{2\sigma^{2}}\right\}
 \end{equation}
 Here the model, and hence the function $f(t)$, are yet to be determined. Given
-a sequence of $N$ observations (e.g. some data) we can compute the likelihood
-function as
+a sequence of $N$ observations (i.e. some data) we can compute the conditional
+probability distribution of the data:
 \begin{equation}
-    p(\mathrm{data}|\mathrm{model}, \vec{\theta}, \sigma) = \prod_{i=1}^{N}p(W(t_{i})|\mathrm{model}), \vec{\theta}, \sigma
+    p(\mathrm{data}|M_{i}, \vec{\theta}, \sigma) = 
+                        \prod_{i=1}^{N}p(W(t_{i})|M_{i}, \vec{\theta}, \sigma).
     \label{eqn: likelihood}
 \end{equation}
+In box VIII we discuss how to marginalise this and compute the likelihood.
 }
 
 \column{\mycolwidth}
@@ -154,23 +168,23 @@ function as
 To illustrate how we can apply Bayesian data analysis consider the data
 shown in the figure below. This is a plot of the measured beam width
 of pulsar B1828-11 showing a distinct periodic behaviour. This data was 
-originally published in figure 5 of [1], we are thankful
-to the original authors for allowing us access to this data.
-
+originally published in figure 5 of [1] and we are thankful
+to the authors for allowing us access to this data.
 \begin{tikzfigure}
     \centering
-    \includegraphics[width=0.33\textwidth]{img/raw_data}
+    \includegraphics[trim=0mm 3mm 0mm 8mm,clip=true, width=0.4\textwidth]{img/raw_data}
 \end{tikzfigure}
+From this data, the authors argue that the beam width $W_{10}$ is
+periodically \emph{switching}
+between two distinct values. This is in stark contrast to the standard view that
+the beam width should be \emph{smoothly} oscillating. 
+The physics which underlies these two ideas are inherently different, so which
+of these models best explains the data is an important question for neutron star physics.
 
-Prior to this paper, slow periodic modulation of the spin-down was cited as
-evidence for precession in this pulsar. Clearly the beam width is also being 
-modulated at this same time-scale. The authors argue that the beam width is
-not smoothly varying between, but instead \emph{switching}. This has important
-implications for neutron star physics.\\
-
-\footnotesize
+\vspace{5mm}
+\small
 [1] Lyne, A., Hobbs, G., Kramer, M., Stairs, I., and Stappers, B. (2010). 
-\emph{Switched Magnetospheric Regulation of Pulsar Spin-Down.} Science, 329:408–.
+\emph{Switched Magnetospheric Regulation of Pulsar Spin-Down.} Science.
 }
 
 \end{columns}
@@ -179,10 +193,12 @@ implications for neutron star physics.\\
 
 \column{0.5}
 \block[]{VI: Model A}{
-The simplest model we can propose to explain the periodic features is a simple
+The simplest way to model smoothly varying peridic features is with a
 trig. function. This does not capture all of the physics of alternative models,
 but nevertheless will test the assumption that $W_{10}$ switches instantaneously
 between two values. The signal function for this model is
+\setlength\abovedisplayskip{10pt plus 1pt minus 1pt}
+\setlength\belowdisplayskip{10pt plus 1pt minus 1pt}
 \begin{equation}
     f(t; W_{0}, A, f, \phi_{0}) = W_{0} + A\sin(2\pi f t + \phi_{0}) 
     \label{eqn: A}
@@ -191,13 +207,16 @@ between two values. The signal function for this model is
 
 \column{0.5}
 \block[]{VII: Model B}{
-The model proposed by the authors can be captured by a simple square wave. We
-then make an assumption that the observed data is the sum of a square wave and
-noise.
+The model proposed by the authors can be captured by a simple square wave which
+we give here as a generic function: 
+\setlength\abovedisplayskip{10pt plus 1pt minus 1pt}
+\setlength\belowdisplayskip{10pt plus 1pt minus 1pt}
 \begin{equation}
-    g(t; W_{0}, A, f, \phi_{0}) = W_{0} + \mathrm{square}(t\; W_{0}, A, f, \phi_{0}) 
+    g(t; W_{0}, A, f, \phi_{0}) = W_{0} + A \; \mathrm{square}(t\; f, \phi_{0}) 
     \label{eqn: B}
 \end{equation}
+Where the parameters can be directly compared with those in model A. This model
+can be improved by allowing for a duty cycle as well.
 }
 \end{columns}
 
@@ -206,29 +225,32 @@ noise.
 \column{\mycolwidth}
 
 \block{VIII: Marginalisation and odds ratio}{
-Plugging the model functions \ref{eqn: A} and \ref{eqn: B} into the likelihood
-\ref{eqn: likelihood} we have $P(\data| M_{i}, \vec{\theta}, \sigma)$. The next
-step is to marginalise over all the model parameters:
-
+Plugging the model functions (\ref{eqn: A}) and (\ref{eqn: B}) into 
+eqn.~(\ref{eqn: likelihood}) we have the conditional likelihood.  To compute the
+likelihood we marginalise over all the parameters:
+\setlength\abovedisplayskip{15pt plus 1pt minus 1pt}
+\setlength\belowdisplayskip{15pt plus 1pt minus 1pt}
 \begin{equation}
-    p(\data)| M_{i}) = \int \int p(\data | M_{i}, \vec{\theta}, \sigma) p(\vec{\theta}) p(\sigma) d\vec{\theta}d\sigma
+    p(\data)| M_{i}) = \iint p(\data | M_{i}, \vec{\theta}, \sigma) p(\vec{\theta}) p(\sigma) d\vec{\theta}d\sigma
 \end{equation}
-
 Often this integral will be unfeasible analytically, instead we can turn to 
-numerical method such as MCMC and nested sampling.
+numerical methods such as MCMC and nested sampling.
+\vspace{6mm}
 }
 
 \column{\mycolwidth}
 \block{IX: Results}{
 The observed beam width data was tested with both a sinusoidal model and a
 square-wave model. We computed the marginal likelihoods using MCMC software
-\emph{dan.iel.fm/emcee}. This resulted in an odds ratio:
+from \emph{dan.iel.fm/emcee}. This resulted in an odds ratio:
+\setlength\abovedisplayskip{10pt plus 1pt minus 1pt}
+\setlength\belowdisplayskip{10pt plus 1pt minus 1pt}
 \begin{equation}
     \log_{10}\left(\frac{p(M_{A}| \data)}{p(M_{B}| \data)}\right) = -6
 \end{equation}
 This establishes that the square wave model proposed by the authors significantly
-out performs a sinusoidal model. We are currently in the process of exploring
-more physical models to further probe the assumptions.
+outperforms a sinusoidal model. We are currently in the process of exploring
+%more physical models to further probe the assumptions.
 
 }
 

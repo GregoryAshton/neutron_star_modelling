@@ -12,7 +12,7 @@
 %% LaTeX version 2013/12/01 or later.
 %% 
 
-\documentclass[20pt, a1paper, portrait, margin=0mm, innermargin=8mm,
+\documentclass[20pt, a1paper, portrait, margin=5mm, innermargin=8mm,
                blockverticalspace=8mm,colspace=5mm, subcolspace=0mm]
                {tikzposter}
 
@@ -39,14 +39,31 @@
 
 
 % Header
+\makeatletter
+\def\TP@titlegraphictotitledistance{-0cm}
+\settitle{ \centering \vbox{
+\@titlegraphic \\ [\TP@titlegraphictotitledistance] 
+\centering
+\color{titlefgcolor} {\bfseries \Large \sc \@title \par}
+\vspace*{1em}
+{\Large \@author \par} \vspace*{1em} {\Large \@institute}
+}}
+\makeatother
+
+\setlength{\columnsep}{2cm}
+
 \title{\textcolor{colorThree}{\fontsize{2.3cm}{1em}\selectfont 
        Searching for signals in noise}}
+%
+\author{Gregory Ashton, supervised by D.I. Jones \& R. Prix}
+%
+\institute{G.Ashton@soton.ac.uk \hspace{15mm} University of Southampton }
 
-\author{Gregory Ashton, supervised by D.I. Jones \& R. Prix \\
-    {\Large G.Ashton@soton.ac.uk}}
-
-\institute{University of Southampton }
-
+%\titlegraphic{
+%\includegraphics[width=10cm,height=5cm]{./img/Square_Fit.pdf}
+%\hfill
+%\includegraphics[width=10cm,height=5cm]{./img/Sine_Fit.pdf}
+%}
 \begin{document}
 
  % Title block with title, author, logo, etc.
@@ -64,8 +81,7 @@
 \newcommand{\mycolwidth}{0.5}
 \column{\mycolwidth}
 \block[]{I: Motivations}{
-Astrophysics is full of interesting and observed phenomena, let alone
-those that we have yet to see. The problem we often have is that 
+Astrophysics is full of interesting and observed phenomena. The problem we often have is that 
 that our observations are in a low signal to noise regime; this can mean
 it is difficult to choose between which of several models explains what we have 
 observed.
@@ -84,7 +100,7 @@ observed data, which astrophysical model is most likely.
 We have some data, and several models $\{M_{1}, \dots, M_{n}\}$ which 
 could explain it. An intuitive approach to decide between them be found
 by writing Bayes rule for the $i^{th}$ model given some data:
-\setlength\abovedisplayskip{3pt plus 1pt minus 1pt}
+\setlength\abovedisplayskip{0pt plus 1pt minus 1pt}
 \setlength\belowdisplayskip{3pt plus 1pt minus 1pt}
 \begin{equation}
     p(M_{i}|\data) = p(\data|M_{i}) \frac{p(M_{i})}{p(\data)},
@@ -172,7 +188,7 @@ originally published in figure 5 of [1] and we are thankful
 to the authors for allowing us access to this data.
 \begin{tikzfigure}
     \centering
-    \includegraphics[trim=0mm 3mm 0mm 8mm,clip=true, width=0.4\textwidth]{img/raw_data}
+    \includegraphics[trim=0mm 3mm 0mm 7mm,clip=true, width=0.37\textwidth]{img/raw_data}
 \end{tikzfigure}
 From this data, the authors argue that the beam width $W_{10}$ is
 periodically \emph{switching}

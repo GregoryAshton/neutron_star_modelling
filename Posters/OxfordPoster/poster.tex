@@ -12,8 +12,8 @@
 %% LaTeX version 2013/12/01 or later.
 %% 
 
-\documentclass[20pt, a1paper, portrait, margin=5mm, innermargin=8mm,
-               blockverticalspace=8mm,colspace=5mm, subcolspace=0mm]
+\documentclass[20pt, a1paper, portrait, margin=10mm, innermargin=10mm,
+               blockverticalspace=12mm,colspace=10mm, subcolspace=0mm]
                {tikzposter}
 
 % Choose Layout
@@ -29,9 +29,9 @@
 
 % Set block style
 \useblockstyle[titlewidthscale=1, bodywidthscale=1, titlecenter,
-    titleoffsetx=0pt, titleoffsety=1pt, bodyoffsetx=0pt, bodyoffsety=25pt,
+    titleoffsetx=0pt, titleoffsety=1pt, bodyoffsetx=0pt, bodyoffsety=30pt,
     bodyverticalshift=0pt, roundedcorners=5, linewidth=0.4cm,
-    titleinnersep=8mm, bodyinnersep=8mm]{Default}
+    titleinnersep=7mm, bodyinnersep=7mm]{Default}
 
 \usetitlestyle[titletoblockverticalspace=8mm]{Filled}
 
@@ -40,13 +40,13 @@
 
 % Header
 \makeatletter
-\def\TP@titlegraphictotitledistance{-0cm}
+\def\TP@titlegraphictotitledistance{-0.2cm}
 \settitle{ \centering \vbox{
 \@titlegraphic \\ [\TP@titlegraphictotitledistance] 
 \centering
 \color{titlefgcolor} {\bfseries \Large \sc \@title \par}
 \vspace*{1em}
-{\Large \@author \par} \vspace*{1em} {\Large \@institute}
+{\huge \@author \par} \vspace*{1em} {\Large \@institute}
 }}
 \makeatother
 
@@ -93,9 +93,6 @@ observed data, which astrophysical model is most likely.
 }
 
 
- % SECOND column
-\column{\mycolwidth}
-
 \block{II: Bayesian Data Analysis}{
 We have some data, and several models $\{M_{1}, \dots, M_{n}\}$ which 
 could explain it. An intuitive approach to decide between them be found
@@ -111,15 +108,13 @@ we have observed some $\data$.
 
 }
 
-\end{columns}
-
 \block{III: Model comparison}{
 The issue with Bayes rule as written in eqn.~(\ref{eqn: bayes}) is that 
 $p(\data)$ is often difficult, or even impossible to define. Instead, we can
 compare two models, say $M_{A}$ and $M_{B}$ by looking at the ratio
-\setlength\abovedisplayskip{1pt plus 1pt minus 1pt}
-\setlength\belowdisplayskip{1pt plus 1pt minus 1pt}
-\vspace{-4mm}
+\setlength\abovedisplayskip{15pt plus 1pt minus 1pt}
+\setlength\belowdisplayskip{15pt plus 1pt minus 1pt}
+\vspace{0mm}
 \begin{equation}
     \frac{p(M_{A}|\data)}{p(M_{B}|\data)} = 
     \frac{p(\data| M_{B})}{p(\data|M_{A})} \times
@@ -131,9 +126,6 @@ our `prior' knowledge about the two models. Unless we have a strong reason to
 believe otherwise this is generally set to unity: $p(M_{A}) = p(M_{B})$.
 }
 
-\begin{columns}
-\newcommand{\mycolwidth}{0.5}
-\column{\mycolwidth}
 
 \block{IV: Signals in noise}{
 To compute the odds ratio between two models, we need to first define our 
@@ -162,16 +154,31 @@ Then the probability of a single observed data point at $t_{i}$ is given by
 Here the model, and hence the function $f(t)$, are yet to be determined. Given
 a sequence of $N$ observations (i.e. some data) we can compute the conditional
 probability distribution of the data:
+\setlength\belowdisplayskip{0pt plus 1pt minus 1pt}
 \begin{equation}
     p(\mathrm{data}|M_{i}, \vec{\theta}, \sigma) = 
                         \prod_{i=1}^{N}p(W(t_{i})|M_{i}, \vec{\theta}, \sigma).
     \label{eqn: likelihood}
 \end{equation}
-In box VIII we discuss how to marginalise this and compute the likelihood.
+\vspace{-5mm}
+}
+
+\block{V: Marginalisation and odds ratio}{
+Plugging the model functions (such as (\ref{eqn: A}) and (\ref{eqn: B})) into 
+eqn.~(\ref{eqn: likelihood}) we have the conditional likelihood.  To compute the
+likelihood we marginalise over all the parameters:
+\setlength\abovedisplayskip{15pt plus 1pt minus 1pt}
+\setlength\belowdisplayskip{15pt plus 1pt minus 1pt}
+\vspace{-8mm}
+\begin{equation}
+    p(\data)| M_{i}) = \iint p(\data | M_{i}, \vec{\theta}, \sigma) p(\vec{\theta}) p(\sigma) d\vec{\theta}d\sigma
+\end{equation}
+Often this integral will be unfeasible analytically, instead we can turn to 
+numerical methods such as MCMC and nested sampling.
 }
 
 \column{\mycolwidth}
-\block[]{V: Example}{
+\block[]{VI: Example}{
 
 %\begin{wrapfigure}[8]{r}{0.8\linewidth}
 %    \vspace{-10mm}
@@ -188,7 +195,7 @@ originally published in figure 5 of [1] and we are thankful
 to the authors for allowing us access to this data.
 \begin{tikzfigure}
     \centering
-    \includegraphics[trim=0mm 3mm 0mm 7mm,clip=true, width=0.37\textwidth]{img/raw_data}
+    \includegraphics[trim=0mm 3mm 0mm 7mm,clip=true, width=0.32\textwidth]{img/raw_data}
 \end{tikzfigure}
 From this data, the authors argue that the beam width $W_{10}$ is
 periodically \emph{switching}
@@ -203,58 +210,37 @@ of these models best explains the data is an important question for neutron star
 \emph{Switched Magnetospheric Regulation of Pulsar Spin-Down.} Science.
 }
 
-\end{columns}
 
-\begin{columns}
 
-\column{0.5}
-\block[]{VI: Model A}{
+\block[]{VII: Model A}{
 The simplest way to model smoothly varying peridic features is with a
 trig. function. This does not capture all of the physics of alternative models,
 but nevertheless will test the assumption that $W_{10}$ switches instantaneously
-between two values. The signal function for this model is
+between two values. The signal function for this model is given by:
 \setlength\abovedisplayskip{10pt plus 1pt minus 1pt}
 \setlength\belowdisplayskip{10pt plus 1pt minus 1pt}
 \begin{equation}
-    f(t; W_{0}, A, f, \phi_{0}) = W_{0} + A\sin(2\pi f t + \phi_{0}) 
+    f(t; W_{0}, A, f, \phi_{0}) = W_{0} + A\sin(2\pi f t + \phi_{0}).
     \label{eqn: A}
 \end{equation}
 }
 
-\column{0.5}
-\block[]{VII: Model B}{
+\block[]{VIII: Model B}{
 The model proposed by the authors can be captured by a simple square wave which
 we give here as a generic function: 
 \setlength\abovedisplayskip{10pt plus 1pt minus 1pt}
 \setlength\belowdisplayskip{10pt plus 1pt minus 1pt}
 \begin{equation}
-    g(t; W_{0}, A, f, \phi_{0}) = W_{0} + A \; \mathrm{square}(t\; f, \phi_{0}) 
+    g(t; W_{0}, A, f, \phi_{0}) = W_{0} + A \; \mathrm{square}(t\; f, \phi_{0}). 
     \label{eqn: B}
 \end{equation}
 Where the parameters can be directly compared with those in model A. This model
 can be improved by allowing for a duty cycle as well.
 }
-\end{columns}
 
-\begin{columns}
-\newcommand{\mycolwidth}{0.5}
-\column{\mycolwidth}
 
-\block{VIII: Marginalisation and odds ratio}{
-Plugging the model functions (\ref{eqn: A}) and (\ref{eqn: B}) into 
-eqn.~(\ref{eqn: likelihood}) we have the conditional likelihood.  To compute the
-likelihood we marginalise over all the parameters:
-\setlength\abovedisplayskip{15pt plus 1pt minus 1pt}
-\setlength\belowdisplayskip{15pt plus 1pt minus 1pt}
-\begin{equation}
-    p(\data)| M_{i}) = \iint p(\data | M_{i}, \vec{\theta}, \sigma) p(\vec{\theta}) p(\sigma) d\vec{\theta}d\sigma
-\end{equation}
-Often this integral will be unfeasible analytically, instead we can turn to 
-numerical methods such as MCMC and nested sampling.
-\vspace{6mm}
-}
 
-\column{\mycolwidth}
+
 \block{IX: Results}{
 The observed beam width data was tested with both a sinusoidal model and a
 square-wave model. We computed the marginal likelihoods using MCMC software
@@ -262,12 +248,31 @@ from \emph{dan.iel.fm/emcee}. This resulted in an odds ratio:
 \setlength\abovedisplayskip{10pt plus 1pt minus 1pt}
 \setlength\belowdisplayskip{10pt plus 1pt minus 1pt}
 \begin{equation}
-    \log_{10}\left(\frac{p(M_{A}| \data)}{p(M_{B}| \data)}\right) = -6
+    \log_{10}\left(\frac{p(M_{A}| \data)}{p(M_{B}| \data)}\right) \approx -6
 \end{equation}
 This establishes that the square wave model proposed by the authors significantly
-outperforms a sinusoidal model. We are currently in the process of exploring
-%more physical models to further probe the assumptions.
+outperforms a sinusoidal model.\\ 
 
+\newcommand{\picwidth}{0.233}
+\begin{wrapfigure}[16]{r}{\picwidth\textwidth}
+\centering
+\vspace{-15mm}
+\begin{tikzfigure}
+    \centering
+    \includegraphics[trim=5mm 5mm 10mm 5mm,clip=true, width=\picwidth\textwidth]
+                    {img/ResultsCombined.pdf}
+\end{tikzfigure}
+\end{wrapfigure}
+In the figure to the right, several realisations of the two models are displayed
+along with the original data. This can be a useful way to evaluate the fit of
+the models.
+
+\vspace{5mm}
+The next step is to add more physics into the signal models. This is to be done
+by predicting the beam width variations due to realistic modulations such as
+free precession and a biased magnetosphere.
+
+\vspace{5mm}
 }
 
 

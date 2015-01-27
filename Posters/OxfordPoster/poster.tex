@@ -13,7 +13,7 @@
 %% 
 
 \documentclass[20pt, a1paper, portrait, margin=10mm, innermargin=10mm,
-               blockverticalspace=12mm,colspace=10mm, subcolspace=0mm]
+               blockverticalspace=10mm,colspace=10mm, subcolspace=0mm]
                {tikzposter}
 
 % Choose Layout
@@ -82,7 +82,7 @@
 \column{\mycolwidth}
 \block[]{I: Motivations}{
 Astrophysics is full of interesting and observed phenomena. The problem we often have is that 
-that our observations are in a low signal to noise regime; this can mean
+our observations are in a low signal to noise regime; this can mean
 it is difficult to choose between which of several models explains what we have 
 observed.
 
@@ -98,7 +98,7 @@ We have some data, and several models $\{M_{1}, \dots, M_{n}\}$ which
 could explain it. An intuitive approach to decide between them be found
 by writing Bayes rule for the $i^{th}$ model given some data:
 \setlength\abovedisplayskip{0pt plus 1pt minus 1pt}
-\setlength\belowdisplayskip{3pt plus 1pt minus 1pt}
+\setlength\belowdisplayskip{8pt plus 1pt minus 1pt}
 \begin{equation}
     p(M_{i}|\data) = p(\data|M_{i}) \frac{p(M_{i})}{p(\data)},
     \label{eqn: bayes}
@@ -106,9 +106,6 @@ by writing Bayes rule for the $i^{th}$ model given some data:
 where by $P(M_{i}|\data)$ we mean "The probability of the model, given that 
 we have observed some $\data$.
 
-}
-
-\block{III: Model comparison}{
 The issue with Bayes rule as written in eqn.~(\ref{eqn: bayes}) is that 
 $p(\data)$ is often difficult, or even impossible to define. Instead, we can
 compare two models, say $M_{A}$ and $M_{B}$ by looking at the ratio
@@ -119,6 +116,7 @@ compare two models, say $M_{A}$ and $M_{B}$ by looking at the ratio
     \frac{p(M_{A}|\data)}{p(M_{B}|\data)} = 
     \frac{p(\data| M_{B})}{p(\data|M_{A})} \times
     \frac{p(M_{A})}{p(M_{B})}.
+\label{eqn: model comparison}
 \end{equation}
 This ratio can directly be interpreted as the `odds ratio', or how much more
 we should believe model $A$ over $B$ \emph{given} the data. The last fraction reflects
@@ -131,7 +129,7 @@ believe otherwise this is generally set to unity: $p(M_{A}) = p(M_{B})$.
 To compute the odds ratio between two models, we need to first define our 
 `likelihood' function $p(\mathrm{data}|M_{i})$: \emph{the probability of the 
 data given the model}. To 
-calculate this, we first calculate the conditional probablity distribution for
+calculate this, we first calculate the conditional probability distribution for
 all the parameters.
 
 For signals in noise we assume that the observed data is the sum of
@@ -146,12 +144,13 @@ while $n(t; \sigma)$ is the noise process with strength $\sigma$.
 If we subtract the signal model (with the correct parameters) from the observed
 data we \emph{will} be left with Gaussian noise:
 $W(t) - f(t; \vec{\theta}) = n(t; \sigma)$.
-Then the probability of a single observed data point at $t_{i}$ is given by
+Then the probability of a single observed data point at $t_{i}$, given
+parameters $\vec{\theta}$ and $\sigma$ is:
 \begin{equation}
     p(W(t_{i})|M_{i}, \vec{\theta}, \sigma) = 
-       \frac{1}{\sqrt{2\pi\sigma}}\exp\left\{-\frac{(W(t_{i}) - f(t_{i})}{2\sigma^{2}}\right\}
+       \frac{1}{\sqrt{2\pi\sigma}}\exp\left\{-\frac{(W(t_{i}) - f(t_{i}; \vec{\theta})}{2\sigma^{2}}\right\}
 \end{equation}
-Here the model, and hence the function $f(t)$, are yet to be determined. Given
+Here the model, and hence the function $f(t; \vec{\theta})$, are yet to be determined. Given
 a sequence of $N$ observations (i.e. some data) we can compute the conditional
 probability distribution of the data:
 \setlength\belowdisplayskip{0pt plus 1pt minus 1pt}
@@ -163,18 +162,22 @@ probability distribution of the data:
 \vspace{-5mm}
 }
 
-\block{V: Marginalisation and odds ratio}{
+\block{V: Marginalisation}{
 Plugging the model functions (such as (\ref{eqn: A}) and (\ref{eqn: B})) into 
 eqn.~(\ref{eqn: likelihood}) we have the conditional likelihood.  To compute the
 likelihood we marginalise over all the parameters:
 \setlength\abovedisplayskip{15pt plus 1pt minus 1pt}
-\setlength\belowdisplayskip{15pt plus 1pt minus 1pt}
+\setlength\belowdisplayskip{10pt plus 1pt minus 1pt}
 \vspace{-8mm}
 \begin{equation}
     p(\data)| M_{i}) = \iint p(\data | M_{i}, \vec{\theta}, \sigma) p(\vec{\theta}) p(\sigma) d\vec{\theta}d\sigma
 \end{equation}
 Often this integral will be unfeasible analytically, instead we can turn to 
-numerical methods such as MCMC and nested sampling.
+numerical methods such as MCMC and nested sampling. We also need to specify
+our prior distributions on the parameters $p(\vec{\theta})$ and $p(\sigma)$,
+often a simple uniform prior is sufficient. 
+Having computed this for two different models, they can be directly compared using
+eqn.~(\ref{eqn: model comparison}).
 }
 
 \column{\mycolwidth}
@@ -188,7 +191,7 @@ numerical methods such as MCMC and nested sampling.
 %\end{tikzfigure}
 %\end{wrapfigure}
 
-To illustrate how we can apply Bayesian data analysis consider the data
+To illustrate how we can apply Bayesian data analysis, consider the data
 shown in the figure below. This is a plot of the measured beam width
 of pulsar B1828-11 showing a distinct periodic behaviour. This data was 
 originally published in figure 5 of [1] and we are thankful
@@ -213,7 +216,7 @@ of these models best explains the data is an important question for neutron star
 
 
 \block[]{VII: Model A}{
-The simplest way to model smoothly varying peridic features is with a
+The simplest way to model smoothly varying periodic features is with a
 trig. function. This does not capture all of the physics of alternative models,
 but nevertheless will test the assumption that $W_{10}$ switches instantaneously
 between two values. The signal function for this model is given by:
@@ -245,8 +248,8 @@ can be improved by allowing for a duty cycle as well.
 The observed beam width data was tested with both a sinusoidal model and a
 square-wave model. We computed the marginal likelihoods using MCMC software
 from \emph{dan.iel.fm/emcee}. This resulted in an odds ratio:
-\setlength\abovedisplayskip{10pt plus 1pt minus 1pt}
-\setlength\belowdisplayskip{10pt plus 1pt minus 1pt}
+\setlength\abovedisplayskip{16pt plus 1pt minus 1pt}
+\setlength\belowdisplayskip{16pt plus 1pt minus 1pt}
 \begin{equation}
     \log_{10}\left(\frac{p(M_{A}| \data)}{p(M_{B}| \data)}\right) \approx -6
 \end{equation}

@@ -73,7 +73,7 @@ def Parameter_Dictionary(user_input):
     
     # tauP doesn't make sense with epsI1 != 0 so set it to zero
     if epsI1==0:
-        tauP = 2 * pi * pow(omega0 * epsI3, -1)
+        tauP = 2 * pi * pow(omega0 * abs(epsI3), -1)
     else:
         tauP = 2 * pi * pow(omega0 * max(abs(epsI3), abs(epsI1)), -1)
         print "Warning: calculating tauP not defined for triaxial body"

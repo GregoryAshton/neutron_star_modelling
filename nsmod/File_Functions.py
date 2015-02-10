@@ -98,7 +98,7 @@ def Parameter_Dictionary(user_input):
         p_d["tauS"] = str(tauS)
         
 
-        Bs = (2 * np.sqrt(epsA * I0 * R * pow(c, 2)) / pow(R, 3))
+        Bs = (2 * np.sqrt(epsA * I0 * pow(c, 2) / pow(R, 5)))
         p_d["Bs"] = str(Bs)
 
         omega_dot0 = -2 * R /(3. * c) * omega0**3 * np.sin(alpha)**2 * epsA

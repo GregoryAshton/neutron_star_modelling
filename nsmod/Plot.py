@@ -1024,7 +1024,7 @@ def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="",
     return ax
 
 def SpindownRate(file_name, ax=None, normalise=False, divisor=10, 
-           analytic="", *args, **kwargs):
+                 analytic="", *args, **kwargs):
     """ 
 
     Plot an approximation of nu_dot the Slowdown rate using the Lyne2010 method

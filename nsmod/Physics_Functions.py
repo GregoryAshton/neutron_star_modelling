@@ -277,7 +277,7 @@ def nu_dot(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=7):
         time_mid = 0.5*(time[i] + time[i+T_index_range])
         nu_dot = get_nudot(time[i:i + T_index_range], 
                            Phi_list[i:i + T_index_range],
-                           tref)
+                           time_mid)
         nu_dot_list.append(nu_dot)
         time_list.append(time_mid) 
     

@@ -78,17 +78,13 @@ In figure \ref{fig: nu_dot no torque} we plot three curves: the numerical
 result obtained using Lyne method of calculating the spin-down, the analytic
 prediction from eqn.~\eqref{eqn: Phi_ddot FP} and the magnitude obtained by
 eqn.~\eqref{eqn: spin-down variations FP}
-\begin{figure}[ht]
-\centering
-	\includegraphics[width=0.5\textwidth]{nu_dot_no_torque.pdf}
-\caption{Modulations in the spin-down rate due to free precesion. The solid black
-         line is the numerical solution. in blue we show the analytic 
-         preduction of the magnitude of modulations due to free-precession as
-         given by equation \eqref{eqn: spin-down variations FP} and the red-dashed
-         line indicates the analytic prediction of eqn~/\eqref{eqn: Phi_ddot FP}}
-\label{fig: nu_dot no torque}
-\end{figure}
 
+\FigureAndTable{nu_dot_no_torque}{nu_dot no torque}{ Modulations in the
+    spin-down rate due to free precesion. The solid black line is the numerical
+    solution. in blue we show the analytic preduction of the magnitude of
+    modulations due to free-precession as given by equation \eqref{eqn:
+    spin-down variations FP} and the red-dashed line indicates the analytic
+    prediction of eqn~/\eqref{eqn: Phi_ddot FP}}
 The variations seen in figure \ref{fig: nu_dot no torque} are the result of
 free precession. As there is no torque, the overall spindown is zero. However,
 due to precession the magnetic dipole performs a slow rotation about the
@@ -182,28 +178,15 @@ with $\mathcal{A}_{\mathrm{EM}} \approx 0.4$. Here we see
 the non-zero average spin-down (given by eqn. \eqref{eqn: spin-down initial EM chi})
 due to EM torque modulated by the geometric variations of free precession. The
 black (numerical results) and dashed red lines (analytic prediction) show good agreement.
-\begin{figure}[htb]
-\begin{floatrow}
-\ffigbox{%
-\includegraphics[width=0.5\textwidth]{nu_dot_with_torque.pdf}
-}{%
-  \caption{Modulation in the spin-down rate due to precession. The solid black line
+
+\FigureAndTable{nu_dot_with_torque}{nu_dot with torque}{
+Modulation in the spin-down rate due to precession. The solid black line
 indicates the numerical solution including a torque; the solid red line indicates
 the approximate average spin-down rate due to the EM toque as calculated
 from equation \eqref{eqn: spin-down initial EM chi}; the blue lines indicate
 the magnitude of modulation about the average spin-down due to precession; finally
 the red-dashed line is the prediction of equation \eqref{eqn: 1238}}
-\label{fig: nu_dot with torque}
-}
-\capbtabbox{%
-  \input{nu_dot_with_torque.tex}
-}{%
-  \caption{}%
-  \label{tab: nu_dot with torque}
-}
-\end{floatrow}
-\end{figure}
-
+"F",
 \FloatBarrier
 
 \subsubsection{EM torque amplification of the spin-down modulation}
@@ -257,29 +240,15 @@ than \eqref{eqn: spin-down variations FP}.
 %\label{fig: nu_dot with torque EM}
 %\end{figure}
 
-\begin{figure}[htb]
-\begin{floatrow}
-\ffigbox{%
-\includegraphics[width=0.5\textwidth]{nu_dot_with_torque_EM_amplification.pdf}
-}{%
-  \caption{EM amplification of the modulation in the spin-down rate due to precession. 
-    The solid black line
-indicates the numerical solution including a torque; the solid red line indicates
-the approximate average spin-down rate due to the EM toque as calculated
-from equation \eqref{eqn: spin-down initial EM chi}; the blue region indicates
-the modulation about the average spin-down due to precession from equation 
-\eqref{eqn: spin-down variations FP} while the green region indicates the modulation 
-about as calculated from equation \eqref{eqn: spin-down variations FP EM}.}
-  \label{fig: nu_dot with torque EM}
-}
-\capbtabbox{%
-  \input{nu_dot_with_torque_EM_amplification.tex}
-}{%
-  \caption{}%
-  \label{tab: nu_dot with torque EM}
-}
-\end{floatrow}
-\end{figure}
+\FigureAndTable{nu_dot_with_torque_EM_amplification}{nu_dot with torque EM}{
+EM amplification of the modulation in the spin-down rate due to precession.
+The solid black line indicates the numerical solution including a torque; the
+solid red line indicates the approximate average spin-down rate due to the EM
+toque as calculated from equation \eqref{eqn: spin-down initial EM chi}; the
+blue region indicates the modulation about the average spin-down due to
+precession from equation \eqref{eqn: spin-down variations FP} while the green
+region indicates the modulation about as calculated from equation \eqref{eqn:
+spin-down variations FP EM}.}
 
 \FloatBarrier
 \subsection{Double peaked spin-down values}
@@ -297,22 +266,8 @@ the EM torque prediction of \eqref{eqn: Phi_dot EM}. The EM torque
 prediction shows no visible modulation which we expect since the geometric 
 free precession features dominate in this regime. The free precession result
 agrees with good precision with the exact numerical result.
-\begin{figure}[htb]
-\begin{floatrow}
-\ffigbox{%
-    \includegraphics[width=0.5\textwidth]{DoublePeaked_LowAem.pdf}
-}{%
-  \caption{}
-  \label{fig: Double peaked low Aem}
-}
-\capbtabbox{%
-    \input{DoublePeaked_LowAem.tex}
-}{%
-  \caption{}%
-  \label{tab: Double peaked low Aem}
-}
-\end{floatrow}
-\end{figure}
+
+\FigureAndTable{DoublePeaked_LowAem}{Double peaked low Aem}{}
 
 \subsubsection{Amplification of the spin-down modulation}
 
@@ -325,25 +280,7 @@ with the numerical result). The EM analytic result gets the correct magnitude
 but there is clearly differences in the structure, this is due to the assumptions
 made on the Euler angles.
 
-\begin{figure}[htb]
-\begin{floatrow}
-\ffigbox{%
-    \includegraphics[width=0.5\textwidth]{DoublePeaked_HighAem.pdf}
-}{%
-  \caption{}
-  \label{fig: Double peaked high Aem}
-}
-\capbtabbox{%
-    \input{DoublePeaked_HighAem.tex}
-}{%
-  \caption{}%
-  \label{tab: Double peaked high Aem}
-}
-\end{floatrow}
-\end{figure}
-
-
-
+\FigureAndTable{DoublePeaked_HighAem}{Double peaked high Aem}{}
 
 
 \biblio

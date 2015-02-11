@@ -208,6 +208,13 @@ def PropertiesTable(file_name, table_name):
 
     PD = Parameter_Dictionary(file_name)
 
+    if PD.has_key('Bs'):
+        Bs = Useful_Tools.Texify_Float(PD['Bs'],3)
+        Aem = Useful_Tools.Texify_Float(PD['EMtorqueAmplificationfactor'])
+    else:
+        Bs = 0.0
+        Aem = 0.0
+
     table = (r""" \begin{{tabular}}{{ccl}}
 \multicolumn{{3}}{{c}}{{Simulation parameters}} \\
 \hline
@@ -219,11 +226,11 @@ $\tilde{{\theta}}$ &= & {:2.2f}$^{{\circ}}$ \\
 $\mathcal{{A}}_{{\mathrm{{EM}}}}$ &= & ${}$
 \end{{tabular}}
     """).format(PD['omega0'], 
-                Useful_Tools.Texify_Float(PD['Bs'],3),
+                Bs,
                 PD['chi0'],
                 PD['a0'],
                 np.degrees(PD['wobble_angle']),
-                Useful_Tools.Texify_Float(PD['EMtorqueAmplificationfactor'])
+                Aem 
                 )
     
     with open(table_name+".tex", "w+") as f:

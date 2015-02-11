@@ -1081,23 +1081,23 @@ def SpindownRate(file_name, ax=None, normalise=False, divisor=10,
         nu_dot0 = 0
 
     if "EM" in analytic:
-        ax.axhline(nu_dot0, label=r"$\dot{\nu}_{\mathrm{EM}}$",
+        ax.axhline(nu_dot0, label=r"$\dot{\nu}_{0}$",
                    color="r")
 
     if "FP" in analytic:
         Delta_nu0 = PD['delta_omega_dot0_FP'] / (2*np.pi)
-        ax.axhline(nu_dot0 + Delta_nu0, label=r"$\Delta\dot{\nu}_{\mathrm{FP}}$")
+        ax.axhline(nu_dot0 + Delta_nu0, label=r"$|\Delta\dot{\nu}|_{\mathrm{p}}$")
         ax.axhline(nu_dot0 - Delta_nu0)
-        ax.fill_between(time, nu_dot0-Delta_nu0, nu_dot0 + Delta_nu0, color="b", 
-                        alpha=0.2)
+        #ax.fill_between(time, nu_dot0-Delta_nu0, nu_dot0 + Delta_nu0, color="b", 
+        #                alpha=0.1, zorder=-100)
 
     if "58" in analytic:
         c = "green"
         Delta_nu0_58 = PD['delta_omega_dot0_FP_EM'] / (2*np.pi)
-        ax.axhline(nu_dot0 + Delta_nu0_58, color=c, label=r"$|\Delta\dot{\nu}|^{58}_{\mathrm{FP}}$")
+        ax.axhline(nu_dot0 + Delta_nu0_58, color=c, label=r"$|\Delta\dot{\nu}|^{58}_{\mathrm{p}}$")
         ax.axhline(nu_dot0 - Delta_nu0_58, color=c)
-        ax.fill_between(time, nu_dot0-Delta_nu0_58, nu_dot0 + Delta_nu0_58, color=c, 
-                        alpha=0.2)
+        #ax.fill_between(time, nu_dot0-Delta_nu0_58, nu_dot0 + Delta_nu0_58, color=c, 
+        #                alpha=0.2)
     
     ax.set_xlim(time[0], time[-1])
    #D1 = 3 * np.cos(chi0)/np.sin(chi0) * theta[0] * PD['epsI3']

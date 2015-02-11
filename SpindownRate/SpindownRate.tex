@@ -174,7 +174,7 @@ given by
         \sin\chi\dot{\psi} \frac{\cos\theta\sin\chi - \sin \psi \sin \theta \cos\chi 
 }{(\sin\theta \cos \chi - \cos \theta \sin \psi \sin \chi)^{2} + \cos^{2}\psi \sin^{2} \chi}
 \right)
-\label{eqn : 1238}
+\label{eqn: 1238}
 \end{equation}
 
 In figure \ref{fig: nu_dot with torque} we plot a typical spin-down calculation
@@ -222,8 +222,9 @@ torque:
     }{(\sin\theta \cos \chi - \cos \theta \sin \psi \sin \chi)^{2} + \cos^{2}\psi \sin^{2} \chi}\right)^{3}
     \left(\sin\theta\sin\psi\sin\chi + \cos\theta\cos\chi\right)
 \end{align}
-where we are implicitly assuming $\theta=\mathrm{const.}$ which is still 
-approximately true in the biaxial case \textcolor{red}{check this}.
+where we are implicitly assuming $\theta=\mathrm{const.}$, this is not true 
+when we have any EM torque. However, provided the variations are small we can
+to assume it as a first aproximation.
 Finally we assume that the Euler angles are approximately the same as in 
 the torque free case, that is:
 \begin{align}
@@ -235,6 +236,7 @@ the torque free case, that is:
      \left(1 -  \epsI\frac{ \sin(\chi)(\cos\theta\sin\chi - \sin \psi \sin \theta \cos\chi)
      }{(\sin\theta \cos \chi - \cos \theta \sin \psi \sin \chi)^{2} + \cos^{2}\psi \sin^{2} \chi}\right)^{3}
      \left(\sin\theta\sin\psi\sin\chi + \cos\theta\cos\chi\right)
+     \label{eqn: Phi_dot EM}
  \end{align}     
 In figure \ref{fig: nu_dot with torque EM} we plot the results of a simulation
 for which this amplifcation factor is greater than unity. This shows that the
@@ -282,6 +284,67 @@ about as calculated from equation \eqref{eqn: spin-down variations FP EM}.}
 
 \FloatBarrier
 \subsection{Double peaked spin-down values}
+When the magnetic dipole can range over the equatorial line (in the inertial
+frame), the spin-down variations can become doubly peaked. This happens
+when $\chi + \theta \sim \pi/2$. The magnitude of
+variations is still tied to the size of the EM amplification as such we 
+treat the two cases separately again.
+
+\subsubsection{Geometric dominated spin-down modulation}
+With $\Aem \ll 1$, we set $\chi=88.6^{\circ}$ and plot the spin-down modulations
+in figure \ref{fig: Double peaked low Aem}. This shows the exact numerical 
+result along with the free precession prediction of eqn.~\eqref{eqn: 1238} and
+the EM torque prediction of \eqref{eqn: Phi_dot EM}. The EM torque 
+prediction shows no visible modulation which we expect since the geometric 
+free precession features dominate in this regime. The free precession result
+agrees with good precision with the exact numerical result.
+\begin{figure}[htb]
+\begin{floatrow}
+\ffigbox{%
+    \includegraphics[width=0.5\textwidth]{DoublePeaked_LowAem.pdf}
+}{%
+  \caption{}
+  \label{fig: Double peaked low Aem}
+}
+\capbtabbox{%
+    \input{DoublePeaked_LowAem.tex}
+}{%
+  \caption{}%
+  \label{tab:}
+}
+\end{floatrow}
+\end{figure}
+
+\subsubsection{Amplification of the spin-down modulation}
+
+We now consider the case when $\Aem \gg 1$. In figure \ref{fig: Double peaked
+low Aem} we show the exact numerical result along with the free precession
+prediction of eqn.~\eqref{eqn: 1238} and the EM torque prediction of
+\eqref{eqn: Phi_dot EM}. This illustrates that the EM torque has amplified
+the size of modulations (that is the free precession result is inconsistent
+with the numerical result). The EM analytic result gets the correct magnitude
+but there is clearly differences in the structure, this is due to the assumptions
+made on the Euler angles.
+
+\begin{figure}[htb]
+\begin{floatrow}
+\ffigbox{%
+    \includegraphics[width=0.5\textwidth]{DoublePeaked_HighAem.pdf}
+}{%
+  \caption{}
+  \label{fig: Double peaked low Aem}
+}
+\capbtabbox{%
+    \input{DoublePeaked_HighAem.tex}
+}{%
+  \caption{}%
+  \label{tab:}
+}
+\end{floatrow}
+\end{figure}
+
+
+
 
 
 \biblio

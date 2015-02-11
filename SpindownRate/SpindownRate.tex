@@ -76,7 +76,7 @@ differentiating equation \eqref{eqn: Jones 49} twice which gives:
 
 In figure \ref{fig: nu_dot no torque} we plot three curves: the numerical
 result obtained using Lyne method of calculating the spin-down, the analytic
-prediction from eqn.~\eqref{eqn: Phi_ddot} and the magnitude obtained by
+prediction from eqn.~\eqref{eqn: Phi_ddot FP} and the magnitude obtained by
 eqn.~\eqref{eqn: spin-down variations FP}
 \begin{figure}[ht]
 \centering
@@ -85,7 +85,7 @@ eqn.~\eqref{eqn: spin-down variations FP}
          line is the numerical solution. in blue we show the analytic 
          preduction of the magnitude of modulations due to free-precession as
          given by equation \eqref{eqn: spin-down variations FP} and the red-dashed
-         line indicates the analytic prediction of eqn~/\eqref{eqn: Phi_ddot}}
+         line indicates the analytic prediction of eqn~/\eqref{eqn: Phi_ddot FP}}
 \label{fig: nu_dot no torque}
 \end{figure}
 
@@ -132,7 +132,7 @@ first show that the magnitude of modulation will depend on the EM torque.
 \subsubsection{Amplification of the spin-down modulation}
 The magnitude of the spin-down modulation due to precession will 
 depend on the EM amplification factor which we discussed in equation 
-\eqref{eqn: EM amplification factor}. For the timing residuals \citet{Jones2001}
+\eqref{eqn: EM amplification}. For the timing residuals \citet{Jones2001}
 demonstrated that the residuals could be amplified by the EM torque, we now
 show that a similar effect occurs for the 
 spin-down modulation. Starting with a vacuum point-dipole spin-down torque
@@ -165,7 +165,7 @@ amplify the spin-down modulation by a factor $\mathcal{A}_{\mathrm{EM}}$ as defi
 \subsubsection{Geometric dominated spin-down modulation}
 When the $\mathcal{A}_{\mathrm{EM}} \ll 1$, the geometric variations
 in the spin-down dominate. We can predict the spin-down then by allowing 
-$\ddot{\phi}$ in equation \eqref{eqn: Phi_dot FP} to be non-zero and given
+$\ddot{\phi}$ in equation \eqref{eqn: Phi_ddot FP} to be non-zero and given
 exactly by $\ddot{\phi} = 2\pi \dot{\nu}_{0}$. Then under an EM torque and 
 in the low $\Aem$ the analytic prediction for the spin-down modulation is
 given by 
@@ -199,7 +199,7 @@ the red-dashed line is the prediction of equation \eqref{eqn: 1238}}
   \input{nu_dot_with_torque.tex}
 }{%
   \caption{}%
-  \label{tab:}
+  \label{tab: nu_dot with torque}
 }
 \end{floatrow}
 \end{figure}
@@ -270,14 +270,13 @@ from equation \eqref{eqn: spin-down initial EM chi}; the blue region indicates
 the modulation about the average spin-down due to precession from equation 
 \eqref{eqn: spin-down variations FP} while the green region indicates the modulation 
 about as calculated from equation \eqref{eqn: spin-down variations FP EM}.}
-\label{fig: nu_dot with torque EM}%
   \label{fig: nu_dot with torque EM}
 }
 \capbtabbox{%
   \input{nu_dot_with_torque_EM_amplification.tex}
 }{%
   \caption{}%
-  \label{tab:}
+  \label{tab: nu_dot with torque EM}
 }
 \end{floatrow}
 \end{figure}
@@ -310,7 +309,7 @@ agrees with good precision with the exact numerical result.
     \input{DoublePeaked_LowAem.tex}
 }{%
   \caption{}%
-  \label{tab:}
+  \label{tab: Double peaked low Aem}
 }
 \end{floatrow}
 \end{figure}
@@ -318,7 +317,7 @@ agrees with good precision with the exact numerical result.
 \subsubsection{Amplification of the spin-down modulation}
 
 We now consider the case when $\Aem \gg 1$. In figure \ref{fig: Double peaked
-low Aem} we show the exact numerical result along with the free precession
+high Aem} we show the exact numerical result along with the free precession
 prediction of eqn.~\eqref{eqn: 1238} and the EM torque prediction of
 \eqref{eqn: Phi_dot EM}. This illustrates that the EM torque has amplified
 the size of modulations (that is the free precession result is inconsistent
@@ -332,13 +331,13 @@ made on the Euler angles.
     \includegraphics[width=0.5\textwidth]{DoublePeaked_HighAem.pdf}
 }{%
   \caption{}
-  \label{fig: Double peaked low Aem}
+  \label{fig: Double peaked high Aem}
 }
 \capbtabbox{%
     \input{DoublePeaked_HighAem.tex}
 }{%
   \caption{}%
-  \label{tab:}
+  \label{tab: Double peaked high Aem}
 }
 \end{floatrow}
 \end{figure}

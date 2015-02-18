@@ -22,7 +22,7 @@ SCI_FORMATTER = ticker.ScalarFormatter(useOffset=False,
                                        useMathText=True)
 
 # Plotting functions
-def simple_plot(file_name, tmax=None, tmin=None):
+def simple_plot(file_name, tmax=None, tmin=None, axes=None, *args, **kwargs):
     """
 
     Plots `file_name` in cartesian components
@@ -32,31 +32,35 @@ def simple_plot(file_name, tmax=None, tmin=None):
     file_name: str
     tmax: float 
     tmin: float
+    axes : 3 axes instances,
+        If given plot on top of these figures, else new ones are created.
 
     """
     
     (time, wx, wy, wz) = File_Functions.One_Component_Import(file_name)
 
-    fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, sharex=True)
+    if axes:
+        (ax1, ax2, ax3) = axes
+    else: 
+        fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, sharex=True)
 
-    ax1.plot(time, wx)
+    ax1.plot(time, wx, *args, **kwargs)
     ax1.set_ylabel(r"$\omega_{x}$", rotation="horizontal")
     ax1.set_yticks(ax1.get_yticks()[1:-1])
     ax1.set_xlim(tmin, tmax)
 
-    ax2.plot(time, wy)
+    ax2.plot(time, wy, *args, **kwargs)
     ax2.set_ylabel(r"$\omega_{y}$", rotation="horizontal")
     ax2.set_yticks(ax2.get_yticks()[1:-1])
     ax2.set_xlim(tmin, tmax)
 
-    ax3.plot(time, wz)
+    ax3.plot(time, wz, *args, **kwargs)
     ax3.set_ylabel(r"$\omega_{z} $", rotation="horizontal")
     ax3.set_xlim(tmin, tmax)
 
     ax3.set_xlabel(r"$t$")
 
-    py.show()
-
+    return (ax1, ax2, ax3)
 
 def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0, 
                    end_val=False, save_fig=False, **kwargs):

@@ -32,6 +32,7 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     chi = (<double *> params)[1]
     epsI1 = (<double *> params)[2]
     epsI3 = (<double *> params)[3]
+    AnomTorque = (<double *> params)[4]
 
     # Calculate the torque
     mx = sin(chi)
@@ -44,13 +45,17 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     Ty_sd = -pre * epsA * w[1]
     Tz_sd = pre * epsA * mx * (w[0] * mz - w[2] * mx)
 
-    Tx = (Tx_sd + epsA * (w[0] * mx + w[2] * mz) * w[1] * mz)
-    Ty = (Ty_sd + epsA * (w[0] * mx + w[2] * mz) * (w[2] * mx - w[0] * mz))
-    Tz = (Tz_sd - epsA * (w[0] * mx + w[2] * mz) * w[1] * mx)
+    if AnomTorque == 1:
+        Tx = (Tx_sd + epsA * (w[0] * mx + w[2] * mz) * w[1] * mz)
+        Ty = (Ty_sd + epsA * (w[0] * mx + w[2] * mz) * (w[2] * mx - w[0] * mz))
+        Tz = (Tz_sd - epsA * (w[0] * mx + w[2] * mz) * w[1] * mx)
+    else:
+        Tx = Tx_sd
+        Ty = Ty_sd
+        Tz = Tz_sd
 
     #  Define the three ODEs in f[] as functions of the above variables
     
-
     f[0] = Tx /(1 + epsI1) - w[1] * w[2] * epsI3 / (1 + epsI1)
 
     f[1] = Ty + w[0] * w[2] * (epsI3 - epsI1)
@@ -74,7 +79,7 @@ cdef int jac (double t, double w[], double *dfdy,
 
 
 def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
-    a0=50., T=1.0e3, n=10000, error=1e-10, cleanup=True, DryRun=False):
+    a0=50., T=1.0e3, AnomTorque=True, n=10000, error=1e-10, cleanup=True, DryRun=False):
     """ One component NS with Euler angles and switching
     
     This solves the Euler equations for a single component NS and the 
@@ -97,6 +102,8 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
         Initial polar angle of the spin vector in degrees
     T : float
         Duration of the simulation in seconds
+    AnomTorque : bool
+        If true, indlude the anomalous torque
     n : int
         Number of data points to save
     error : float
@@ -109,21 +116,25 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     """
  
     (file_name, run_sim) = FileNamer(epsI1=epsI1, epsI3=epsI3, epsA=epsA,
-                          omega0=omega0, chi0=chi0, a0=a0, T=T,
+                          omega0=omega0, chi0=chi0, a0=a0, T=T, AnomTorque=AnomTorque,
                           n=n, error=error, cleanup=cleanup)
     if not run_sim or DryRun:
         return file_name
+
+   # Convert python Bool to int
+    AnomTorque = AnomTorque.real
 
     # We allow the user to give angles in degrees and convert here
     chi0 = np.deg2rad(chi0)
     a0 = np.deg2rad(a0)
 
     # Pass them to params list
-    cdef double params[4]
+    cdef double params[5]
     params[0] = epsA
     params[1] = chi0
     params[2] = epsI1
     params[3] = epsI3
+    params[4] = AnomTorque
 
     # Initial values and calculate eta_relative
     cdef int i

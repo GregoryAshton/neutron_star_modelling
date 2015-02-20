@@ -1,0 +1,91 @@
+\documentclass[/home/greg/Thesis/main/main.tex]{subfiles}
+
+\begin{document}
+
+\graphicspath{{/home/greg/Neutron_star_modelling/SpindownRate/img/}}
+\inputpath{/home/greg/Neutron_star_modelling/SpindownRate/}
+
+\newcommand{\spindown}{\dot{\nu}}
+\newcommand{\Aem}{\mathcal{A}_{\mathrm{EM}}}
+\newcommand{\Tsd}{\boldsymbol{T}_{\mathrm{s}}}
+\newcommand{\wx}{\omega_{\mathrm{x}}}
+\newcommand{\wy}{\omega_{\mathrm{y}}}
+\newcommand{\wz}{\omega_{\mathrm{z}}}
+
+First we write down the spin-down torque in component form
+\begin{align}
+\Tsd = \left(\begin{array}{c}
+-\frac{\wx}{2}\left(\cos(2\chi) + 1\right) + \frac{\wz}{2}\sin(2\chi) \\
+-\wy \\
+\frac{\wx}{2}\sin(2\chi) + \frac{\wz}{2}\left(\cos(2\chi) - 1\right) 
+\end{array}\right)
+\end{align}
+First we will assume that the wobble-angle is small, such that $\omega = \wz + \eta$
+where $\eta \sim \wx, \wy$ and is small. Second, we assume that the magnetic
+dipole is close to the equator such that $\chi \approx \pi/2$. Expanding
+the trig. functions about this point we have
+\begin{align}
+\sin(2\chi) &\approx -2\left(\chi - \pi/2\right) + \mathcal{O}\left(\left(\chi - \pi/2\right)^{2}\right) \\
+\cos(2\chi) &\approx -1 + \mathcal{O}\left(\left(\chi - \pi/2\right)^{2}\right)
+\end{align}
+ Under these 
+assumptions, the spin-down torque is given by 
+\begin{align}
+\Tsd = \left(\begin{array}{c}
+0 \\
+0 \\
+-\wz 
+\end{array}\right) + \mathcal{O}(\eta) + \mathcal{O}(\chi - \pi/2)
+\end{align}
+Considering the three coupled ODEs for the components of $\spin$, unlike in the
+free-precession case where $\dot{\wz} = 0$, we now have:
+\begin{align}
+\dot{\wz} = -\frac{2R}{3c} \epsA \wz^{3}
+\end{align}
+This has a physical solution (where $\wz > 0$) given by 
+\begin{align}
+\wz(t) = \left(\frac{4R}{3c} \epsA t + C_0 \right)^{-1/2}
+\end{align}
+Solving for $C$ using the initial condition
+\begin{align}
+\wz(t) = \left(\frac{4R}{3c} \epsA t + \frac{1}{\wz(0)^{2}}\right)^{-1/2}
+\end{align}
+
+
+Without the EM torque, the solution to Eulers rigid body equations are given by
+\begin{align}
+\wx &= C_2 \cos(\epsI C_1 t) - C_3 \sin(\epsI C_1 t) \\
+\wy &= C_3 \cos(\epsI C_1 t) + C_2 \sin(\epsI C_1 t) \\
+\wz &= C_1 
+\end{align}
+
+We fix the integration constants by specifying the initial coniditions: as in
+the simulation results we begin with the spin vector $\spin$ in the $x-z$ plane
+at an angle $a_{0}$ to the $z$ axis such that $\wz(0) = \omega_{0}\cos(a_{0})$.
+Under the assumptions made above then we obtain a set of solutions for the
+spin-vector in the body frame:
+\begin{align}
+\wx &= \omega_0 \sin(a_0) \cos(\epsI \wz t)  \\
+\wy &= \omega_0 \sin(a_0) \sin(\epsI \wz t) \\
+\wz &= \left(\frac{4R}{3c} \epsA t + \left(\omega_0 \cos(a_0)\right)^{-2}\right)^{-1/2}
+\end{align}
+
+\subsection{Euler angles}
+Having obtained approximate solutions for the components of the spin-vector in
+the body frame we now need to use these to find approximate solutions for the
+Euler angles $\theta, \phi, \psi$. This can be done by solving the differential
+equations with these approximate solutions
+\begin{align}
+    \dot{\psi} &= -\wz \epsI \\
+    &= -\epsI\left(\frac{4R}{3c} \epsA t + \left(\omega_0 \cos(a_0)\right)^{-2}\right)^{-1/2}
+\end{align}
+Integrating and using the initial condition $\psi(t=0) = \pi/2$ we get
+\begin{align}
+\psi(t) = \frac{-3\epsI c}{2 R \epsA} 
+          \left(\frac{4R}{3c} \epsA t + \left(\omega_0 \cos(a_0)\right)^{-2}\right)^{-1/2}
+          + \frac{\pi}{2} + \frac{3 \epsI c}{2 R \epsA \omega_0 \cos(a_0)}
+\end{align}
+
+\biblio
+\end{document}
+

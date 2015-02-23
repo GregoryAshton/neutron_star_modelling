@@ -82,8 +82,14 @@ equations with these approximate solutions
 Integrating and using the initial condition $\psi(t=0) = \pi/2$ we get
 \begin{align}
 \psi(t) = \frac{-3\epsI c}{2 R \epsA} 
-          \left(\frac{4R}{3c} \epsA t + \left(\omega_0 \cos(a_0)\right)^{-2}\right)^{-1/2}
+          \left(\frac{4R}{3c} \epsA t + \left(\omega_0 \cos(a_0)\right)^{-2}\right)^{1/2}
           + \frac{\pi}{2} + \frac{3 \epsI c}{2 R \epsA \omega_0 \cos(a_0)}
+\end{align}
+Writing this in terms of $\wz$ we have
+\begin{align}
+\psi(t) = \frac{-3\epsI c}{2 R \epsA} 
+          \left(\frac{1}{\wz} - \frac{1}{\wz(t=0)}\right)
+          + \frac{\pi}{2} 
 \end{align}
 
 \biblio

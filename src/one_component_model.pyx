@@ -1,15 +1,15 @@
 """
 Solver for three coupled ODEs which define the single component system
 
-The solver used GSL odeint to actually solve the odes and Cython_GSL
-as a python interface documentation can be found at
+The solver uses GSL odeint to actually solve the odes and Cython_GSL
+as a python interface, for help see
 
-    http://www.gnu.org/software/gsl/manual/
+    www.gnu.org/software/gsl/manual/
     html_node/Ordinary-Differential-Equations.html
 
 and
 
-    https://github.com/twiecki/CythonGSL
+    www.github.com/twiecki/CythonGSL
 
 any changes to these files will require recompiling using the setup.py in
 the home directory.
@@ -17,15 +17,12 @@ the home directory.
 """
 
 import numpy as np
-import math
 from cython_gsl cimport *
 import h5py
 from nsmod.File_Functions import FileNamer
 
 cdef int funcs (double t, double w[], double f[], void *params) nogil:
     """ Function defining the ODEs with the anomalous torque """
-    # Define the variables used in the calculation
-    cdef double epsI1,epsI3
 
     # Import the constant variables from params
     epsA = (<double *> params)[0]
@@ -38,7 +35,8 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     mx = sin(chi)
     mz = cos(chi)
 
-    pre =  ( pow(w[0],2) + pow(w[1],2) + pow(w[2],2) ) * 2.0 * pow(10,6) * pow(9.0 * pow(10,10),-1)
+    pre = ((pow(w[0],2) + pow(w[1],2) + pow(w[2],2) ) *
+            2.0 * pow(10, 6) * pow(9.0 * pow(10, 10),-1))
 
     Tx_sd = pre * epsA * mz * (w[2] * mx - w[0] * mz)
     Ty_sd = -pre * epsA * w[1]
@@ -48,37 +46,34 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
         Tx = Tx_sd + epsA * (w[0] * mx + w[2] * mz) * w[1] * mz
         Ty = Ty_sd + epsA * (w[0] * mx + w[2] * mz) * (w[2] * mx - w[0] * mz)
         Tz = Tz_sd - epsA * (w[0] * mx + w[2] * mz) * w[1] * mx
-
     else:
         Tx = Tx_sd
         Ty = Ty_sd
         Tz = Tz_sd
 
-
     #  Define the three ODEs in f[] as functions of the above variables
+    f[0] = Tx /(1 + epsI1) - w[1] * w[2] * epsI3 / (1 + epsI1)
 
-    f[0] = Tx * pow(1 + epsI1,-1) - w[1] * w[2] * epsI3 * pow(1 + epsI1, -1)
+    f[1] = Ty + w[0] * w[2] * (epsI3 - epsI1)
 
-    f[1] = Ty - w[0] * w[2] * (epsI1 - epsI3)
-
-    f[2] = Tz * pow(1 + epsI3,-1) + w[0] * w[1] * epsI1 * pow(1 + epsI3, -1)
+    f[2] = Tz / (1 + epsI3) + w[0] * w[1] * epsI1 / (1 + epsI3)
 
     return GSL_SUCCESS
 
 
 # Currently jac is unused by the ODE solver so is left empty
-cdef int jac (double t, double y[], double *dfdy, 
+cdef int jac (double t, double w[], double *dfdy,
               double dfdt[], void *params) nogil:
 
     return GSL_SUCCESS
 
 
-def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
-    chi0=30.0, a0=50., T=1.0e3 , AnomTorque=True, eta=0.1, n=None, 
-    error=1e-10):
+def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
+          a0=50., T=1.0e3, AnomTorque=True, eta=0.1, n=None, error=1e-10,
+          DryRun=False, cleanup=True):
     """ One component NS model
-    
-    This solves the Euler equations for a single component NS and the 
+
+    This solves the Euler equations for a single component NS and the
     Euler angles to take it into the inertial frame. The body is acted
     on by the Deutsch torque, with the addition of a switching component
 
@@ -90,10 +85,10 @@ def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
         Ellipticity along the z axis
     epsA : float
         Magnetic deformation [Glampedakis & Jones, 2010]
+   omega0 : float
+        Initial magnitude of the spin vector
     chi0 : float
         Initial polar angle of the magnetic dipole in degrees
-    omega0 : float
-        Initial magnitude of the spin vector
     a0 : float
         Initial polar angle of the spin vector in degrees
     T : float
@@ -107,14 +102,20 @@ def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
         Number of data points to save
     error : float
         Error passed to the ODE solver
-    
-    
+
+
     """
 
-    file_name = FileNamer(epsI1=epsI1, epsI3=epsI3, epsA=epsA,
-                          omega0=omega0, chi0=chi0, a0=a0, T=T,
-                          AnomTorque=AnomTorque, n=n, eta=eta,
-                          error=error)
+    (file_name, run_sim) = FileNamer(epsI1=epsI1, epsI3=epsI3, epsA=epsA,
+                          omega0=omega0, chi0=chi0, a0=a0, T=T, AnomTorque=AnomTorque,
+                          n=n, error=error, cleanup=cleanup, eta=eta, n=n)
+    if not run_sim or DryRun:
+        return file_name
+
+
+    # We allow the user to give angles in degrees and convert here
+    chi0 = np.deg2rad(chi0)
+    a0 = np.deg2rad(a0)
 
     # Pass them to params list
     cdef double params[5]
@@ -204,10 +205,10 @@ def main (epsI1=-1.0e-6, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1,
         gsl_odeiv2_control_free (c)
         gsl_odeiv2_step_free (s)
 
-    f = h5py.File(file_name,'w')
-    f.create_dataset("time",data=time)
-    f.create_dataset("w1",data=w1)
-    f.create_dataset("w2",data=w2)
-    f.create_dataset("w3",data=w3)
-    f.close()
+    with h5py.File(file_name, 'w') as f:
+        f.create_dataset("time", data=np.array(time))
+        f.create_dataset("w1", data=np.array(w1))
+        f.create_dataset("w2", data=np.array(w2))
+        f.create_dataset("w3", data=np.array(w3))
+
     return file_name

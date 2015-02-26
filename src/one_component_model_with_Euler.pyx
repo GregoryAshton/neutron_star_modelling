@@ -1,17 +1,18 @@
 """
-Solver for three coupled ODEs which define the single component system along 
+Solver for three coupled ODEs which define the single component system along
 with the Euler angle equations
 
 The solver uses GSL odeint to actually solve the odes and Cython_GSL
-as a python interface, for help see documentation:
+as a python interface, for help see
 
-    gnu.org/software/gsl/manual/html_node/Ordinary-Differential-Equations.html
+    www.gnu.org/software/gsl/manual/
+    html_node/Ordinary-Differential-Equations.html
 
 and
 
-    github.com/twiecki/CythonGSL
+    www.github.com/twiecki/CythonGSL
 
-any changes to these files will require recompiling using the setup.np in
+any changes to these files will require recompiling using the setup.py in
 the home directory.
 
 """
@@ -20,7 +21,6 @@ import numpy as np
 from cython_gsl cimport *
 import h5py
 from nsmod.File_Functions import FileNamer
-
 
 cdef int funcs (double t, double w[], double f[], void *params) nogil:
     """ Function defining the ODEs with the anomalous torque """
@@ -38,32 +38,31 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
     mx = sin(chi)
     mz = cos(chi)
 
-    pre =  ((pow(w[0], 2) + pow(w[1], 2) + pow(w[2], 2)) * 
-             2.0 * pow(10, 6) * pow(9.0 * pow(10,10),-1))
+    pre =  ((pow(w[0], 2) + pow(w[1], 2) + pow(w[2], 2)) *
+             2.0 * pow(10, 6) * pow(9.0 * pow(10, 10), -1))
 
     Tx_sd = pre * epsA * mz * (w[2] * mx - w[0] * mz)
     Ty_sd = -pre * epsA * w[1]
     Tz_sd = pre * epsA * mx * (w[0] * mz - w[2] * mx)
 
     if AnomTorque == 1:
-        Tx = (Tx_sd + epsA * (w[0] * mx + w[2] * mz) * w[1] * mz)
-        Ty = (Ty_sd + epsA * (w[0] * mx + w[2] * mz) * (w[2] * mx - w[0] * mz))
-        Tz = (Tz_sd - epsA * (w[0] * mx + w[2] * mz) * w[1] * mx)
+        Tx = Tx_sd + epsA * (w[0] * mx + w[2] * mz) * w[1] * mz
+        Ty = Ty_sd + epsA * (w[0] * mx + w[2] * mz) * (w[2] * mx - w[0] * mz)
+        Tz = Tz_sd - epsA * (w[0] * mx + w[2] * mz) * w[1] * mx
     else:
         Tx = Tx_sd
         Ty = Ty_sd
         Tz = Tz_sd
 
     #  Define the three ODEs in f[] as functions of the above variables
-    
     f[0] = Tx /(1 + epsI1) - w[1] * w[2] * epsI3 / (1 + epsI1)
 
     f[1] = Ty + w[0] * w[2] * (epsI3 - epsI1)
 
     f[2] = Tz / (1 + epsI3) + w[0] * w[1] * epsI1 / (1 + epsI3)
-    
+
     f[3] = w[0] * cos(w[5]) - w[1] * sin(w[5])
-    
+
     f[4] = (w[0] * sin(w[5]) + w[1] * cos(w[5])) / sin(w[3])
 
     f[5] = w[2] - (w[0] * sin(w[5]) + w[1] * cos(w[5])) / tan(w[3])
@@ -72,17 +71,18 @@ cdef int funcs (double t, double w[], double f[], void *params) nogil:
 
 
 # Currently jac is unused by the ODE solver so is left empty
-cdef int jac (double t, double w[], double *dfdy, 
+cdef int jac (double t, double w[], double *dfdy,
               double dfdt[], void *params) nogil:
 
     return GSL_SUCCESS
 
 
 def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
-    a0=50., T=1.0e3, AnomTorque=True, n=10000, error=1e-10, cleanup=True, DryRun=False):
+          a0=50., T=1.0e3, AnomTorque=True, n=10000, error=1e-10, 
+          DryRun=False, cleanup=True):
     """ One component NS with Euler angles and switching
-    
-    This solves the Euler equations for a single component NS and the 
+
+    This solves the Euler equations for a single component NS and the
     Euler angles to take it into the inertial frame. The body is acted
     on by the Deutsch torque, with the addition of a switching component
 
@@ -103,18 +103,18 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     T : float
         Duration of the simulation in seconds
     AnomTorque : bool
-        If true, indlude the anomalous torque
+        If true, include the anomalous torque
     n : int
         Number of data points to save
     error : float
         Error passed to the ODE solver
     cleanup = bool
-        If true old data files with the same file_name will be removed. If 
+        If true old data files with the same file_name will be removed. If
         False then the simulation will not run and simply return the file_name
-    
-    
+
+
     """
- 
+
     (file_name, run_sim) = FileNamer(epsI1=epsI1, epsI3=epsI3, epsA=epsA,
                           omega0=omega0, chi0=chi0, a0=a0, T=T, AnomTorque=AnomTorque,
                           n=n, error=error, cleanup=cleanup)
@@ -143,11 +143,11 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     w[0] = omega0*sin(a0)
     w[1] = 0.0
     w[2] = omega0*cos(a0)
-    w[3] = (np.arccos(cos(a0) * (1.0 + epsI3) / 
-             np.sqrt(pow(sin(a0) * (1.0 + epsI1), 2) + 
+    w[3] = (np.arccos(cos(a0) * (1.0 + epsI3) /
+             np.sqrt(pow(sin(a0) * (1.0 + epsI1), 2) +
                  pow(cos(a0) * (1.0 + epsI3), 2))))
     w[4] = 0.0
-    w[5] = np.sign(a0) * 0.5 * np.pi 
+    w[5] = np.sign(a0) * 0.5 * np.pi
 
     # Inititate the system and define the set of functions
     cdef gsl_odeiv2_system sys
@@ -157,7 +157,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
     sys.dimension = 6
     sys.params = params
 
-    # Setup the solver 
+    # Setup the solver
     cdef gsl_odeiv2_driver * d
     d = gsl_odeiv2_driver_alloc_y_new(
                     &sys,  # const gsl_odeiv2_system * sys
@@ -169,9 +169,9 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
 
     cdef int status
     cdef double ti, dt
-    
+
     time = np.linspace(0, T, n+1)
-    
+
     w_list = [[w[0], w[1], w[2], w[3], w[4], w[5]]]
 
     # Run saving at discrete time values
@@ -181,7 +181,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
         #if (status != GSL_SUCCESS):
         #    print("error, return value=%d\n" % status)
         #    break
-        
+
         w_list.append([w[0], w[1], w[2], w[3], w[4], w[5]])
 
     gsl_odeiv2_driver_free(d)

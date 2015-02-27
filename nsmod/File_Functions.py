@@ -46,10 +46,11 @@ def Parameter_Dictionary(user_input):
         # Remove the file descriptor and the path directory
         f = RemoveFileSuffix(user_input)
         f = f.split("/")[-1]
-        
+                
         # Import the rest of the parameters
         f = f.split("_")
-        for i in range(0, len(f), 2):
+        p_d['source_script'] = f[0]
+        for i in range(1, len(f), 2):
             p_d[f[i]] = float(f[i + 1])
 
     elif type(user_input) is dict:
@@ -354,16 +355,21 @@ def FormatValue(key, val):
 
     return formatted_val
 
-def FileNamer(data_dir="data", **kwargs):
+def FileNamer(data_dir="data", source_script="Unknown", **kwargs):
     """ Returns a file name describing the key word arguments """
 
+    # Check source-scipt has sensible name
+    if "_" in source_script:
+        raise ValueError("source_script cannot contain '_' as this will "
+                         "interfer with the file naming system. Suggest using - "
+                         "instead")
     # Check if data folder exists
     data_dir = "./"+data_dir+"/"
     if not os.path.isdir(data_dir):
         os.mkdir(data_dir)
 
     # Create the file name
-    file_name_list = []
+    file_name_list = [source_script+"_"]
     for key, val in kwargs.iteritems():
         formatted_val = FormatValue(key, val)
         if formatted_val:

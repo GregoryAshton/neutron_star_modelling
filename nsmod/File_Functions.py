@@ -194,7 +194,8 @@ def Two_Component_Import(file_name):
 
     return (time, w1, w2, w3, o1, o2, o3)
 
-def PropertiesTable(file_name, table_name):
+def PropertiesTable(file_name, table_name, 
+                    include=['omega0', 'B', 'chi', 'a0', 'Aem', 'wobble_angle']):
     """ Print a latex table of the NS properties used in a simulation
 
     Parameters
@@ -203,40 +204,62 @@ def PropertiesTable(file_name, table_name):
         Name of the simulation file
     table_name : str
         Name of the file to save data in, file will always be .tex
+    include : list
+        A list of attributes to save in the properties table. Possible values
+        are: omega0, B, chi, a0, Aem, wobble_angle, tauP, tauS, tauA
     """
 
     table_name = table_name.split(".")[0]
 
     PD = Parameter_Dictionary(file_name)
 
-    if PD.has_key('Bs'):
-        Bs = Useful_Tools.Texify_Float(PD['Bs'],3)
-        Aem = Useful_Tools.Texify_Float(PD['EMtorqueAmplificationfactor'])
-    else:
-        Bs = 0.0
-        Aem = 0.0
+    lines = [r"\begin{tabular}{ccl}",
+             r"\multicolumn{3}{c}{Simulation parameters} \\",
+             "\hline"]
+    if 'omega0' in include:
+        lines.append(r"$\omega_0$  &=& {} rad/s\\".format(PD['omega0']))
+    if 'B' in include:
+        try: 
+            Bs = Useful_Tools.Texify_Float(PD['Bs'],3)
+        except KeyError:
+            Bs = 0
+        lines.append(r"$B_0$  &=& ${}$ G \\".format(Bs))
+    if 'chi' in include:
+        lines.append(r"$\chi$  &=& {:2.2f}$^{{\circ}}$ \\".format(PD['chi0']))
+    if 'a0' in include:
+        lines.append(r"$a_0$ &=& {:2.2f}$^{{\circ}}$ \\".format(PD['a0']))
+    if 'wobble_angle' in include:
+        lines.append(r"$\tilde{{\theta}}$ &= & {:2.2f}$^{{\circ}}$ \\".format(
+                       np.degrees(PD['wobble_angle'])))
+    if 'Aem' in include:
+        try:
+            Aem = Useful_Tools.Texify_Float(PD['EMtorqueAmplificationfactor'])
+        except KeyError:
+            Aem = 0
+        lines.append("$\mathcal{{A}}_{{\mathrm{{EM}}}}$ &= & ${}$".format(Aem))
+    if 'tauP' in include:
+        tauP = Useful_Tools.Texify_Float(PD['tauP'], 0)
+        lines.append(r"$\tau_{{P}}$ &$\approx$& ${}$ \\".format(tauP))
+    if 'tauA' in include:
+        try:
+            tauA = Useful_Tools.Texify_Float(PD['tauA'], 0)
+            lines.append(r"$\tau_{{A}}$ &$\approx$& ${}$ \\".format(tauA))
+        except KeyError:
+            print "WARNING: tauA requested but not in PD. Ignoring."
+    if 'tauS' in include:
+        try:
+            tauS = Useful_Tools.Texify_Float(PD['tauS'], 0)
+            lines.append(r"$\tau_{{S}}$ &$\approx$& ${}$ \\".format(tauS))
+        except KeyError:
+            print "WSRNING: tauS requested but not in PD. Ignoring."
 
-    table = (r""" \begin{{tabular}}{{ccl}}
-\multicolumn{{3}}{{c}}{{Simulation parameters}} \\
-\hline
-$\omega_0$  &=& {} rad/s\\
-$B_0$  &=& ${}$ G \\
-$\chi$  &=& {:2.2f}$^{{\circ}}$ \\
-$a_0$ &=& {:2.2f}$^{{\circ}}$ \\
-$\tilde{{\theta}}$ &= & {:2.2f}$^{{\circ}}$ \\
-$\mathcal{{A}}_{{\mathrm{{EM}}}}$ &= & ${}$
-\end{{tabular}}
-    """).format(PD['omega0'], 
-                Bs,
-                PD['chi0'],
-                PD['a0'],
-                np.degrees(PD['wobble_angle']),
-                Aem 
-                )
-    
+
+    lines.append("\end{tabular}")
+
+    table = "\n".join(lines)
     with open(table_name+".tex", "w+") as f:
         f.write(table)
-    
+
 
 def Read_File(file_name):
     """

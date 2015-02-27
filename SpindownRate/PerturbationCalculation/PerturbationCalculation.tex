@@ -2,8 +2,8 @@
 
 \begin{document}
 
-\graphicspath{{/home/greg/Neutron_star_modelling/SpindownRate/img/}}
-\inputpath{/home/greg/Neutron_star_modelling/SpindownRate/}
+\graphicspath{{/home/greg/Neutron_star_modelling/SpindownRate/PerturbationCalculation/img/}}
+\inputpath{/home/greg/Neutron_star_modelling/SpindownRate/PerturbationCalculation/}
 
 \newcommand{\spindown}{\dot{\nu}}
 \newcommand{\Aem}{\mathcal{A}_{\mathrm{EM}}}
@@ -12,7 +12,11 @@
 \newcommand{\wy}{\omega_{\mathrm{y}}}
 \newcommand{\wz}{\omega_{\mathrm{z}}}
 
-First we write down the spin-down torque in component form
+\section{Approximate analytic spin-down modulation}
+The aim of this work is to calculate an approximate form of the spin-down 
+modulation capable of exhibiting the key features in the appropriate limit. To 
+do this we will first nelect the anomalous torque and work exclusively with the
+spin-down torque. In component form, this is given by
 \begin{align}
 \Tsd = \left(\begin{array}{c}
 -\frac{\wx}{2}\left(\cos(2\chi) + 1\right) + \frac{\wz}{2}\sin(2\chi) \\
@@ -20,16 +24,22 @@ First we write down the spin-down torque in component form
 \frac{\wx}{2}\sin(2\chi) + \frac{\wz}{2}\left(\cos(2\chi) - 1\right) 
 \end{array}\right)
 \end{align}
-First we will assume that the wobble-angle is small, such that $\omega = \wz + \eta$
-where $\eta \sim \wx, \wy$ and is small. Second, we assume that the magnetic
-dipole is close to the equator such that $\chi \approx \pi/2$. Expanding
-the trig. functions about this point we have
+Clearly solving this in general as a source in the Euler rigid body equations is
+difficult. In order to get an approximate solution we will define two assumptions
+which are acceptable for a small subset of realistic pulsars:
+\begin{itemize}
+\item We assume that the wobble-angle is small, such that $\omega = \wz + \eta$
+      where $\eta \sim \wx, \wy$ and is small.
+\item Second, we assume that the magnetic dipole is close to the equator such
+      that $\chi \approx \pi/2$. Expanding the trig. functions about this point
+      we have
 \begin{align}
 \sin(2\chi) &\approx -2\left(\chi - \pi/2\right) + \mathcal{O}\left(\left(\chi - \pi/2\right)^{2}\right) \\
 \cos(2\chi) &\approx -1 + \mathcal{O}\left(\left(\chi - \pi/2\right)^{2}\right)
 \end{align}
- Under these 
-assumptions, the spin-down torque is given by 
+\end{itemize}
+
+Under these assumptions, the spin-down torque is:
 \begin{align}
 \Tsd = \left(\begin{array}{c}
 0 \\
@@ -37,6 +47,7 @@ assumptions, the spin-down torque is given by
 -\wz 
 \end{array}\right) + \mathcal{O}(\eta) + \mathcal{O}(\chi - \pi/2)
 \end{align}
+
 Considering the three coupled ODEs for the components of $\spin$, unlike in the
 free-precession case where $\dot{\wz} = 0$, we now have:
 \begin{align}
@@ -49,48 +60,99 @@ This has a physical solution (where $\wz > 0$) given by
 Solving for $C$ using the initial condition
 \begin{align}
 \wz(t) = \left(\frac{4R}{3c} \epsA t + \frac{1}{\wz(0)^{2}}\right)^{-1/2}
+\label{eqn: wz with torque}
 \end{align}
 
+We can demonstrate that this approximation holds by comparing with exact
+numerical solutions as shown in figure \ref{fig: wz with torque}. In this plot
+we see that the full numerical solution both spins-down and undergoes a
+modulation at the precession frequency. By comparing this with the numerical
+solution without the anomlous torque, we can understand that the modulations
+are a result of the anomalous torque. Without the anomalous torque the numerical
+solution agrees well with the analytic solution of equation 
+\eqref{eqn: wz with torque}; it should be noted that deviations are found
+to exist at the $~10^{-3}$ level.
 
-Without the EM torque, the solution to Eulers rigid body equations are given by
-\begin{align}
-\wx &= C_2 \cos(\epsI C_1 t) - C_3 \sin(\epsI C_1 t) \\
-\wy &= C_3 \cos(\epsI C_1 t) + C_2 \sin(\epsI C_1 t) \\
-\wz &= C_1 
-\end{align}
+\FigureAndTable{omegaz}{omegaz}{
+         Comparison of three results for the $z$ component of the spin-vector in
+         the body frame. In solid black is shown the full numerical solution, the
+         dashed black line indicates the numerical solution when the anomalous
+         torque component is neglected, in red is shown the analytic result of
+         equation \eqref{eqn: wz with torque}}
+%\begin{figure}[htb]
+%\centering
+%\includegraphics[width=0.7\textwidth]{omegaz.pdf}
+%\caption{Comparison of three results for the $z$ component of the spin-vector in
+%         the body frame. In solid black is shown the full numerical solution, the
+%         dashed black line indicates the numerical solution when the anomalous
+%         torque component is neglected, in red is shown the analytic result of
+%         equation \eqref{eqn: wz with torque}}
+%\label{fig: wz with torque}
+%\end{figure}
 
-We fix the integration constants by specifying the initial coniditions: as in
-the simulation results we begin with the spin vector $\spin$ in the $x-z$ plane
-at an angle $a_{0}$ to the $z$ axis such that $\wz(0) = \omega_{0}\cos(a_{0})$.
-Under the assumptions made above then we obtain a set of solutions for the
-spin-vector in the body frame:
-\begin{align}
-\wx &= \omega_0 \sin(a_0) \cos(\epsI \wz t)  \\
-\wy &= \omega_0 \sin(a_0) \sin(\epsI \wz t) \\
-\wz &= \left(\frac{4R}{3c} \epsA t + \left(\omega_0 \cos(a_0)\right)^{-2}\right)^{-1/2}
-\end{align}
+This result holds for any spin-down strength provided the assumptions listed
+above are met. However, we can further simplify by working in the weak 
+spin-down limit for which $\epsA \ll 1$. Expanding we have
+\begin{equation}
+\wz(t) \approx \wz(0) + \frac{2R}{3c}\epsA \wz(0)^{3} t + \mathcal{O}(\epsA^{2})
+\end{equation}
 
-\subsection{Euler angles}
-Having obtained approximate solutions for the components of the spin-vector in
-the body frame we now need to use these to find approximate solutions for the
-Euler angles $\theta, \phi, \psi$. This can be done by solving the differential
-equations with these approximate solutions
-\begin{align}
-    \dot{\psi} &= -\wz \epsI \\
-    &= -\epsI\left(\frac{4R}{3c} \epsA t + \left(\omega_0 \cos(a_0)\right)^{-2}\right)^{-1/2}
-\end{align}
-Integrating and using the initial condition $\psi(t=0) = \pi/2$ we get
-\begin{align}
-\psi(t) = \frac{-3\epsI c}{2 R \epsA} 
-          \left(\frac{4R}{3c} \epsA t + \left(\omega_0 \cos(a_0)\right)^{-2}\right)^{1/2}
-          + \frac{\pi}{2} + \frac{3 \epsI c}{2 R \epsA \omega_0 \cos(a_0)}
-\end{align}
-Writing this in terms of $\wz$ we have
-\begin{align}
-\psi(t) = \frac{-3\epsI c}{2 R \epsA} 
-          \left(\frac{1}{\wz} - \frac{1}{\wz(t=0)}\right)
-          + \frac{\pi}{2} 
-\end{align}
+Now we refer to \citet{Landau1969} where, provided suitable initial conditions
+are used, the $\psi$ euler angle is shown to satisfy:
+\begin{equation}
+\dot{\psi} = -\epsI \wz.
+\end{equation}
+Plugging in the expanded version of $\wz$ and solving we have
+\begin{equation}
+\psi(t) = -\epsI\wz(0) t + \frac{R}{3c} \epsA \epsI \omega_{z}(0)^{3} t^{2} + \mathcal{O}(\epsA^{2})
+\end{equation}
+\begin{figure}[htb]
+\centering
+\includegraphics[width=0.7\textwidth]{psi.pdf}
+\caption{}
+\label{}
+\end{figure}
+
+
+%When $\Tsd=0$, the general solution to Eulers rigid body equations are
+%\begin{align}
+%\wx &= C_2 \cos(\epsI C_1 t) - C_3 \sin(\epsI C_1 t) \\
+%\wy &= C_3 \cos(\epsI C_1 t) + C_2 \sin(\epsI C_1 t) \\
+%\wz &= C_1 
+%\end{align}
+%
+%We fix the integration constants by specifying the initial coniditions: as in
+%the simulation results we begin with the spin vector $\spin$ in the $x-z$ plane
+%at an angle $a_{0}$ to the $z$ axis such that $\wz(0) = \omega_{0}\cos(a_{0})$.
+%Under the assumptions made above then we obtain a set of solutions for the
+%spin-vector in the body frame:
+%\begin{align}
+%\wx &= \omega_0 \sin(a_0) \cos(\epsI \wz t)  \\
+%\wy &= \omega_0 \sin(a_0) \sin(\epsI \wz t) \\
+%\wz &= \left(\frac{4R}{3c} \epsA t + \left(\omega_0 \cos(a_0)\right)^{-2}\right)^{-1/2}
+%\end{align}
+
+%\subsection{Euler angles}
+%Having obtained approximate solutions for the components of the spin-vector in
+%the body frame we now need to use these to find approximate solutions for the
+%Euler angles $\theta, \phi, \psi$. This can be done by solving the differential
+%equations with these approximate solutions
+%\begin{align}
+%    \dot{\psi} &= -\wz \epsI \\
+%    &= -\epsI\left(\frac{4R}{3c} \epsA t + \left(\omega_0 \cos(a_0)\right)^{-2}\right)^{-1/2}
+%\end{align}
+%Integrating and using the initial condition $\psi(t=0) = \pi/2$ we get
+%\begin{align}
+%\psi(t) = \frac{-3\epsI c}{2 R \epsA} 
+%          \left(\frac{4R}{3c} \epsA t + \left(\omega_0 \cos(a_0)\right)^{-2}\right)^{1/2}
+%          + \frac{\pi}{2} + \frac{3 \epsI c}{2 R \epsA \omega_0 \cos(a_0)}
+%\end{align}
+%Writing this in terms of $\wz$ we have
+%\begin{align}
+%\psi(t) = \frac{-3\epsI c}{2 R \epsA} 
+%          \left(\frac{1}{\wz} - \frac{1}{\wz(t=0)}\right)
+%          + \frac{\pi}{2} 
+%\end{align}
 
 \biblio
 \end{document}

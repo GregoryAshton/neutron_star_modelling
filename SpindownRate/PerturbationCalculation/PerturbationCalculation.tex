@@ -11,10 +11,76 @@
 \newcommand{\wx}{\omega_{\mathrm{x}}}
 \newcommand{\wy}{\omega_{\mathrm{y}}}
 \newcommand{\wz}{\omega_{\mathrm{z}}}
+\newcommand{\Phiddot}{\ddot{\Phi}}
+\newcommand{\Phidot}{\dot{\Phi}}
 
 \section{Approximate analytic spin-down modulation}
-The aim of this work is to calculate an approximate form of the spin-down 
-modulation capable of exhibiting the key features in the appropriate limit. To 
+The spin-down of a pulsar is obtained by calculating $\ddot{\Phi}$,
+the second time-derivative of the magnetic dipole phase. The phase itself is
+constructed from the Euler angles $\psi, \phi$ and $\theta$ which relate the
+motion in the body frame to the interial frame of an observer. No exact analytic
+solution for these angles is known when the electromagnetic dipole torque is
+included; therefore the same is true of the spin-down.
+
+We are interested in calculating the spin-down for pulsar B1828-11. The 
+evidence suggests that it is in a region of parameter space
+where $\epsA \ll 1$ (or the spin-down timescale is much longer than the precession
+time scale), and the wobble angle is small. Therefore it is appropriate to model
+the spin-down with an approximate analytic solution, expanding in both of these term:
+\begin{align}
+\Phiddot(\epsA, \theta)\vert_{\epsA, \theta}
+& = \Phiddot(0, 0) + \frac{\partial \Phiddot(0, 0)}{\partial \epsA}  \epsA
++ \frac{\partial \Phiddot(0, 0) }{\partial \theta} \theta 
++ \mathcal{O}(\epsA^{2}, \epsA \theta, \theta^{2})
+\end{align}
+The spin-down at the origin of this parameter space is zero so the first term 
+will vanish. We can then identify the other two terms with the corresponding
+Taylor expansion in one-dimension:
+\begin{align}
+\Phiddot(\epsA, \theta)\vert_{\epsA, \theta}
+& = \ddot{\Phi}|_{\epsA = 0} + \ddot{\Phi}|_{\theta = 0}
++ \mathcal{O}(\epsA^{2}, \epsA \theta, \theta^{2})
+\end{align}
+
+\subsection{Small $\theta$ limit}
+The electomagnetic torque produced by a dipole can be written as 
+\begin{equation}
+\Phiddot = \frac{2R}{3c}\epsA \Phidot^{3} \sin^{2}\Theta
+\end{equation}
+where $\Theta$ is the polar angle of the dipole with respect to the inertial
+$z$ axis. In the limit of $\theta \rightarrow 0$, we can expand as following
+\begin{align}
+\cos\Theta &= \sin\theta \sin\psi \sin\chi + \cos\theta \cos \chi \\
+& \approx \theta\sin\psi \sin\chi  + \cos\chi + \mathcal{O}(\theta^{2})
+\end{align}
+And similarly 
+\begin{align}
+\Phidot &= \dot{\phi} + \dot{\psi} \sin\chi 
+\frac{\cos\theta \sin\chi - \sin\psi \sin \theta \cos \chi}
+{(\sin\theta\cos\chi - \cos\theta \sin \psi \sin \chi)^{2} + \cos^{2}\psi \sin^{2}\chi}
+\\
+& \approx \dot{\phi} + \dot{\psi} (1 + \tan\chi \sin\psi \theta) + \mathcal{O}(\theta^{2})
+\end{align}
+Putting these two expressions into the dipole spin-down we have
+\begin{equation}
+\Phiddot |_{\theta=0} = \frac{2R}{3c} \epsA (\dot{\phi} + \dot{\psi})^{3} \sin^{2}\chi 
++ \mathcal{O}(\theta^{2}, \epsA \theta)
+\end{equation}
+%Since we are taking the limit $\theta \rightarrow 0$, the deformation axis and
+%angular momentum are closely aligned such that $\dot{\psi} + \dot\phi = \Omega$
+%\begin{equation}
+%\Phiddot |_{\theta=0} = \frac{2R}{3c} \epsA \Omega^{3} \sin^{2}\chi 
+%+ \mathcal{O}(\theta^{2})
+%\end{equation}
+
+
+\subsection{Small $\epsA$ limit}
+At zeroth order (when $\epsA=$),  we have exact results for the Euler angles
+and hence the spin-down. We will now derive approximate analytic results for
+the Euler angles under some conditions, the aim being to derive results for the
+spin-down.
+
+To 
 do this we will first nelect the anomalous torque and work exclusively with the
 spin-down torque. In component form, this is given by
 \begin{align}
@@ -104,7 +170,7 @@ are used, the $\psi$ euler angle is shown to satisfy:
 \end{equation}
 Plugging in the expanded version of $\wz$ and solving we have
 \begin{equation}
-\psi(t) = -\epsI\wz(0) t + \frac{R}{3c} \epsA \epsI \omega_{z}(0)^{3} t^{2} + \mathcal{O}(\epsA^{2})
+\psi(t) = -\epsI\wz(0) t + \frac{R}{3c} \epsA \epsI \omega_{z}(0)^{3} t^{2} + \pi/2 + \mathcal{O}(\epsA^{2})
 \end{equation}
 \begin{figure}[htb]
 \centering
@@ -113,7 +179,42 @@ Plugging in the expanded version of $\wz$ and solving we have
 \label{}
 \end{figure}
 
+Finally from \citet{Landau1969} again we have
+\begin{align}
+\dot{\phi} & = \wz - \dot{\psi} = \wz(1 + \epsI). + \mathcal{O}(\theta^{2})
+\end{align}
+Substitting for $\wz$ and differentiating we have
+\begin{align}
+\ddot{\phi} = (1+\epsI)\left(\frac{2R}{3c} \epsA \wz(0)^{3}\right) + \mathcal{O}(\epsA^{2})
+\end{align}
 
+\subsubsection{Plugging terms into the spin-down}
+From \citet{Jones2001}, the instantaneous EM frequency is given by 
+\begin{equation}
+\Phidot = \dot{\phi} + \dot{\psi} \sin\chi
+\frac{\cos\theta\sin\chi - \sin\psi\sin\theta\cos\chi}{
+    (\sin\theta\cos\chi - \cos\theta\sin\psi\sin\chi)^{2} + \cos^{2}\psi\sin^{2}\chi}.
+\end{equation}
+To simplify the calcualtion, we define a function as such
+\begin{equation}
+f(\theta, \chi, \psi) = \sin\chi
+\frac{\cos\theta\sin\chi - \sin\psi\sin\theta\cos\chi}{
+    (\sin\theta\cos\chi - \cos\theta\sin\psi\sin\chi)^{2} + \cos^{2}\psi\sin^{2}\chi}.
+\end{equation}
+Then differentiating the frequency, we get the spin-down:
+\begin{align}
+\Phiddot = \ddot{\phi} + \ddot{\psi}f(\theta, \chi, \psi) + \dot{\psi}\frac{d}{dt}f(\theta, \chi, \psi)
+\end{align}
+Since the only time dependence in $f$ is that of $\psi$, we may simplify
+\begin{align}
+\Phiddot = \ddot{\phi} + \ddot{\psi}f(\theta, \chi, \psi) + \dot{\psi}^{2}\frac{d}{d\psi}f(\theta, \chi, \psi).
+\end{align}
+Since we know  that $\epsI \ll 1$, we can neglect terms of order $\epsI\epsA$. 
+The coefficients then are 
+\begin{align}
+\ddot{\psi} & = 0 + \mathcal{O}(\epsA\epsI) \\
+\dot{\psi}^{2} & = \left(\epsI \wz(0)\right)^{2} + \mathcal{O}(\epsA \epsI^{2})
+\end{align}
 %When $\Tsd=0$, the general solution to Eulers rigid body equations are
 %\begin{align}
 %\wx &= C_2 \cos(\epsI C_1 t) - C_3 \sin(\epsI C_1 t) \\

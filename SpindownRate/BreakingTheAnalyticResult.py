@@ -56,9 +56,9 @@ if "data" in sys.argv:
         with open(results_file, "w+") as file:
             file.write("Aem epsI3 epsA omega0 a0 chi res\n")
 
-    for chi0 in np.linspace(45, 89., 50):
-        for a0 in np.linspace(1, 45, 50):
-            for epsA in np.logspace(-6, -4, 50):
+    for chi0 in np.linspace(80, 89., 50):
+        for a0 in np.linspace(1, 10, 50):
+            for epsA in np.logspace(-7, -3, 50):
                 file_name = main(chi0=chi0, epsI3=epsI3, epsA=epsA, omega0=omega0, T=T, 
                              n=n, error=error, a0=a0, cleanup=False, DryRun=False, 
                              AnomTorque=True)
@@ -83,17 +83,20 @@ if "data" in sys.argv:
 
 if "plot" in sys.argv:
     df = pd.read_csv(results_file, delim_whitespace=True)
-    df.tauP = 1.0 / (df.epsI3 * df.omega0)
-    df.tauS = 3.*3e10/(2.*1e6 * df.epsA * df.omega0**2) 
+    df['tauP'] = 1.0 / (df.epsI3 * df.omega0)
+    df['tauS'] = 3.*3e10/(2.*1e6 * df.epsA * df.omega0**2) 
 
-    z = np.log10(df.res.values)
-    x = np.log10(np.unique(df.tauP.values/df.tauS.values))
-    y = np.unique(df.a0.values)
-    print len(x), len(y), len(z)
+    chi = 89
+    df_slice = df[df.chi == chi]
+    z = np.log10(df_slice.res.values)
+    x = np.log10(np.unique(df_slice.tauP.values/df_slice.tauS.values))
+    y = np.unique(df_slice.a0.values)
 
     X, Y = np.meshgrid(x, y)
     Z = z.reshape(X.shape)
     ax = plt.subplot(111)
+    ax.set_xlabel(r"$\tau_P / \tau_S$")
+    ax.set_ylabel("$a_{0}$")
     pcm = ax.pcolormesh(X, Y, Z)
     plt.colorbar(pcm, label="$\log_{10}(\mathrm{residual})$")
 

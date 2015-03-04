@@ -41,7 +41,9 @@ if "omegaz" in sys.argv:
         R=1e6
         c=3e10
         wz0 = omega0*np.cos(np.radians(a0))
-        return 1.0 / np.sqrt(4*R/(3*c) * epsA * t + wz0**-2)
+        #return 1.0 / np.sqrt(4*R/(3*c) * epsA * t + wz0**-2)
+        return wz0 - 2*R/(3*c) * epsA*wz0**3*t
+
     ax.plot(time, wz_analytic(time, epsA, omega0, a0), ls="-", color="r",
             label="Analytic", zorder=-10)
 

@@ -53,6 +53,10 @@ $z$ axis. In the limit of $\theta \rightarrow 0$, we can expand as following
 \cos\Theta &= \sin\theta \sin\psi \sin\chi + \cos\theta \cos \chi \\
 & \approx \theta\sin\psi \sin\chi  + \cos\chi + \mathcal{O}(\theta^{2})
 \end{align}
+and then solving for $\sin^{2}\Theta$ we find
+\begin{align}
+\sin^{2}\Theta \approx \sin^{2}\chi - 2\theta \sin\psi \sin\chi\cos\chi + \mathcal{O}(\theta^{2})
+\end{align}
 And similarly 
 \begin{align}
 \Phidot &= \dot{\phi} + \dot{\psi} \sin\chi 
@@ -61,11 +65,26 @@ And similarly
 \\
 & \approx \dot{\phi} + \dot{\psi} (1 + \tan\chi \sin\psi \theta) + \mathcal{O}(\theta^{2})
 \end{align}
+We can simplify this expression by expanding the following relation about 
+$\theta=0$:
+\begin{align}
+\wz(t) &= \dot{\phi} \cos\theta + \dot{\psi} \\
+&\approx \dot{\phi} + \dot{\psi} + \mathcal{O}(\theta^{2})
+\end{align}
+Therefore
+\begin{align}
+\Phidot & \approx \wz + \dot{\psi} \theta \tan \chi \sin\psi \\
+\Phidot^{3} & \approx \wz^{3} + 3 \wz^{2}\dot{\psi}\theta \tan \chi \sin\psi +
+\mathcal{O}(\theta^{2})
+\end{align}
 Putting these two expressions into the dipole spin-down we have
 \begin{equation}
-\Phiddot |_{\theta=0} = \frac{2R}{3c} \epsA (\dot{\phi} + \dot{\psi})^{3} \sin^{2}\chi 
-+ \mathcal{O}(\theta^{2}, \epsA \theta)
+\Phiddot |_{\theta=0} = \frac{2R}{3c} \epsA \left(
+\wz^{3} \sin^{2}\chi + \theta \left(
+\wz^{2} \dot{\psi}\tan \chi \sin\psi \sin^{2}\chi - 2\wz^{3}\sin\psi\sin\chi\cos\chi\right)
+\right) + \mathcal{O}(\theta^{2})
 \end{equation}
+
 %Since we are taking the limit $\theta \rightarrow 0$, the deformation axis and
 %angular momentum are closely aligned such that $\dot{\psi} + \dot\phi = \Omega$
 %\begin{equation}
@@ -160,7 +179,7 @@ This result holds for any spin-down strength provided the assumptions listed
 above are met. However, we can further simplify by working in the weak 
 spin-down limit for which $\epsA \ll 1$. Expanding we have
 \begin{equation}
-\wz(t) \approx \wz(0) + \frac{2R}{3c}\epsA \wz(0)^{3} t + \mathcal{O}(\epsA^{2})
+\wz(t) \approx \wz(0) - \frac{2R}{3c}\epsA \wz(0)^{3} t + \mathcal{O}(\epsA^{2})
 \end{equation}
 
 Now we refer to \citet{Landau1969} where, provided suitable initial conditions
@@ -172,6 +191,11 @@ Plugging in the expanded version of $\wz$ and solving we have
 \begin{equation}
 \psi(t) = -\epsI\wz(0) t + \frac{R}{3c} \epsA \epsI \omega_{z}(0)^{3} t^{2} + \pi/2 + \mathcal{O}(\epsA^{2})
 \end{equation}
+%We can also write this in terms of the precession and spin-down time scales:
+%\begin{equation}
+%\psi(t) = - \frac{t}{\tauP} + \frac{1}{2}\frac{t^{2}}{\tauP \tauS} + \pi/2 + \mathcal{O}(\epsA^{2})
+%\end{equation}
+
 \begin{figure}[htb]
 \centering
 \includegraphics[width=0.7\textwidth]{psi.pdf}
@@ -183,10 +207,15 @@ Finally from \citet{Landau1969} again we have
 \begin{align}
 \dot{\phi} & = \wz - \dot{\psi} = \wz(1 + \epsI). + \mathcal{O}(\theta^{2})
 \end{align}
-Substitting for $\wz$ and differentiating we have
+Substituting for $\wz$ and differentiating we have
 \begin{align}
-\ddot{\phi} = (1+\epsI)\left(\frac{2R}{3c} \epsA \wz(0)^{3}\right) + \mathcal{O}(\epsA^{2})
+\ddot{\phi} = -(1+\epsI)\left(\frac{2R}{3c} \epsA \wz(0)^{3}\right) + \mathcal{O}(\epsA^{2})
 \end{align}
+%Or
+%\begin{align}
+%\ddot{\phi} = -(1+\epsI) \frac{wz(0)}{\tauS} + \mathcal{O}(\epsA^{2}) =
+%-\frac{\wz(0)}{\tauP} - \frac{1}{\tauP\tauS} + \mathcal{O}(\epsA^{2})
+%\end{align}
 
 \subsubsection{Plugging terms into the spin-down}
 From \citet{Jones2001}, the instantaneous EM frequency is given by 
@@ -212,9 +241,11 @@ Since the only time dependence in $f$ is that of $\psi$, we may simplify
 Since we know  that $\epsI \ll 1$, we can neglect terms of order $\epsI\epsA$. 
 The coefficients then are 
 \begin{align}
-\ddot{\psi} & = 0 + \mathcal{O}(\epsA\epsI) \\
-\dot{\psi}^{2} & = \left(\epsI \wz(0)\right)^{2} + \mathcal{O}(\epsA \epsI^{2})
+\ddot{\psi} & = \frac{2R}{3c}\epsA\epsI \wz(0)^{3} + \mathcal{O}(\epsA^{2}) \\
+\dot{\psi}^{2} & = \left(\epsI \wz(0)\right)^{2} + \frac{4R}{3c} \epsA \epsI^{2} \wz(0)^{4} t +  \mathcal{O}(\epsA^{2}) \\
+\ddot{\phi} & = -(1+\epsI)\left(\frac{2R}{3c} \epsA \wz(0)^{3}\right) + \mathcal{O}(\epsA^{2})
 \end{align}
+
 %When $\Tsd=0$, the general solution to Eulers rigid body equations are
 %\begin{align}
 %\wx &= C_2 \cos(\epsI C_1 t) - C_3 \sin(\epsI C_1 t) \\

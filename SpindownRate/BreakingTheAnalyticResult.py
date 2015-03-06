@@ -6,7 +6,8 @@ from numpy import cos, sin
 import pandas as pd
 
 from nsmod.manual_switching_torque_with_Euler import main
-from nsmod import File_Functions, Physics_Functions
+from nsmod import File_Functions, Physics_Functions, Plot
+
 
 def SignalModel_EM2(theta, t):
     omega0, epsI, a0, chi, epsA = theta
@@ -35,13 +36,12 @@ def SignalModel_EM2(theta, t):
 
     return PHIDDOT + GEOMETRIC 
 
-results_file = "ResultsBreakingAnalytic.dat"
+results_file = "SAVED_ResultsBreakingAnalytic.dat"
 
 if "data" in sys.argv:
     # Parameters
-    omega0 = 2*np.pi*1000
-    epsI3 = 1.05e-3
-    epsA = 3e-10
+    omega0 = 2*np.pi*10
+    epsI3 = 1.05e-5
     chi0 = 87.0
     a0 = 3.0
     n = 50000
@@ -56,28 +56,28 @@ if "data" in sys.argv:
         with open(results_file, "w+") as file:
             file.write("Aem epsI3 epsA omega0 a0 chi res\n")
 
-    for chi0 in np.linspace(80, 89., 50):
-        for a0 in np.linspace(1, 10, 50):
-            for epsA in np.logspace(-7, -3, 50):
-                file_name = main(chi0=chi0, epsI3=epsI3, epsA=epsA, omega0=omega0, T=T, 
-                             n=n, error=error, a0=a0, cleanup=False, DryRun=False, 
-                             AnomTorque=True)
+    for a0 in np.linspace(1, 10, 25):
+        for epsA in np.logspace(-10, -5.5, 25):
+            file_name = main(chi0=chi0, epsI3=epsI3, epsA=epsA, omega0=omega0, T=T, 
+                         n=n, error=error, a0=a0, cleanup=False, DryRun=False, 
+                         AnomTorque=True)
 
-                out_EA = File_Functions.Euler_Angles_Import(file_name, time_offset=None)
-                [time, w1, w2, w3, theta, phi, psi] = out_EA
+            out_EA = File_Functions.Euler_Angles_Import(file_name, time_offset=None)
+            [time, w1, w2, w3, theta, phi, psi] = out_EA
 
-                time, nu_dot = Physics_Functions.nu_dot(time, w1, w2, w3, theta, phi, psi, 
-                                                        np.radians(chi0), tauP, divisor=divisor)
+            time, nu_dot = Physics_Functions.nu_dot(time, w1, w2, w3, theta, phi, psi, 
+                                                    np.radians(chi0), tauP, divisor=divisor)
 
-                theta_EM = np.array([omega0, epsI3, np.radians(a0), np.radians(chi0), epsA])
-                nu_dot_analytic = SignalModel_EM2(theta_EM, time)
+            theta_EM = np.array([omega0, epsI3, np.radians(a0), np.radians(chi0), epsA])
 
-                res = np.sum((nu_dot_analytic - nu_dot)**2)
-                Aem = 2*R*epsA*(omega0/(2*np.pi))/(3 * c* epsI3**2) * (2*np.pi)**2
-                results = "{:1.5e} {:1.5e} {:1.5e} {:1.5e} {:1.5e} {:1.5e} {:1.5e}\n".format(
-                           Aem, epsI3, epsA, omega0, a0, chi0, res)
-                with open("ResultsBreakingAnalytic.dat", "a") as file:
-                    file.write(results)
+            nu_dot_analytic = SignalModel_EM2(theta_EM, time)
+
+            res = np.sum((nu_dot_analytic - nu_dot)**2)
+            Aem = 2*R*epsA*(omega0/(2*np.pi))/(3 * c* epsI3**2) * (2*np.pi)**2
+            results = "{:1.5e} {:1.5e} {:1.5e} {:1.5e} {:1.5e} {:1.5e} {:1.5e}\n".format(
+                       Aem, epsI3, epsA, omega0, a0, chi0, res)
+            with open("ResultsBreakingAnalytic.dat", "a") as file:
+                file.write(results)
 
                 os.remove(file_name)
 
@@ -87,18 +87,39 @@ if "plot" in sys.argv:
     df['tauS'] = 3.*3e10/(2.*1e6 * df.epsA * df.omega0**2) 
 
     chi = 89
-    df_slice = df[df.chi == chi]
+    df_slice = df
     z = np.log10(df_slice.res.values)
-    x = np.log10(np.unique(df_slice.tauP.values/df_slice.tauS.values))
-    y = np.unique(df_slice.a0.values)
+    y = np.log10(np.unique(df_slice.tauP.values/df_slice.tauS.values))
+    x = np.unique(df_slice.a0.values)
 
     X, Y = np.meshgrid(x, y)
     Z = z.reshape(X.shape)
     ax = plt.subplot(111)
-    ax.set_xlabel(r"$\tau_P / \tau_S$")
-    ax.set_ylabel("$a_{0}$")
+    ax.set_ylabel(r"$\log_{10}(\tau_P / \tau_S)$")
+    ax.set_xlabel("$a_{0}$")
     pcm = ax.pcolormesh(X, Y, Z)
     plt.colorbar(pcm, label="$\log_{10}(\mathrm{residual})$")
 
+
+    plt.show()
+
+if "Aem" in sys.argv:
+    df = pd.read_csv(results_file, delim_whitespace=True)
+    df['tauP'] = 1.0 / (df.epsI3 * df.omega0)
+    df['tauS'] = 3.*3e10/(2.*1e6 * df.epsA * df.omega0**2) 
+
+    z = np.log10(df.res.values)
+    x = np.log10(np.unique(df.Aem.values))
+    y = np.log10(np.unique(df.tauP.values/df.tauS.values))
+    print len(x), len(y), len(z)
+
+    X, Y = np.meshgrid(x, y)
+    Z = z.reshape(X.shape)
+ 
+    ax = plt.subplot(111)
+    pcm = ax.pcolormesh(X, Y, Z)
+    plt.colorbar(pcm, label="$\log_{10}(\mathrm{residual})$")
+    ax.set_xlabel("Aem")
+    ax.set_ylabel(r"$\log_{10}(\tau_P / \tau_S)$")
 
     plt.show()

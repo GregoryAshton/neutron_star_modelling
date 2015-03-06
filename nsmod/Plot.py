@@ -1028,7 +1028,7 @@ def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="",
     return ax
 
 def SpindownRate(file_name, ax=None, normalise=False, divisor=10, 
-                 analytic="", *args, **kwargs):
+                 analytic="", nmax=None, *args, **kwargs):
     """ 
 
     Plot an approximation of nu_dot the Slowdown rate using the Lyne2010 method
@@ -1050,8 +1050,9 @@ def SpindownRate(file_name, ax=None, normalise=False, divisor=10,
 
     """
     
-    out_EA = File_Functions.Euler_Angles_Import(file_name, time_offset=None)
+    out_EA = File_Functions.Euler_Angles_Import(file_name, nmax=nmax)
     [time, w1, w2, w3, theta, phi, psi] = out_EA
+
 
     PD = File_Functions.Parameter_Dictionary(file_name)
     chi0 = np.radians(PD['chi0'])

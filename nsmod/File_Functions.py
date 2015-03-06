@@ -295,7 +295,7 @@ def vprint(verbose, *args):
         vprint = lambda *a: None      # do-nothing function
 
 
-def Euler_Angles_Import(file_name, time_offset=None):
+def Euler_Angles_Import(file_name, time_offset=None, nmax=None):
     """ Returns tuple of "(time, w1, w2, w3, theta, phi, psi) 
     
     Parameters
@@ -326,7 +326,8 @@ def Euler_Angles_Import(file_name, time_offset=None):
         phi = phi[idx:]
         psi = psi[idx:]
     
-    return (time, w1, w2, w3, theta, phi, psi)
+    return (time[:nmax], w1[:nmax], w2[:nmax], w3[:nmax],
+            theta[:nmax], phi[:nmax], psi[:nmax])
 
 
 def Clean_Data(directory, ask_user=True):

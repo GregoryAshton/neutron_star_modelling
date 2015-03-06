@@ -7,7 +7,7 @@ font.serif      : Computer Modern
 text.usetex     : True  # use latex for all text handling
 figure.figsize  : 7.3, 5.2
 axes.formatter.use_mathtext : True
-axes.formatter.useoffset : True
+axes.formatter.useoffset : False
 axes.formatter.limits : -3, 3
 figure.facecolor : w
 axes.color_cycle : k, b, r

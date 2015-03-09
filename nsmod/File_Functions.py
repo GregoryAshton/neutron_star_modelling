@@ -147,6 +147,8 @@ def Parameter_Dictionary(user_input):
 
         p_d['delta_omega_dot0_FP_EM'] = delta_omega_dot0_FP * EMtorqueAmplificationfactor / np.pi
 
+        p_d['delta_omega_dot0_EM'] = pow(tauS * P, -1)
+
     # Need to import the beta function
     #from Physics_Functions import Beta_Function
     #p_d["beta30"] = str(Beta_Function(epsI, epsA, 30 * pi / 180) * 180 / pi)

@@ -1027,29 +1027,33 @@ def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="",
                    zorder=-100) 
     return ax
 
-def SpindownRate(file_name, ax=None, normalise=False, divisor=10, 
-                 analytic="", nmax=None, *args, **kwargs):
-    """ 
+def SpindownRate(file_name, ax=None, normalise=False, divisor=10, analytic="",
+                 nmax=None, method='Lyne', *args, **kwargs):
+    """
 
-    Plot an approximation of nu_dot the Slowdown rate using the Lyne2010 method
+    Plot the spindown rate from numeric simulation
 
     Parameters:
     ----------
-    file_name: string referencing t0he h5py data file
-    ax: an axis instance to plot, if None a new instance is initiated
-    save_fig: Option to save the figure using the default save feature
-    normalise: option to normalise the plotted output, useful when comparing several 
-               different simulations
-    
-    Note: One can also pass *args and **kwargs onto the matplotlib plot function
+    file_name : str
+        Name of the h5py data file
+    ax : axis instance
+        If None a new instance is initiated
+    normalise : bool
+        Option to normalise the plotted output, useful when comparing several
+        different simulations
+    method : str
+        Either One of "Lyne" or "Numeric" describing how to compute nu_dot
+
+    Note: One can also pass *args and **kwargs onto the matplotlib plot
+          function
 
     Returns:
     --------
-    ax: the axis instance
-
+    ax : the axis instance
 
     """
-    
+
     out_EA = File_Functions.Euler_Angles_Import(file_name, nmax=nmax)
     [time, w1, w2, w3, theta, phi, psi] = out_EA
 
@@ -1058,19 +1062,21 @@ def SpindownRate(file_name, ax=None, normalise=False, divisor=10,
     chi0 = np.radians(PD['chi0'])
     tauP = PD['tauP']
 
-    out = Physics_Functions.nu_dot(time, w1, w2, w3, theta, phi, psi, chi0, 
-                                   tauP, divisor=divisor)
+    if method in ['Lyne']:
+        time, nu_dot = Physics_Functions.nu_dot_Lyne(time, w1, w2, w3,
+                                                     theta, phi, psi, chi0,
+                                                     tauP, divisor=divisor)
+    elif method in ['Numeric', 'numeric']:
+        time, nu_dot = Physics_Functions.nu_dot_numeric(time, theta, psi,
+                                                        phi, chi0)
 
     if not ax:
         fig, ax = plt.subplots()
 
-
-    #(t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(out[0])
-    time = out[0]
     if normalise:
-        nu_dot = out[1] / sum(out[1]**2)**0.5
+        nu_dot = nu_dot / sum(nu_dot**2)**0.5
     else:
-        nu_dot = out[1]
+        nu_dot = nu_dot
 
     ax.plot(time, nu_dot, *args, **kwargs)
 
@@ -1081,8 +1087,8 @@ def SpindownRate(file_name, ax=None, normalise=False, divisor=10,
 
     # Plot analytic calcualtions
     if PD.has_key('nu_dot0'):
-        nu_dot0 = PD['nu_dot0'] 
-    else: 
+        nu_dot0 = PD['nu_dot0']
+    else:
         nu_dot0 = 0
 
     if "EM" in analytic:
@@ -1091,25 +1097,25 @@ def SpindownRate(file_name, ax=None, normalise=False, divisor=10,
 
     if "FP" in analytic:
         Delta_nu0 = PD['delta_omega_dot0_FP'] / (2*np.pi)
-        ax.axhline(nu_dot0 + Delta_nu0, label=r"$|\Delta\dot{\nu}|_{\mathrm{p}}$")
+        ax.axhline(nu_dot0 + Delta_nu0,
+                   label=r"$|\Delta\dot{\nu}|_{\mathrm{p}}$")
         ax.axhline(nu_dot0 - Delta_nu0)
-        #ax.fill_between(time, nu_dot0-Delta_nu0, nu_dot0 + Delta_nu0, color="b", 
+        #ax.fill_between(time, nu_dot0-Delta_nu0,
+        #                 nu_dot0 + Delta_nu0, color="b",
         #                alpha=0.1, zorder=-100)
 
     if "58" in analytic:
         c = "green"
         Delta_nu0_58 = PD['delta_omega_dot0_FP_EM'] / (2*np.pi)
-        ax.axhline(nu_dot0 + Delta_nu0_58, color=c, label=r"$|\Delta\dot{\nu}|^{58}_{\mathrm{p}}$")
+        ax.axhline(nu_dot0 + Delta_nu0_58, color=c,
+                   label=r"$|\Delta\dot{\nu}|^{58}_{\mathrm{p}}$")
         ax.axhline(nu_dot0 - Delta_nu0_58, color=c)
-        #ax.fill_between(time, nu_dot0-Delta_nu0_58, nu_dot0 + Delta_nu0_58, color=c, 
-        #                alpha=0.2)
-    
+        #ax.fill_between(time,
+        #                 nu_dot0-Delta_nu0_58, nu_dot0 + Delta_nu0_58,
+        #                 color=c, alpha=0.2)
+
     ax.set_xlim(time[0], time[-1])
-   #D1 = 3 * np.cos(chi0)/np.sin(chi0) * theta[0] * PD['epsI3']
-    #D2 = 2 * theta[0] * np.sin(chi0) * np.cos(chi0) * .5 / (
-    #         np.sin(chi0)**2 - 2 * theta[0] *  np.sin(chi0) * np.cos(chi0) * .5) 
-    #print D1*nu0, D2*nu0
-    #ax.axhline(nu0 + D2*nu0, color="r")
+
     return ax
 
 def Amplitude(file_name, Phi0, Theta0, sigmaB, 

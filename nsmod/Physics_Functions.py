@@ -225,7 +225,7 @@ def PhaseResidual(time, w1, w2, w3, theta, phi, psi, chi, order=3,
     else:
         return Phi_res
 
-def nu_dot(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=7):
+def nu_dot_Lyne(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=7):
     """
     
     Calculate the spin down rate using the method precesribed by Lyne 2010 
@@ -283,8 +283,33 @@ def nu_dot(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=7):
     
         i += dT
 
-    return np.array([time_list, nu_dot_list])
+    return np.array(time_list), np.array(nu_dot_list)
 
+def Ndiff(x, y):
+    """ Numeric derivative assuming x is linearly spaced """
+    dx = x[1] - x[0]
+    return np.gradient(y) / dx
+
+def nu_dot_numeric(time, theta, psi, phi, chi):
+    phiddot = Ndiff(time, Ndiff(time, phi))
+    psidot = Ndiff(time, Ndiff(time, psi))
+    psiddot = Ndiff(time, Ndiff(time, psidot))
+    f = sin(chi) * (cos(theta)*sin(chi) - sin(psi)*sin(theta)*cos(chi))/(
+                   (sin(theta)*cos(chi) - cos(theta)*sin(psi)*sin(chi))**2 +
+                   (cos(psi)*sin(chi))**2
+                   )
+    dfdpsi = ((2*sin(chi)**3*sin(psi)*sin(theta)*cos(theta) - 
+                              sin(chi)**2*sin(psi)**2*sin(theta)**2*cos(chi) - 
+                              2*sin(chi)**2*sin(theta)**2*cos(chi) + 
+                              sin(chi)**2*cos(chi) - sin(theta)**2*cos(chi)**3
+                             )*sin(chi)*sin(theta)*cos(psi)/(
+                            (sin(chi)*sin(psi)*cos(theta) - sin(theta)*cos(chi))**2 + 
+                             sin(chi)**2*cos(psi)**2)**2
+                            )
+
+    return time, phiddot + psiddot*f + psidot**2 * dfdpsi
+
+    
 def Amplitude(Phi, Theta, PhiO, ThetaO, sigmaB=0.01, A0=1):
     DeltaSigma = np.arccos(np.sin(Theta)*np.sin(ThetaO) + 
                            np.cos(Theta)*np.cos(ThetaO)*np.cos(np.abs(Phi - PhiO)))

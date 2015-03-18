@@ -10,6 +10,10 @@ from nsmod.manual_switching_torque_with_Euler import main
 from nsmod import File_Functions, Physics_Functions, Plot
 
 
+def diff(x, y):
+    #return np.abs(np.sqrt(np.sum((x-y)**2)) / np.mean(x))
+    return np.abs(np.sqrt(np.mean((x-y)**2)) / np.mean(x))
+
 def SignalModel_EM2(params, t):
     omega0, epsI, a0, chi, epsA = params
 
@@ -125,23 +129,26 @@ print "Using results file {}".format(results_file)
 omega0 = 100
 epsI3 = 5e-6
 chi0 = 88.0
-n = 100000
-error = 1e-16
-divisor=9
+n = 500000
+error = 1e-17
+divisor=7
 
 tauP = 2.0*np.pi/abs(epsI3 * omega0)
 T = 3.3 * tauP
 c = 3e10
 R = 1e6
 
+print "Summary of fixed quantities"
+print "omega0 : {}\ntauP : {:1.2e}\nchi0 : {}".format(omega0, tauP, chi0)
+
 if "data" in sys.argv:
     if not os.path.isfile(results_file):
         with open(results_file, "w+") as file:
             file.write("T Aem epsI3 epsA omega0 a0 chi res resWG\n")
 
-    D = 25
+    D = 30
     for a0 in np.linspace(0.1, 6, D):
-        for epsA in np.logspace(-10, -5, D):
+        for epsA in np.logspace(-10, -6, D):
             file_name = main(chi0=chi0, epsI3=epsI3, epsA=epsA, omega0=omega0, T=T,
                          n=n, error=error, a0=a0, cleanup=False, DryRun=False,
                          AnomTorque=False)
@@ -156,10 +163,12 @@ if "data" in sys.argv:
             theta_EM = np.array([omega0, epsI3, np.radians(a0), np.radians(chi0), epsA])
 
             nu_dot_analytic = SignalModel(theta_EM, time)
-            res = np.sum((nu_dot_analytic - nu_dot)**2) / np.mean(nu_dot_analytic)**2
+            res = diff(nu_dot, nu_dot_analytic)
+            #res = np.sum((nu_dot_analytic - nu_dot)**2) / np.mean(nu_dot_analytic**2)
 
             nu_dot_analyticWG = SignalModelWithGeometric(theta_EM, time)
-            resWG = np.sum((nu_dot_analyticWG - nu_dot)**2) / np.mean(nu_dot_analyticWG)**2
+            resWG = diff(nu_dot, nu_dot_analyticWG)
+            #resWG = np.sum((nu_dot_analyticWG - nu_dot)**2) / np.mean(nu_dot_analyticWG**2)
 
             Aem = 2*R*epsA*(omega0/(2*np.pi))/(3 * c* epsI3**2) * (2*np.pi)**2
 
@@ -199,20 +208,19 @@ if "plot" in sys.argv:
         zlabel = "res"
 
     print zlabel
-    vmin, vmax = -11, 2
+    vmin, vmax = -6, 0
 
     X, Y, Z = ReadData("a0", "tauP_over_tauS", zlabel)
 
-    if np.min(Z) < vmin or np.max(Z) > vmax:
-        print("vmin {} and vmax {} not covering Z range {} -> {}".format(
-              vmin, vmax, np.min(Z), np.max(Z)))
+    print("Using limits {}, {} for data with range {}, {}".format(
+          vmin, vmax, np.min(Z), np.max(Z)))
 
 
     ax = plt.subplot(111)
     #ax.set_ylabel(r"$\epsilon_A$", rotation='horizontal')
     ax.set_ylabel(r"$\log_{10}\left(\frac{\tau_{\mathrm{P}}}{\tau_{\mathrm{S}}}\right)$",
                   rotation='horizontal', labelpad=40)
-    ax.set_xlabel("$a_{0}$ [degrees]")
+    ax.set_xlabel(r"$\theta$ [degrees]")
     pcm = ax.pcolormesh(X, Y, Z, vmin=vmin, vmax=vmax)
     plt.colorbar(pcm, label="$\log_{10}(\mathrm{residual})$",
                  orientation='horizontal',
@@ -258,6 +266,7 @@ if "corners" in sys.argv:
                              DryRun=True, AnomTorque=False)
             try:
                 ax = Plot.SpindownRate(file_name, ax=axes[j][i], 
+                                       divisor=divisor,
                                        label="Numeric solution")
             except IOError:
                 break
@@ -265,31 +274,44 @@ if "corners" in sys.argv:
             out_EA = File_Functions.Euler_Angles_Import(file_name)
             [time, w1, w2, w3, theta, phi, psi] = out_EA
 
+            time, nu_dot = Physics_Functions.nu_dot_Lyne(time, w1, w2, w3, theta, phi, psi,
+                                                    np.radians(chi0), tauP, divisor=divisor)
+
+            time_fine = np.linspace(time[0], time[-1], 1000)
 
             theta_EM = np.array([omega0, epsI3, np.radians(a0),
                                  np.radians(chi0), epsA])
 
             if "WG" not in sys.argv:
-                nu_dot_analytic = SignalModel(theta_EM, time)
-                ax.plot(time, nu_dot_analytic, "-", color="b",
+                nu_dot_analytic = SignalModel(theta_EM, time_fine)
+                line, = ax.plot(time_fine, nu_dot_analytic, "--", color="r",
                         label="Analytic without geometric")
 
             else:
-                nu_dot_analyticGeometric = SignalModelWithGeometric(theta_EM,
-                                                                time)
-                ax.plot(time, nu_dot_analyticGeometric, "--", color="r",
+                nu_dot_analyticWG = SignalModelWithGeometric(theta_EM, time_fine)
+                line, = ax.plot(time_fine, nu_dot_analyticWG, "--", color="r",
                     label="Analytic with geometric")
 
-            if "verbose" in sys.argv:
-                ax.annotate("{} {}".format(a0, epsA), (0.5, 0.5), 
-                             xycoords="axes fraction")
-                print j, i
-                print df[(df.a0 == a0) & (df.epsA == epsA)]
+            line.set_dashes((3,2))
 
-    axes[1][1].legend(bbox_to_anchor=(0.8, 2.46), frameon=False,
+            if "verbose" in sys.argv:
+                print j, i
+                line = df[(df.a0 == a0) & (df.epsA == epsA)]
+                print line
+                ax.annotate("{} \n{} \n{}".format(a0, epsA, line[zlabel].values[0]),
+                            (0.2, 0.75), 
+                             xycoords="axes fraction")
+
+
+
+    axes[1][1].legend(bbox_to_anchor=(0.5, 2.46), frameon=False,
                       fontsize=14, ncol=3)
     axes[0][0].set_xlabel("")
     axes[0][1].set_xlabel("")
+
+    for ax, label in zip(axes.flat, map(chr, range(65, 69))):
+        ax.annotate(label, (0.008, 0.9), xycoords="axes fraction", size=22,
+                    bbox=dict(facecolor='white', alpha=0.9, edgecolor='white'))
     #fig.tight_layout()
     plt.savefig("CornersPlot_{}.pdf".format(zlabel))
     plt.show()

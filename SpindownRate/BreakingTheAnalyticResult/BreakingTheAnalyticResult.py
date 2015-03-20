@@ -2,118 +2,16 @@ import numpy as np
 from matplotlib import pyplot as plt
 import sys
 import os
-from numpy import cos, sin
 import pandas as pd
 import re
 
 from nsmod.manual_switching_torque_with_Euler import main
 from nsmod import File_Functions, Physics_Functions, Plot
-
+from nsmod.Spindown_SignalModels import SignalModelWithGeometric
 
 def diff(x, y):
     #return np.abs(np.sqrt(np.sum((x-y)**2)) / np.mean(x))
     return np.abs(np.sqrt(np.mean((x-y)**2)) / np.mean(x))
-
-def SignalModel_EM2(params, t):
-    omega0, epsI, a0, chi, epsA = params
-
-    theta = a0
-
-    c = 3e10
-    R = 1e6
-    k = 2/3.0 * R/c * epsA
-
-    psidot = -epsI*omega0
-    psi = psidot*t + np.pi/2
-    C = 1 - (cos(theta)*cos(chi))**2 - 0.5*(sin(theta)*sin(chi))**2
-    tauP = 1./(epsI*omega0)
-    tauS = 1./(k*epsA*omega0**2)
-
-    I1 = tauP * cos(t/tauP) + .5*sin(chi)**2/(tauS*tauP) * (
-                cos(t/tauP)*t**3/3.0 - tauP * sin(t/tauP)*t**2)
-    I2 = -.5*tauP *sin(2*t/tauP) + sin(chi)**2/(tauS*tauP) * (
-                sin(2*t/tauP)*t**3/3.0 + .5*tauP * cos(2*t/tauP)*t**2)
-
-    Phidot3 = (2*k*(C*t + (.5*sin(2*theta)*sin(2*chi)*I1
-                                      - .25*(sin(theta)*sin(chi))**2*I2))
-               + omega0**-2
-               )**(-3./2)
-    Sin2Theta = 1 - (sin(theta)*sin(psi)*sin(chi) + cos(theta)*cos(chi))**2
-
-    theta = a0
-    GEOMETRIC = psidot**2 * ((2*sin(chi)**3*sin(psi)*sin(theta)*cos(theta) -
-                              sin(chi)**2*sin(psi)**2*sin(theta)**2*cos(chi) -
-                              2*sin(chi)**2*sin(theta)**2*cos(chi) +
-                              sin(chi)**2*cos(chi) - sin(theta)**2*cos(chi)**3
-                             )*sin(chi)*sin(theta)*cos(psi)/(
-                            (sin(chi)*sin(psi)*cos(theta) - sin(theta)*cos(chi))**2 +
-                             sin(chi)**2*cos(psi)**2)**2
-                            )/ (2*np.pi)
-
-    return  -k * Phidot3 * Sin2Theta / (2*np.pi) + 0*GEOMETRIC
-
-
-def SignalModel(params, t):
-    omega0, epsI, a0, chi, epsA = params
-
-    theta = a0
-
-    c = 3e10
-    R = 1e6
-    k = 2/3.0 * R/c * epsA
-    tauP = 1./(epsI*omega0)
-
-    psi = -epsI*omega0*t + np.pi/2 + 0.5*k*epsI*sin(chi)**2*omega0**3*t**2
-
-    C = 1 - (cos(theta)*cos(chi))**2 - 0.5*(sin(theta)*sin(chi))**2
-
-    T1 = -k * omega0**3 * C
-    T2 =  3*k**2*omega0**5 * C**2 * t
-
-    T3 = 0.5 * k * omega0**3 *(sin(2*theta)*sin(2*chi)*sin(psi) -
-                               (sin(theta)*sin(chi))**2*cos(2*psi))
-
-    #T4 = 1.5*k**2*omega0**5*C*(-sin(2*theta)*sin(2*chi)*(tauP*cos(psi) + t*sin(psi))
-    #                           +(sin(theta)*sin(chi))**2*(.5*tauP*sin(2*psi) + t*cos(2*psi)))
-
-    #T5 = 0.75*k**2*omega0**5*tauP*(
-    #          (sin(2*theta)*sin(2*chi)*cos(psi)
-    #           - 0.5*((sin(theta)*sin(chi))**2*sin(2*psi))) *
-    #          (sin(2*theta)*sin(2*chi)*sin(psi)
-    #           - ((sin(theta)*sin(chi))**2*cos(2*psi))))
-
-    return  (T1 + T2 + T3)/(2*np.pi)
-
-def SignalModelWithGeometric(params, t):
-    omega0, epsI, a0, chi, epsA = params
-
-    theta = a0
-
-    c = 3e10
-    R = 1e6
-    k = 2/3.0 * R/c * epsA
-
-    psi = -epsI*omega0*t + np.pi/2 + 0.5*k*epsI*sin(chi)**2*omega0**3*t**2
-
-    C = 1 - (cos(theta)*cos(chi))**2 - 0.5*(sin(theta)*sin(chi))**2
-
-    T1 = -k * omega0**3 * C
-    T2 =  3*k**2*omega0**5 * C**2 * t
-
-    T3 = 0.5 * k * omega0**3 *(sin(2*theta)*sin(2*chi)*sin(psi) -
-                               (sin(theta)*sin(chi))**2*cos(2*psi))
-
-    theta = a0
-    psidot = -epsI*omega0
-    GEOMETRIC = psidot**2 * ((2*sin(chi)**3*sin(psi)*sin(theta)*cos(theta) -
-                              sin(chi)**2*sin(psi)**2*sin(theta)**2*cos(chi) -
-                              2*sin(chi)**2*sin(theta)**2*cos(chi) +
-                              sin(chi)**2*cos(chi) - sin(theta)**2*cos(chi)**3
-                             )*sin(chi)*sin(theta)*cos(psi)/(
-                            (sin(chi)*sin(psi)*cos(theta) - sin(theta)*cos(chi))**2 +
-                             sin(chi)**2*cos(psi)**2)**2
-                            )
-    return  (T1 + T2 + T3 + GEOMETRIC)/(2*np.pi)
 
 dat_files = [string for string in sys.argv if re.match("^.*\.dat", string)]
 if len(dat_files) == 1:
@@ -162,11 +60,11 @@ if "data" in sys.argv:
 
             theta_EM = np.array([omega0, epsI3, np.radians(a0), np.radians(chi0), epsA])
 
-            nu_dot_analytic = SignalModel(theta_EM, time)
+            nu_dot_analytic = SignalModelWithGeometric(theta_EM, time, geometric=0)
             res = diff(nu_dot, nu_dot_analytic)
             #res = np.sum((nu_dot_analytic - nu_dot)**2) / np.mean(nu_dot_analytic**2)
 
-            nu_dot_analyticWG = SignalModelWithGeometric(theta_EM, time)
+            nu_dot_analyticWG = SignalModelWithGeometric(theta_EM, time, geometric=1)
             resWG = diff(nu_dot, nu_dot_analyticWG)
             #resWG = np.sum((nu_dot_analyticWG - nu_dot)**2) / np.mean(nu_dot_analyticWG**2)
 

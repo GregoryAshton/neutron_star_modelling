@@ -114,7 +114,7 @@ def Parameter_Dictionary(user_input):
     # Wobble angle calculation
 
     if epsA != 0:
-        beta = Physics_Functions.Beta_Function(epsI3, epsA, chi0)
+        beta = Physics_Functions.Beta_Function(epsI3, epsA, chi0, warning=False)
         wobble_angle_spindown = (P / tauS) * (1 + 1.0/epsI3) 
     else:
         beta = 0

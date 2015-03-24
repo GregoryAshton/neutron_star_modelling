@@ -93,9 +93,10 @@ def Fix_Varphi(varphi, epsilon=170.0, Angle_Type="Degrees"):
         return varphi
 
 
-def Beta_Function(epsI, epsA, chi):
+def Beta_Function(epsI, epsA, chi, warning=True):
     """ Returns beta the rotation of the effective MOI tensor """
-    print "BETA FUNCTION IS USED"
+    if warning:
+        print "BETA FUNCTION IS USED"
     if chi > 2 * pi:
         print "Assuming chi has been given in degrees rather than radians"
         chi = np.radians(chi)

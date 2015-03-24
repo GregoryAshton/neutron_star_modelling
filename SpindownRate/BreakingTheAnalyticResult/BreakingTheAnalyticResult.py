@@ -70,7 +70,7 @@ if "data" in sys.argv:
 
             Aem = 2*R*epsA*(omega0/(2*np.pi))/(3 * c* epsI3**2) * (2*np.pi)**2
 
-            results = "{:1.5e} {:1.5e} {:1.5e} {:1.5e} {:1.5e} {:1.5e} {:1.5e} {:1.5e} {:1.5e}\n".format(
+            results = "{:1.5e} {:1.5e} {:2e} {:.2e} {:1.5e} {:1.10e} {:1.10e} {:1.5e} {:1.5e}\n".format(
                        T, Aem, epsI3, epsA, omega0, a0, chi0, res, resWG)
             with open("ResultsBreakingAnalytic.dat", "a") as file:
                 file.write(results)
@@ -168,7 +168,7 @@ if "corners" in sys.argv:
                                        label="Numeric solution")
             except IOError:
                 break
-
+            print a0, epsA
             out_EA = File_Functions.Euler_Angles_Import(file_name)
             [time, w1, w2, w3, theta, phi, psi] = out_EA
 
@@ -181,7 +181,7 @@ if "corners" in sys.argv:
                                  np.radians(chi0), epsA])
 
             if "WG" not in sys.argv:
-                nu_dot_analytic = SignalModel(theta_EM, time_fine)
+                nu_dot_analytic = SignalModelWithGeometric(theta_EM, time_fine, geometric=0)
                 line, = ax.plot(time_fine, nu_dot_analytic, "--", color="r",
                         label="Analytic without geometric")
 
@@ -208,6 +208,96 @@ if "corners" in sys.argv:
     axes[0][1].set_xlabel("")
 
     for ax, label in zip(axes.flat, map(chr, range(65, 69))):
+        ax.annotate(label, (0.008, 0.9), xycoords="axes fraction", size=22,
+                    bbox=dict(facecolor='white', alpha=0.9, edgecolor='white'))
+    #fig.tight_layout()
+    plt.savefig("CornersPlot_{}.pdf".format(zlabel))
+    plt.show()
+
+def get_idxs(df, xlabel, ylabel, n):
+    nx = len(df[xlabel])
+    ny = len(df[ylabel])
+    xidxs = np.arange(0, nx+1, nx/float(n-1) -1).astype(int)
+    yidxs = np.arange(0, ny+1, ny/float(n-1) -1).astype(int)
+    return xidxs, yidxs
+
+if "points" in sys.argv:
+    if "WG" in sys.argv:
+        zlabel = "resWG"
+    else:
+        zlabel = "res"
+
+    plt.rcParams['lines.linewidth'] = 2.0
+
+    df = pd.read_csv(results_file, delim_whitespace=True)
+    a0 = df['a0']
+    epsA = df['epsA']
+
+    epsI3 = df['epsI3'][0]
+    chi0 = df['chi'][0]
+    omega0 = df['omega0'][0]
+    #T = np.unique(df['T'])[0]
+    #T = 2.07e4 # NEEDS FIXING
+
+    nrows = ncols = 3
+    fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(14, 7))
+    a0idxs, epsAidxs = get_idxs(df, 'a0', 'epsA', nrows)
+    print "lookhere" 
+    print a0idxs, df['a0'][a0idxs].values
+    print epsAidxs, df['epsA'][epsAidxs].values
+    print
+    for i, a0 in enumerate(df['a0'][a0idxs].values):
+        for j, epsA in enumerate(df['epsA'][epsAidxs].values):
+            file_name = main(chi0=chi0, epsI3=epsI3, epsA=epsA, omega0=omega0,
+                             T=T, n=n, error=error, a0=a0, cleanup=False,
+                             DryRun=True, AnomTorque=False)
+            try:
+                ax = Plot.SpindownRate(file_name, ax=axes[nrows-1-j][i], 
+                                       divisor=divisor,
+                                       label="Numeric solution")
+            except IOError:
+                print file_name
+                print "WARNING: file not found"
+                continue
+            out_EA = File_Functions.Euler_Angles_Import(file_name)
+            [time, w1, w2, w3, theta, phi, psi] = out_EA
+
+            time, nu_dot = Physics_Functions.nu_dot_Lyne(time, w1, w2, w3, theta, phi, psi,
+                                                    np.radians(chi0), tauP, divisor=divisor)
+
+            time_fine = np.linspace(time[0], time[-1], 1000)
+
+            theta_EM = np.array([omega0, epsI3, np.radians(a0),
+                                 np.radians(chi0), epsA])
+
+            if "WG" not in sys.argv:
+                nu_dot_analytic = SignalModelWithGeometric(theta_EM, time_fine, geometric=0)
+                line, = ax.plot(time_fine, nu_dot_analytic, "--", color="r",
+                        label="Analytic without geometric")
+
+            else:
+                nu_dot_analyticWG = SignalModelWithGeometric(theta_EM, time_fine)
+                line, = ax.plot(time_fine, nu_dot_analyticWG, "--", color="r",
+                    label="Analytic with geometric")
+
+            line.set_dashes((3,2))
+
+            if "verbose" in sys.argv:
+                print j, i
+                line = df[(df.a0 == a0) & (df.epsA == epsA)]
+                print line
+                ax.annotate("{} \n{} \n{}".format(a0, epsA, line[zlabel].values[0]),
+                            (0.2, 0.75), 
+                             xycoords="axes fraction")
+
+
+
+    #axes[1][1].legend(bbox_to_anchor=(0.5, 2.46), frameon=False,
+    #                  fontsize=14, ncol=3)
+    axes[0][0].set_xlabel("")
+    axes[0][1].set_xlabel("")
+
+    for ax, label in zip(axes.flat, map(chr, range(65, 65+nrows*ncols))):
         ax.annotate(label, (0.008, 0.9), xycoords="axes fraction", size=22,
                     bbox=dict(facecolor='white', alpha=0.9, edgecolor='white'))
     #fig.tight_layout()

@@ -44,9 +44,9 @@ if "data" in sys.argv:
         with open(results_file, "w+") as file:
             file.write("T Aem epsI3 epsA omega0 a0 chi res resWG\n")
 
-    D = 30
-    for a0 in np.linspace(0.1, 6, D):
-        for epsA in np.logspace(-10, -6, D):
+    D = 50
+    for a0 in np.linspace(0.1, 5, D):
+        for epsA in np.logspace(-9, -6, D):
             file_name = main(chi0=chi0, epsI3=epsI3, epsA=epsA, omega0=omega0, T=T,
                          n=n, error=error, a0=a0, cleanup=False, DryRun=False,
                          AnomTorque=False)
@@ -78,13 +78,14 @@ if "data" in sys.argv:
                 #os.remove(file_name)
 
 def ReadData(xlabel, ylabel, zlabel):
+    """ Reading in the data and return the data in the X, Y, Z format """
     df = pd.read_csv(results_file, delim_whitespace=True)
     df['tauP'] = np.abs(1.0 / (df.epsI3 * df.omega0))
     df['tauS'] = 3.*3e10/(2.*1e6 * df.epsA * df.omega0**2)
     df['tauP_over_tauS'] = df.tauP/df.tauS
 
-    z = np.log10(df[zlabel].values)
-    y = np.log10(np.unique(df[ylabel].values))
+    z = df[zlabel].values
+    y = np.unique(df[ylabel].values)
     x = np.unique(df[xlabel].values)
 
     if len(x) != len(z):
@@ -106,9 +107,11 @@ if "plot" in sys.argv:
         zlabel = "res"
 
     print zlabel
-    vmin, vmax = -6, 0
+    vmin, vmax = -5.5, -1
 
     X, Y, Z = ReadData("a0", "tauP_over_tauS", zlabel)
+    Y = np.log10(Y)
+    Z = np.log10(Z)
 
     print("Using limits {}, {} for data with range {}, {}".format(
           vmin, vmax, np.min(Z), np.max(Z)))
@@ -117,22 +120,27 @@ if "plot" in sys.argv:
     ax = plt.subplot(111)
     #ax.set_ylabel(r"$\epsilon_A$", rotation='horizontal')
     ax.set_ylabel(r"$\log_{10}\left(\frac{\tau_{\mathrm{P}}}{\tau_{\mathrm{S}}}\right)$",
-                  rotation='horizontal', labelpad=40)
+                  rotation='vertical', labelpad=40)
     ax.set_xlabel(r"$\theta$ [degrees]")
-    pcm = ax.pcolormesh(X, Y, Z, vmin=vmin, vmax=vmax)
+    pcm = ax.pcolormesh(X, Y, Z, cmap=plt.cm.jet, vmin=vmin, vmax=vmax)
     plt.colorbar(pcm, label="$\log_{10}(\mathrm{residual})$",
-                 orientation='horizontal',
+                 orientation='vertical',
                  ticks=np.linspace(vmin, vmax, abs(vmax-vmin)+1))
 
-    ax2 = ax.twinx()
-    X, Y, Z = ReadData("a0", "Aem", zlabel)
-    ax2.pcolormesh(X, Y, Z, vmin=vmin, vmax=vmax)
-    ax2.set_ylabel(r"$\mathcal{A}_{\textrm{EM}}$", rotation="horizontal",
-                   labelpad=30)
+    #ax2 = ax.twinx()
+    #X, Y, Z = ReadData("a0", "Aem", zlabel)
+    #Y = np.log10(Y)
+    #Z = np.log10(Z)
+    #
+    #ax2.set_zorder(-100)
+    #ax2.pcolormesh(X, Y, Z, vmin=vmin, vmax=vmax)
+    #ax2.set_ylabel(r"$\log_{10}\left(\mathcal{A}_{\textrm{EM}}\right)$",
+    #               rotation="vertical", labelpad=30)
 
-    ax2.set_xlim(np.min(X), np.max(X))
-    ax2.set_ylim(np.min(Y), np.max(Y))
+    ax.set_xlim(np.min(X), np.max(X))
+    ax.set_ylim(np.min(Y), np.max(Y))
 
+    ax.set_zorder(100)
 
     plt.tight_layout()
     plt.savefig("Approximate_nu_dot_validation_{}.pdf".format(zlabel))
@@ -163,7 +171,7 @@ if "corners" in sys.argv:
                              T=T, n=n, error=error, a0=a0, cleanup=False,
                              DryRun=True, AnomTorque=False)
             try:
-                ax = Plot.SpindownRate(file_name, ax=axes[j][i], 
+                ax = Plot.SpindownRate(file_name, ax=axes[j][i],
                                        divisor=divisor,
                                        label="Numeric solution")
             except IOError:
@@ -197,7 +205,7 @@ if "corners" in sys.argv:
                 line = df[(df.a0 == a0) & (df.epsA == epsA)]
                 print line
                 ax.annotate("{} \n{} \n{}".format(a0, epsA, line[zlabel].values[0]),
-                            (0.2, 0.75), 
+                            (0.2, 0.75),
                              xycoords="axes fraction")
 
 
@@ -242,7 +250,7 @@ if "points" in sys.argv:
     nrows = ncols = 3
     fig, axes = plt.subplots(nrows=nrows, ncols=ncols, figsize=(14, 7))
     a0idxs, epsAidxs = get_idxs(df, 'a0', 'epsA', nrows)
-    print "lookhere" 
+    print "lookhere"
     print a0idxs, df['a0'][a0idxs].values
     print epsAidxs, df['epsA'][epsAidxs].values
     print
@@ -252,7 +260,7 @@ if "points" in sys.argv:
                              T=T, n=n, error=error, a0=a0, cleanup=False,
                              DryRun=True, AnomTorque=False)
             try:
-                ax = Plot.SpindownRate(file_name, ax=axes[nrows-1-j][i], 
+                ax = Plot.SpindownRate(file_name, ax=axes[nrows-1-j][i],
                                        divisor=divisor,
                                        label="Numeric solution")
             except IOError:
@@ -287,7 +295,7 @@ if "points" in sys.argv:
                 line = df[(df.a0 == a0) & (df.epsA == epsA)]
                 print line
                 ax.annotate("{} \n{} \n{}".format(a0, epsA, line[zlabel].values[0]),
-                            (0.2, 0.75), 
+                            (0.2, 0.75),
                              xycoords="axes fraction")
 
 

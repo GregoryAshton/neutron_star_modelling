@@ -139,7 +139,7 @@ def Inertial_Frame(time, omega, epsI3):
 
     return theta, phi, psi
 
-# Equations for the Euler angles 
+# Equations for the Euler angles
 
 def equations(omega, theta, phi, psi):
     theta_dot = omega[0] * cos(psi) - omega[1] * sin(psi)
@@ -148,19 +148,19 @@ def equations(omega, theta, phi, psi):
     psi_dot = omega[2] - phi_dot * cos(theta)
     return theta_dot, phi_dot, psi_dot
 
-def Phi_dot(omega, theta, phi, psi, chi, theta_dot=None, phi_dot=None, 
+def Phi_dot(omega, theta, phi, psi, chi, theta_dot=None, phi_dot=None,
             psi_dot=None):
-    """ 
+    """
 
     Explicitly pass omega=None to use theta_dot, phi_dot
     """
     if omega!=None:
         theta_dot, phi_dot, psi_dot = equations(omega, theta, phi, psi)
-    return phi_dot +  sin(chi) * ( 
+    return phi_dot +  sin(chi) * (
             (psi_dot * (cos(theta) * sin(chi) - sin(psi) * sin(theta) * cos(chi)) +
              theta_dot * cos(psi) * (sin(psi) * sin(chi) * sin(theta) - cos(chi) * cos(theta))) /
 	    (pow(sin(theta) * cos(chi) - cos(theta) * sin(psi) * sin(chi), 2) + pow(cos(psi) * sin(chi), 2)))
-    
+
 def Phi(theta, phi, psi, chi, fix=True):
     """ See equation (42) of Jones 2001 """
     A = phi - .5 * np.pi
@@ -169,18 +169,18 @@ def Phi(theta, phi, psi, chi, fix=True):
                 (sin(theta) - cos(theta) * sin(psi) * tan(chi)))
     if fix:
         B = np.unwrap(B)
-    return A + B 
+    return A + B
 
-def Theta(theta, psi, chi):  
+def Theta(theta, psi, chi):
     """ See equation (52) of Jones 2001 """
-    return np.arccos(sin(theta) * sin(psi) * sin(chi) + cos(theta) * cos(chi))  
+    return np.arccos(sin(theta) * sin(psi) * sin(chi) + cos(theta) * cos(chi))
 
 def PhaseResidual(time, w1, w2, w3, theta, phi, psi, chi, order=3,
                     full=False):
-    """ 
+    """
 
-    Calculate the phase residuals in the inertial frame using Phi_dot the 
-    instantaneous electromagnetic frequency. To understand the process it is 
+    Calculate the phase residuals in the inertial frame using Phi_dot the
+    instantaneous electromagnetic frequency. To understand the process it is
     best to follow the source code.
 
     Parameters
@@ -228,14 +228,14 @@ def PhaseResidual(time, w1, w2, w3, theta, phi, psi, chi, order=3,
 
 def nu_dot_Lyne(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=7):
     """
-    
-    Calculate the spin down rate using the method precesribed by Lyne 2010 
-    
+
+    Calculate the spin down rate using the method precesribed by Lyne 2010
+
     Parameters:
     -----------
     data: The usual (expand)
-    divisor: The fraction of the precession period to use as a segmentation 
-             time for calculating the nu_dot values. 
+    divisor: The fraction of the precession period to use as a segmentation
+             time for calculating the nu_dot values.
 
     Returns:
     out: Array of the values of the time and nu_dot
@@ -276,12 +276,12 @@ def nu_dot_Lyne(time, w1, w2, w3, theta, phi, psi, chi, tauP, divisor=7):
 
     while i < len(time)-T_index_range:
         time_mid = 0.5*(time[i] + time[i+T_index_range])
-        nu_dot = get_nudot(time[i:i + T_index_range], 
+        nu_dot = get_nudot(time[i:i + T_index_range],
                            Phi_list[i:i + T_index_range],
                            time_mid)
         nu_dot_list.append(nu_dot)
-        time_list.append(time_mid) 
-    
+        time_list.append(time_mid)
+
         i += dT
 
     return np.array(time_list), np.array(nu_dot_list)
@@ -299,12 +299,12 @@ def nu_dot_numeric(time, theta, psi, phi, chi):
                    (sin(theta)*cos(chi) - cos(theta)*sin(psi)*sin(chi))**2 +
                    (cos(psi)*sin(chi))**2
                    )
-    dfdpsi = ((2*sin(chi)**3*sin(psi)*sin(theta)*cos(theta) - 
-                              sin(chi)**2*sin(psi)**2*sin(theta)**2*cos(chi) - 
-                              2*sin(chi)**2*sin(theta)**2*cos(chi) + 
+    dfdpsi = ((2*sin(chi)**3*sin(psi)*sin(theta)*cos(theta) -
+                              sin(chi)**2*sin(psi)**2*sin(theta)**2*cos(chi) -
+                              2*sin(chi)**2*sin(theta)**2*cos(chi) +
                               sin(chi)**2*cos(chi) - sin(theta)**2*cos(chi)**3
                              )*sin(chi)*sin(theta)*cos(psi)/(
-                            (sin(chi)*sin(psi)*cos(theta) - sin(theta)*cos(chi))**2 + 
+                            (sin(chi)*sin(psi)*cos(theta) - sin(theta)*cos(chi))**2 +
                              sin(chi)**2*cos(psi)**2)**2
                             )
 
@@ -324,8 +324,8 @@ def IntensityMax(Theta, ThetaO, sigmaB=0.01, I0=1):
 
 
 def Wp(Phi_dot, Theta, ThetaO, sigmaB, p=50):
-    """ Analytic calculation of the pulse width 
-    
+    """ Analytic calculation of the pulse width
+
     Parameters
     ----------
     Phi_dot, Theta : array_like
@@ -341,7 +341,7 @@ def Wp(Phi_dot, Theta, ThetaO, sigmaB, p=50):
     -------
     Beam width at p
     """
-    A = np.cos(np.sqrt(2 * sigmaB**2 * np.log(100./p))) 
+    A = np.cos(np.sqrt(2 * sigmaB**2 * np.log(100./p)))
     B = (A-np.sin(Theta) * np.sin(ThetaO)) / (np.cos(Theta) * np.cos(ThetaO))
     C = np.pi * Phi_dot
-    return (1 - np.arccos(B) ) / C 
+    return (1 - np.arccos(B) ) / C

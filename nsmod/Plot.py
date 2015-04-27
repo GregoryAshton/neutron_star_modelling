@@ -30,18 +30,18 @@ def simple_plot(file_name, tmax=None, tmin=None, axes=None, *args, **kwargs):
     Parameters
     ----------
     file_name: str
-    tmax: float 
+    tmax: float
     tmin: float
     axes : 3 axes instances,
         If given plot on top of these figures, else new ones are created.
 
     """
-    
+
     (time, wx, wy, wz) = File_Functions.One_Component_Import(file_name)
 
     if axes:
         (ax1, ax2, ax3) = axes
-    else: 
+    else:
         fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, sharex=True)
 
     ax1.plot(time, wx, *args, **kwargs)
@@ -62,7 +62,7 @@ def simple_plot(file_name, tmax=None, tmin=None, axes=None, *args, **kwargs):
 
     return (ax1, ax2, ax3)
 
-def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0, 
+def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
                    end_val=False, save_fig=False, **kwargs):
     """
 
@@ -85,7 +85,7 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
     Returns
     -------
     fig : matplotlib figure instance
-        
+
     """
 
     if axes:
@@ -157,7 +157,7 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
             .format(py.average(varphi_end), max(varphi_end) - min(varphi_end)))
 
     py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12, hspace=0.0)
-    
+
     if save_fig:
         File_Functions.Save_Figure(file_name, 'Spherical_Plot')
 
@@ -762,7 +762,7 @@ def Observables_Plot(file_name):
     Plot some physical observables
 
     """
-    
+
     import NLD_Functions
     # Default settings
     labelx = -0.1  # x position of the yaxis labels
@@ -800,7 +800,7 @@ def Observables_Plot(file_name):
     py.show()
 
 
-def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False, 
+def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
                  *args, **kwargs):
     """ Plot the Euler angles in three subplots """
 
@@ -843,7 +843,7 @@ def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
         ax2.plot(time, phi, ls="--", color=COLOR, lw=lw)
 
         psidot = -1 * epsI3 * phidot
-        psi = np.degrees(psidot * time) + 90.0 
+        psi = np.degrees(psidot * time) + 90.0
         ax3.plot(time, psi, ls="--", color=COLOR, lw=lw)
 
     # Plotting
@@ -884,10 +884,10 @@ def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
     return (ax1, ax2, ax3)
 
 def big_phi_dot(file_name, ax=None, save_fig=False, *args, **kwargs):
-    """ 
-    
-    Plot Phi_dot for data given in file_name 
-    
+    """
+
+    Plot Phi_dot for data given in file_name
+
     :param file_name: Name of the `hdf5` file containing the data
     :type file_name: str
     :param ax: axis instance to use in plotting, if none a new one will be created
@@ -903,9 +903,9 @@ def big_phi_dot(file_name, ax=None, save_fig=False, *args, **kwargs):
     time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
     chi0 = float(File_Functions.Parameter_Dictionary(file_name)['chi0'])
     (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
-    
+
     Phi_dot_list = Physics_Functions.Phi_dot(np.array([w1, w2, w3]), theta, phi, psi, np.radians(chi0))
-    ax.plot(t_scaled, Phi_dot_list, *args, **kwargs) 
+    ax.plot(t_scaled, Phi_dot_list, *args, **kwargs)
     ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
     ax.set_ylabel(r"$\dot{\Phi}$", rotation="horizontal", size=26)
 
@@ -913,10 +913,10 @@ def big_phi_dot(file_name, ax=None, save_fig=False, *args, **kwargs):
 
 
 def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
-    """ 
-    
-    Plot Phi_dot for data given in file_name 
-    
+    """
+
+    Plot Phi_dot for data given in file_name
+
     :param file_name: Name of the `hdf5` file containing the data
     :type file_name: str
     :param ax: axis instance to use in plotting, if none a new one will be created
@@ -932,35 +932,35 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
     time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
     chi0 = float(File_Functions.Parameter_Dictionary(file_name)['chi0'])
     (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
-    
+
     Theta_list = np.degrees(Physics_Functions.Theta(theta, psi, np.radians(chi0)))
-    ax.plot(t_scaled, Theta_list, *args, **kwargs) 
+    ax.plot(t_scaled, Theta_list, *args, **kwargs)
     ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
     ax.set_ylabel(r"$\Theta$", rotation="horizontal", size=26)
 
     return ax
 
 
-def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="", 
+def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="",
                     tstart=None, tend=None, *args, **kwargs):
-    """ 
-    Plot the phase residuals for the data given in file_name. 
-    
+    """
+    Plot the phase residuals for the data given in file_name.
+
     Parameters:
     -----------
-    file_name : 
+    file_name :
         String referencing the h5py data file
-    order : 
+    order :
         Order of polynomial to fit, must be either 2 or 3
-    ax: 
+    ax:
         An axis instance to plot, if None a new instance is initiated
-    save_fig : 
+    save_fig :
         Option to save the figure using the default save feature
     analytic : one of, or a list of, "49", "63", "75"
         If given plot the analytic predictions of Jones 2001
     tstart, tend : float
         If given as floats the start and ends points to use
-    
+
     Note: *args and **kwargs are passed onto the matplotlib plot function
 
     Returns:
@@ -979,8 +979,8 @@ def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="",
     elif tstart:
         idxs = time > tstart
     elif tend:
-        idxs = time < tend     
-    
+        idxs = time < tend
+
     try:
         time = time[idxs]
         w1 = w1[idxs]
@@ -992,8 +992,8 @@ def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="",
     except NameError:
         pass
 
-    Pres = Physics_Functions.PhaseResidual(time, w1, w2, w3, 
-                                             theta, phi, psi, chi0, 
+    Pres = Physics_Functions.PhaseResidual(time, w1, w2, w3,
+                                             theta, phi, psi, chi0,
                                              order=order)
     Cycles = Pres / (2*np.pi)
     if not ax:
@@ -1006,12 +1006,12 @@ def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="",
 
     if "49" in analytic:
         DeltaPhi_49 = PD['DeltaPhi_49']
-        ax.axhline(DeltaPhi_49/(2*np.pi), ls="--", color="k", zorder=-100, 
+        ax.axhline(DeltaPhi_49/(2*np.pi), ls="--", color="k", zorder=-100,
                    label="$|\Delta\Phi^{49}|$")
         ax.axhline(-DeltaPhi_49/(2*np.pi), ls="--", color="k", zorder=-100)
     if "63" in analytic:
         DeltaPhi_63 = PD['DeltaPhi_63']
-        ax.axhline(DeltaPhi_63/(2*np.pi), ls="--", color="r", zorder=-100, 
+        ax.axhline(DeltaPhi_63/(2*np.pi), ls="--", color="r", zorder=-100,
                    label="$|\Delta\Phi^{63}|$")
         ax.axhline(-DeltaPhi_63/(2*np.pi), ls="--", color="r", zorder=-100)
     if "75" in analytic:
@@ -1021,10 +1021,10 @@ def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="",
         ax.axhline(-DeltaPhi_75/(2*np.pi), ls="--", color="b", zorder=-100)
     if "49SD" in analytic:
         DeltaPhi_49_SpindownTorque = PD['DeltaPhi_49_SpindownTorque']
-        ax.axhline(DeltaPhi_49_SpindownTorque/(2*np.pi), ls="--", color="k", 
+        ax.axhline(DeltaPhi_49_SpindownTorque/(2*np.pi), ls="--", color="k",
                    zorder=-100, label="$|\Delta\Phi^{49}|$")
         ax.axhline(-DeltaPhi_49_SpindownTorque/(2*np.pi), ls="--", color="k",
-                   zorder=-100) 
+                   zorder=-100)
     return ax
 
 def SpindownRate(file_name, ax=None, normalise=False, divisor=10, analytic="",
@@ -1170,7 +1170,7 @@ def Intensity(file_name, PhiO, ThetaO, sigmaB,
 
 def PulseWidth(file_name, Theta0, sigmaB, p=50,
                eta=0.01, ax=None, *args, **kwargs):
-    """ 
+    """
     Plot the pulse width using a 2D Gaussian beam model
 
     Parameters:
@@ -1182,13 +1182,13 @@ def PulseWidth(file_name, Theta0, sigmaB, p=50,
     eta : float [0, 1]
         Scaling of the free precession time scale to one in which the modulation
         is negligible
-    file_name: string 
+    file_name: string
         Reference to the h5py data file
     ax : matplotlib axis instance, optional
         Axis to plot on
     save_fig : bool, optional
         Save the figure using the default save feature
-    
+
     Note: One can also pass *args and **kwargs onto the matplotlib plot function
 
     Returns:
@@ -1196,24 +1196,24 @@ def PulseWidth(file_name, Theta0, sigmaB, p=50,
     ax: the axis instance
 
 
-    """    
-    
+    """
+
     if not ax:
         fig, ax = plt.subplots()
 
     out_EA = File_Functions.Euler_Angles_Import(file_name)
     [time, w1, w2, w3, theta, phi, psi] = out_EA
-    
+
     PD = File_Functions.Parameter_Dictionary(file_name)
     chi0 = np.radians(PD['chi0'])
-    
+
     #Phi = Physics_Functions.Phi(theta, phi, psi, chi0, fix=True)
     Theta = Physics_Functions.Theta(theta, psi, chi0)
-    Phi_dot = Physics_Functions.Phi_dot(np.array([w1, w2, w3]), 
+    Phi_dot = Physics_Functions.Phi_dot(np.array([w1, w2, w3]),
                                              theta, phi, psi, chi0)
 
-    #Amplitude = Physics_Functions.Amplitude(Phi, Theta, Phi0, Theta0, 
-    #                              sigmaTheta, sigmaPhi, A0=1) 
+    #Amplitude = Physics_Functions.Amplitude(Phi, Theta, Phi0, Theta0,
+    #                              sigmaTheta, sigmaPhi, A0=1)
 
     #tCONS = eta * PD['tauP']
 

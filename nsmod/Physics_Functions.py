@@ -310,12 +310,18 @@ def nu_dot_numeric(time, theta, psi, phi, chi):
 
     return time, phiddot + psiddot*f + psidot**2 * dfdpsi
 
-    
-def Amplitude(Phi, Theta, PhiO, ThetaO, sigmaB=0.01, A0=1):
-    DeltaSigma = np.arccos(np.sin(Theta)*np.sin(ThetaO) + 
-                           np.cos(Theta)*np.cos(ThetaO)*np.cos(np.abs(Phi - PhiO)))
-    # Is this real? 
-    return A0 *  np.exp(-DeltaSigma**2 / (2*sigmaB**2))
+
+def Intensity(Phi, Theta, PhiO, ThetaO, sigmaB=0.01, I0=1):
+    DeltaSigma = np.arccos(
+        np.sin(Theta)*np.sin(ThetaO)
+        + np.cos(Theta)*np.cos(ThetaO)*np.cos(np.abs(Phi - PhiO)))
+    # Is this real?
+    return I0 * np.exp(-DeltaSigma**2 / (2*sigmaB**2))
+
+
+def IntensityMax(Theta, ThetaO, sigmaB=0.01, I0=1):
+    return I0 * np.exp(-(Theta - ThetaO)**2 / (2*sigmaB**2))
+
 
 def Wp(Phi_dot, Theta, ThetaO, sigmaB, p=50):
     """ Analytic calculation of the pulse width 

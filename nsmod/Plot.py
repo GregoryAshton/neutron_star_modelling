@@ -1118,9 +1118,10 @@ def SpindownRate(file_name, ax=None, normalise=False, divisor=10, analytic="",
 
     return ax
 
-def Amplitude(file_name, Phi0, Theta0, sigmaB, 
+
+def Intensity(file_name, PhiO, ThetaO, sigmaB,
               ax=None, *args, **kwargs):
-    """ 
+    """
     Plot the amplitude using a 2D Gaussian beam model
 
     Parameters:
@@ -1129,14 +1130,14 @@ def Amplitude(file_name, Phi0, Theta0, sigmaB,
         Observers angular position in the inertial frame
     sigmaPhi, sigmaTheta : float
         Pulse shape parameters
-    file_name: string 
+   file_name: string
         Reference to the h5py data file
     ax : matplotlib axis instance, optional
         Axis to plot on
     save_fig : bool, optional
         Save the figure using the default save feature
-    
-    Note: One can also pass *args and **kwargs onto the matplotlib plot function
+
+    Note: One can also pass *args and **kwargs to the matplotlib plot function
 
     Returns:
     --------
@@ -1155,12 +1156,15 @@ def Amplitude(file_name, Phi0, Theta0, sigmaB,
     Phi = Physics_Functions.Phi(theta, phi, psi, chi0, fix=True)
     Theta = Physics_Functions.Theta(theta, psi, chi0)
 
-    Amplitude = Physics_Functions.Amplitude(Phi, Theta, Phi0, Theta0, 
-                                            sigmaB, A0=1) 
-   
-    ax.plot(time, Amplitude, *args, **kwargs)
+    Intensity = Physics_Functions.Intensity(Phi, Theta, PhiO, ThetaO,
+                                            sigmaB, I0=1)
+    ax.plot(time, Intensity, *args, **kwargs)
+
+    IMax = Physics_Functions.IntensityMax(Theta, ThetaO, sigmaB, I0=1)
+    ax.plot(time, IMax, "--b")
+
     ax.set_xlabel("time [s]")
-    ax.set_ylabel("Normalised Amplitude")
+    ax.set_ylabel("Normalised Intensity")
 
     return ax
 

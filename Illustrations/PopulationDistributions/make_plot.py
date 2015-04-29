@@ -9,10 +9,10 @@ from get_data import df
 def AddNormal(ax, data):
     mu = np.mean(data)
     std = np.std(data)
-    quants = np.linspace(data.min(), data.max(), 100)
+    quants = np.linspace(data.min(), data.max(), 50)
     ax.plot(quants, norm.pdf(quants, loc=mu, scale=std), lw=4, color="r")
     s = "Properties\n$\mu$={}\n$\sigma$={}".format(
-        BDA.Texify_Float(mu), BDA.Texify_Float(std))
+        BDA.Texify_Float(mu, 4), BDA.Texify_Float(std, 4))
     ax.annotate(s, xy=(0.7, 0.8), xycoords="figure fraction", size=22,
                 # bbox=dict(boxstyle="square, pad=0.3", fc="w", ec="k", lw=1)
                 )
@@ -61,7 +61,7 @@ if "W10" in sys.argv or len(sys.argv) == 1:
     fig = plt.figure(figsize=(6, 8))
     ax = fig.add_subplot(111)
     log10W10 = np.log10(df.W10[np.isfinite(df.W10)])
-    ax.hist(log10W10, bins=100, normed=True)
+    ax.hist(log10W10, bins=50, normed=True)
     ax = AddNormal(ax, log10W10)
     ax.set_xlabel("$\log_{10}(W_{10})$")
     ax.set_ylabel("Normalised count")

@@ -154,7 +154,7 @@ def Phi_dot(omega, theta, phi, psi, chi, theta_dot=None, phi_dot=None,
 
     Explicitly pass omega=None to use theta_dot, phi_dot
     """
-    if omega!=None:
+    if omega is not None:
         theta_dot, phi_dot, psi_dot = equations(omega, theta, phi, psi)
     return phi_dot +  sin(chi) * (
             (psi_dot * (cos(theta) * sin(chi) - sin(psi) * sin(theta) * cos(chi)) +
@@ -312,18 +312,31 @@ def nu_dot_numeric(time, theta, psi, phi, chi):
 
 
 def Intensity(Phi, Theta, PhiO, ThetaO, sigmaB=0.01, I0=1):
-    DeltaSigma = np.arccos(
-        np.sin(Theta)*np.sin(ThetaO)
-        + np.cos(Theta)*np.cos(ThetaO)*np.cos(np.abs(Phi - PhiO)))
-    # Is this real?
-    return I0 * np.exp(-DeltaSigma**2 / (2*sigmaB**2))
+    DeltadA = np.arccos(
+        np.cos(Theta)*np.cos(ThetaO)
+        + np.sin(Theta)*np.sin(ThetaO)*np.cos(np.abs(Phi - PhiO)))
+    DeltadB = np.arccos(
+        -np.cos(Theta)*np.cos(ThetaO)
+        + np.sin(Theta)*np.sin(ThetaO)*np.cos(np.abs(Phi+np.pi - PhiO)))
+
+    beamA = I0 * np.exp(-DeltadA**2 / (2*sigmaB**2))
+    beamB = I0 * np.exp(-DeltadB**2 / (2*sigmaB**2))
+    return beamA + beamB
 
 
-def IntensityMax(Theta, ThetaO, sigmaB=0.01, I0=1):
+def IntensityMaxA(Theta, ThetaO, sigmaB=0.01, I0=1):
     return I0 * np.exp(-(Theta - ThetaO)**2 / (2*sigmaB**2))
 
 
-def Wp(Phi_dot, Theta, ThetaO, sigmaB, p=50):
+def IntensityMaxB(Theta, ThetaO, sigmaB=0.01, I0=1):
+    return I0 * np.exp(-(np.pi - Theta - ThetaO)**2 / (2*sigmaB**2))
+
+
+def IntensityMax(Theta, ThetaO, sigmaB=0.01, I0=1):
+    return I0*np.exp(-(np.pi/2-np.abs(np.pi/2-Theta)-ThetaO)**2/(2*sigmaB**2))
+
+
+def Wp(Phi_dot, Theta, ThetaO, sigmaB, p=10):
     """ Analytic calculation of the pulse width
 
     Parameters
@@ -341,7 +354,12 @@ def Wp(Phi_dot, Theta, ThetaO, sigmaB, p=50):
     -------
     Beam width at p
     """
-    A = np.cos(np.sqrt(2 * sigmaB**2 * np.log(100./p)))
-    B = (A-np.sin(Theta) * np.sin(ThetaO)) / (np.cos(Theta) * np.cos(ThetaO))
-    C = np.pi * Phi_dot
-    return (1 - np.arccos(B) ) / C
+
+    P = 1/Phi_dot
+    ThetaT = np.pi/2 - np.abs(np.pi/2 - Theta)
+    A = np.cos(np.sqrt((ThetaT - ThetaO)**2 - 2 * sigmaB**2 * np.log(p/100.)))
+    B = np.sin(ThetaT) * np.sin(ThetaO)
+    C = np.cos(ThetaT) * np.cos(ThetaO)
+    D = (A-C)/B
+    w = P * (1 - np.arccos(D)/np.pi)
+    return w

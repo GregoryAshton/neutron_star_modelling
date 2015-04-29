@@ -931,11 +931,12 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
 
     time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
     chi0 = float(File_Functions.Parameter_Dictionary(file_name)['chi0'])
-    (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
+    #(t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
 
     Theta_list = np.degrees(Physics_Functions.Theta(theta, psi, np.radians(chi0)))
-    ax.plot(t_scaled, Theta_list, *args, **kwargs)
-    ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+    ax.plot(time, Theta_list, *args, **kwargs)
+    #ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+    ax.set_xlabel(r"time")
     ax.set_ylabel(r"$\Theta$", rotation="horizontal", size=26)
 
     return ax
@@ -1161,15 +1162,15 @@ def Intensity(file_name, PhiO, ThetaO, sigmaB,
     ax.plot(time, Intensity, *args, **kwargs)
 
     IMax = Physics_Functions.IntensityMax(Theta, ThetaO, sigmaB, I0=1)
-    ax.plot(time, IMax, "--b")
+    ax.plot(time, IMax, "-b")
 
     ax.set_xlabel("time [s]")
     ax.set_ylabel("Normalised Intensity")
 
     return ax
 
-def PulseWidth(file_name, Theta0, sigmaB, p=50,
-               eta=0.01, ax=None, *args, **kwargs):
+
+def PulseWidth(file_name, Theta0, sigmaB, p=50, ax=None, *args, **kwargs):
     """
     Plot the pulse width using a 2D Gaussian beam model
 
@@ -1179,9 +1180,6 @@ def PulseWidth(file_name, Theta0, sigmaB, p=50,
         Observers angular position in the inertial frame in radians
     sigmaPhi, sigmaTheta : float
         Pulse shape parameters
-    eta : float [0, 1]
-        Scaling of the free precession time scale to one in which the modulation
-        is negligible
     file_name: string
         Reference to the h5py data file
     ax : matplotlib axis instance, optional
@@ -1189,7 +1187,7 @@ def PulseWidth(file_name, Theta0, sigmaB, p=50,
     save_fig : bool, optional
         Save the figure using the default save feature
 
-    Note: One can also pass *args and **kwargs onto the matplotlib plot function
+    Note: One can also pass *args and **kwargs onto the plot function
 
     Returns:
     --------
@@ -1207,23 +1205,15 @@ def PulseWidth(file_name, Theta0, sigmaB, p=50,
     PD = File_Functions.Parameter_Dictionary(file_name)
     chi0 = np.radians(PD['chi0'])
 
-    #Phi = Physics_Functions.Phi(theta, phi, psi, chi0, fix=True)
     Theta = Physics_Functions.Theta(theta, psi, chi0)
     Phi_dot = Physics_Functions.Phi_dot(np.array([w1, w2, w3]),
-                                             theta, phi, psi, chi0)
+                                        theta, phi, psi, chi0)
 
-    #Amplitude = Physics_Functions.Amplitude(Phi, Theta, Phi0, Theta0,
-    #                              sigmaTheta, sigmaPhi, A0=1)
-
-    #tCONS = eta * PD['tauP']
-
-    #time_list, W50_list = W50(time, Amplitude, tCONS)
     Wp_list = Physics_Functions.Wp(Phi_dot, Theta, Theta0, sigmaB, p)
-
 
     ax.plot(time, Wp_list, *args, **kwargs)
 
     ax.set_xlabel('time')
-    ax.set_ylabel('$W_{p}$', rotation='vertical')
+    ax.set_ylabel('$W_{{{}}}$'.format(p), rotation='vertical')
 
     return ax

@@ -73,6 +73,7 @@ In such a case the intensity can be written
 I = I_0 \exp\left(-\frac{\left(\cos^{-1}\left[\cos(\ThetaT)\cos(\iota) +
                               \sin(\ThetaT)\sin(\iota)\cos(|\Phi - \PhiO|)\right]
                          \right)^{2}}{2\sigmaB^{2}}\right)
+\label{eqn: General beam intensity}
 \end{align}
 
 From this general expression for the intensity, we can also calcualte the 
@@ -193,36 +194,29 @@ $\Theta$ behaviour which drives changes in the widths.
 \end{figure}•
 
 
-
-
-
-
-%The condition for a full width half maximum at a fixed value of $\tilde{\Theta}$
-%is then
-%\begin{align}
-%\tilde{\Phi}_{50} = \pm\sigma_{\Phi}\left(\ln(2)
-%          - \frac{\tilde{\Theta}}{\sigma_{\Theta}^{2}}\right)^{1/2}
-%\end{align}
-%If $P$ is the period of the rapid spin motion, then the fraction $W_{50}/P$
-%must be equal the fraction of the cycle spent above the full width half maximum
-%which is given by $2\tilde{\Phi}_{50} / 2\pi$. Writing this in terms of the
-%frequency $\dot{\Phi}$ rather than period we have
-%\begin{equation}
-%W_{50} = \frac{1}{\pi\dot\Phi}\sigma_{\Phi}\left(\ln(2)
-%     - \frac{\tilde{\Theta}}{\sigma_{\Theta}^{2}}\right)^{1/2}
-%\label{eqn: pulse width}
-%\end{equation}•
-%
-%In figure \ref{fig: PulseWidthModulation} we plot the pulse width as a function
-%of time for a canonical pulsar with $\chi=70^{\deg}$.
-%\begin{figure}[ht]
-%\centering
-%\includegraphics[width=.5\textwidth]{Pulse_width_modulation}
-%\caption{Pulse width as calculated by equation \eqref{eqn: pulse width} }
-%\label{fig: PulseWidthModulation}
-%\end{figure}•
-
 \FloatBarrier
+
+\subsubsection{Limits on $\sigmaB$}
+So far we have ignored the physical implications of $\sigmaB$, we will now 
+discuss its limits which will help us to gain some intuition about. Inherited
+from the our Gaussian beam structure, $\sigmaB$ provides a measure of the 
+beam width, as such we know $\sigmaB > 0$ in order for us to observe it, but 
+the upper limit is somewhat more subtle. The observed pulses arrive in a 
+'pulse-train' as $\Phi$ increases in Eqn.~\eqref{eqn: General beam intensity}. 
+In order then to measure the $p^{\textrm{rm}}$ percentage of the beamwidth, we
+need
+\begin{equation}
+I_\mathrm{min} < \frac{p}{100}I_\mathrm{max}
+\end{equation}
+where, for the generalise pulse intensity
+\begin{align}
+I_\mathrm{max} & = I_{0} \exp\left(-\frac{(\ThetaT - \iota)^{2}}{2\sigmaB^{2}}\right) \\
+I_\mathrm{min} & = I_{0} \exp\left(-\frac{(\ThetaT + \iota)^{2}}{2\sigmaB^{2}}\right)
+\end{align}
+Substituting and rearranging for $\sigmaB$ we find that
+\begin{equation}
+\sigmaB^{2} < \frac{2\ThetaT\iota}{\log(100/P)}
+\end{equation}
 
 \biblio
 \end{document}

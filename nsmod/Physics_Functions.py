@@ -312,28 +312,15 @@ def nu_dot_numeric(time, theta, psi, phi, chi):
 
 
 def Intensity(Phi, Theta, PhiO, ThetaO, sigmaB=0.01, I0=1):
-    DeltadA = np.arccos(
+    Deltad = np.arccos(
         np.cos(Theta)*np.cos(ThetaO)
         + np.sin(Theta)*np.sin(ThetaO)*np.cos(np.abs(Phi - PhiO)))
-    DeltadB = np.arccos(
-        -np.cos(Theta)*np.cos(ThetaO)
-        + np.sin(Theta)*np.sin(ThetaO)*np.cos(np.abs(Phi+np.pi - PhiO)))
-
-    beamA = I0 * np.exp(-DeltadA**2 / (2*sigmaB**2))
-    beamB = I0 * np.exp(-DeltadB**2 / (2*sigmaB**2))
-    return beamA + beamB
-
-
-def IntensityMaxA(Theta, ThetaO, sigmaB=0.01, I0=1):
-    return I0 * np.exp(-(Theta - ThetaO)**2 / (2*sigmaB**2))
-
-
-def IntensityMaxB(Theta, ThetaO, sigmaB=0.01, I0=1):
-    return I0 * np.exp(-(np.pi - Theta - ThetaO)**2 / (2*sigmaB**2))
+    beam = I0 * np.exp(-Deltad**2 / (2*sigmaB**2))
+    return beam
 
 
 def IntensityMax(Theta, ThetaO, sigmaB=0.01, I0=1):
-    return I0*np.exp(-(np.pi/2-np.abs(np.pi/2-Theta)-ThetaO)**2/(2*sigmaB**2))
+    return I0 * np.exp(-(Theta - ThetaO)**2 / (2*sigmaB**2))
 
 
 def Wp(Phi_dot, Theta, ThetaO, sigmaB, p=10):
@@ -356,10 +343,9 @@ def Wp(Phi_dot, Theta, ThetaO, sigmaB, p=10):
     """
 
     P = 1/Phi_dot
-    ThetaT = np.pi/2 - np.abs(np.pi/2 - Theta)
-    A = np.cos(np.sqrt((ThetaT - ThetaO)**2 - 2 * sigmaB**2 * np.log(p/100.)))
-    B = np.sin(ThetaT) * np.sin(ThetaO)
-    C = np.cos(ThetaT) * np.cos(ThetaO)
+    A = np.cos(np.sqrt((Theta - ThetaO)**2 - 2 * sigmaB**2 * np.log(p/100.)))
+    B = np.sin(Theta) * np.sin(ThetaO)
+    C = np.cos(Theta) * np.cos(ThetaO)
     D = (A-C)/B
     w = P * (1 - np.arccos(D)/np.pi)
     return w

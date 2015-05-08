@@ -24,60 +24,24 @@ intensity to the beam of $I_0$, then parameterise the beam width by $\sigmaB$.
 We can the express the pulse intensity for such a beam geometry as
 \begin{equation}
 I
-(\Theta, \Phi, \iota,  I_{0}, \sigmaB) 
+(\Theta, \Phi, \iota,  I_{0}, \sigmaB)
 =
 I_{0} \left(
-\exp\left(-\frac{\Delta d_{\mathrm{F}}^{2}}{2\sigmaB^{2}}\right)+
-\exp\left(-\frac{\Delta d_{\mathrm{B}}2^{2}}{2\sigmaB^{2}}\right)
+\exp\left(-\frac{\Delta d^{2}}{2\sigmaB^{2}}\right)+
 \right)
 \label{eqn: beam intensity}
 \end{equation}
-Note that there are two beams here: arbtiarily labelled $F$ (front) and $B$ (back)
-corresponding to the two sides of the magnetic dipole. The $\Delta d$ quantity
-measures the central angle between the observers line of sight and each side
-of the beam.
-We can calculate these spherical distances from the spherical law of cosines
+The $\Delta d$ quantity
+measures the central angle between the observers line of sight and the beam.
+We can calculate this spherical distances from the spherical law of cosines
 \begin{align}
-\Delta d_\mathrm{F} &= \cos^{-1}\left[\cos(\Theta)\cos(\iota) +
+\Delta d &= \cos^{-1}\left[\cos(\Theta)\cos(\iota) +
                               \sin(\Theta)\sin(\iota)\cos(|\Phi - \PhiO|)\right] \\
-\Delta d_\mathrm{B} &= \cos^{-1}\left[\cos(\pi - \Theta)\cos(\iota) +
-                              \sin(\pi - \Theta)\sin(\iota)\cos(|\Phi + \pi - \PhiO|)\right] \\
 \label{eqn: angular sep}
 \end{align}
 
-At this point we need to take stock of the significance of the two beams. If
-$\Theta < \pi/2$, then the observer will only observe a single beam, the other
-will much smaller and go unobserved. If $\Theta \approx \pi/2$, then both pulses
-could be observed although the ability to do this will depend on the observers
-sensitivity. 
-
-To illustrate the case where $\chi \approx \pi/2$, in figure
-\ref{fig: intensity variation} we plot the total beam intensity 
-intensity for a torque-free pulsar. This is
-intended to demonstrate the fast rotation frequency of individual pulses, along
-with the longer modulation of the precession: the parameters are artificially
-selected to show both these behaviours on the same timescale. Both sets of pulses
-can be seen with the second second become larger than the first with $\chi > \pi/2$.
-
-Each observation occurs over a period much shorter than the
-precession timescale, so changes in the beam will not be observed during
-a single session, but only between observations. In view of this, we make the
-assumption that the observer only ever measures the larger of the two beams: we
-can then generalise our intensity by stating that the polar angle of whichever
-beam is in the northen hemisphere is 
-\begin{align}
-\ThetaT = \frac{\pi}{2} - \left| \frac{\pi}{2} - \Theta\right|
-\end{align}
-In such a case the intensity can be written
-\begin{align}
-I = I_0 \exp\left(-\frac{\left(\cos^{-1}\left[\cos(\ThetaT)\cos(\iota) +
-                              \sin(\ThetaT)\sin(\iota)\cos(|\Phi - \PhiO|)\right]
-                         \right)^{2}}{2\sigmaB^{2}}\right)
-\label{eqn: General beam intensity}
-\end{align}
-
-From this general expression for the intensity, we can also calcualte the 
-maximum observed intensity
+We now have a general expression for the beam intensity from which we can calculate
+a maximum observed intensity
 \newcommand{\repterm}{\left(\ThetaT - \iota\right)^{2}}
 \begin{align}
 I_\textrm{max} = I_{0} \exp\left(
@@ -85,14 +49,17 @@ I_\textrm{max} = I_{0} \exp\left(
           {2\sigmaB}\right)
 \label{eqn: Imax}
 \end{align}
-We have included this in figure~\ref{fig: intensity variation}. 
+In figure~\ref{fig: intensity variation} we illustrate the pulse intensity and
+maximimal value over a single precessional cycle. We have inentionally chosen
+unphysical values to illustrate both the fast pulses and the slow modulation on
+the same timescale.
 
 \begin{figure}[htb]
 \centering
 \includegraphics[width=.5\textwidth]{intensity_variation}
 \caption{Amplitude variation using a 2D Gaussian emission. In black is the pulse
 intensity as given by \eqref{eqn: beam intensity}: this shows each individual
-pulse at the fast rotation frequency with the slower modulation due to precession. 
+pulse at the fast rotation frequency with the slower modulation due to precession.
 In blue we plot the maximum amplitude as described by Eqn.~\eqref{eqn: Imax}.}
 \label{fig: intensity variation}
 \end{figure}
@@ -119,12 +86,12 @@ We can substitute into equations~\eqref{eqn: beam intensity} and~\eqref{eqn: Ima
 and rearrange. This gives us an expression for when the inequality is satisfied:
 \begin{equation}
 \cos(|\Phi|) < \frac{\cos\left(\sqrt{
-    (\ThetaT - \iota)^{2}-2\sigmaB^{2} \ln(\frac{p}{100})}\right)-\cos(\ThetaT)\cos(\iota)}
-    {\sin(\ThetaT)\sin(\iota)}
+    (\Theta - \iota)^{2}-2\sigmaB^{2} \ln(\frac{p}{100})}\right)-\cos(\Theta)\cos(\iota)}
+    {\sin(\Theta)\sin(\iota)}
 \label{eqn: 6737}
 \end{equation}
-Since we expect $\ThetaT$ to vary on a much longer timescale than $\Phi$, over 
-one period in $\Phi$ we can treat $\ThetaT$, and hence the whole right-hand-side
+Since we expect $\Theta$ to vary on a much longer timescale than $\Phi$, over
+one period in $\Phi$ we can treat $\Theta$, and hence the whole right-hand-side
 as a constant. Lets consider a single rotation with the magnetic dipole
 starting and ending in the antipodal point to the observers position. Then
 $\Phi$ increase beween $-\pi$ and $\pi$ during this rotation. The
@@ -149,33 +116,35 @@ angular width $\Delta\Phi$ for which the inequality is not satisified:
 \begin{equation}
     \Delta\Phi = 2\cos^{-1}\left(
                 \frac{\cos\left(\sqrt{
-                    (\ThetaT - \iota)^{2}-2\sigmaB^{2} \ln(\frac{p}{100})}\right)-\cos(\ThetaT)\cos(\iota)}
-                          {\sin(\ThetaT)\sin(\iota)}
+                    (\Theta - \iota)^{2}-2\sigmaB^{2} \ln(\frac{p}{100})}\right)-\cos(\Theta)\cos(\iota)}
+                          {\sin(\Theta)\sin(\iota)}
                       \right)
 \end{equation}
 Then the angular fraction at which the inequality \emph{is} satisfied is given by
-$2\pi - \Delta\Phi$. The beam width is measured in the time spent above the 
-fraction $f$ of the peak measured amplitude. So we can convert our angular 
+$2\pi - \Delta\Phi$. The beam width is measured in the time spent above the
+fraction $f$ of the peak measured amplitude. So we can convert our angular
 fraction above into a beam width by
 
-We can now convert this into a pulse width 
+We can now convert this into a pulse width
 \begin{align}
     W_p & = P \frac{2\pi - \Delta\Phi}{2\pi} \\
           & = P\left(1 -
                \frac{1}{\pi}\cos^{-1}\left(
                    \frac{\cos\left(\sqrt{\repterm-2\sigmaB^{2} \ln(\frac{p}{100})}\right)
-                    - \cos(\ThetaT)\cos(\iota)}
-                          {\sin(\ThetaT)\sin(\iota)}
+                    - \cos(\Theta)\cos(\iota)}
+                          {\sin(\Theta)\sin(\iota)}
                       \right)
                   \right)
 \label{eqn: Wp}
 \end{align}
 where $P$ is the spin period which we have then written in terms of the spin
-frequency and $p$ is the percentage of beam width. 
+frequency and $p$ is the percentage of beam width.
 the beam width will vary with both the changes in spin-frequency, and with
-$\ThetaT$.
+$\Theta$.
 
-In the following figures we demonstrate typical beamwidths alongside the 
+\subsubsection{Illustrations}
+
+In the following figures we demonstrate typical beamwidths alongside the
 $\Theta$ behaviour which drives changes in the widths.
 \begin{figure}[ht]
 \centering
@@ -197,12 +166,12 @@ $\Theta$ behaviour which drives changes in the widths.
 \FloatBarrier
 
 \subsubsection{Limits on $\sigmaB$}
-So far we have ignored the physical implications of $\sigmaB$, we will now 
-discuss its limits which will help us to gain some intuition about. Inherited
-from the our Gaussian beam structure, $\sigmaB$ provides a measure of the 
-beam width, as such we know $\sigmaB > 0$ in order for us to observe it, but 
-the upper limit is somewhat more subtle. The observed pulses arrive in a 
-'pulse-train' as $\Phi$ increases in Eqn.~\eqref{eqn: General beam intensity}. 
+So far we have ignored the physical implications of $\sigmaB$, we will now
+discuss its limits which will help us to gain some intuition. Inherited
+from the our Gaussian beam structure, $\sigmaB$ provides a measure of the
+beam width; as such we know that in order to observe a pulse $\sigmaB > 0$, but
+the upper limit is somewhat more subtle. The observed pulses arrive in a
+'pulse-train' as $\Phi$ increases in Eqn.~\eqref{eqn: beam intensity}.
 In order then to measure the $p^{\textrm{rm}}$ percentage of the beamwidth, we
 need
 \begin{equation}
@@ -210,12 +179,12 @@ I_\mathrm{min} < \frac{p}{100}I_\mathrm{max}
 \end{equation}
 where, for the generalise pulse intensity
 \begin{align}
-I_\mathrm{max} & = I_{0} \exp\left(-\frac{(\ThetaT - \iota)^{2}}{2\sigmaB^{2}}\right) \\
-I_\mathrm{min} & = I_{0} \exp\left(-\frac{(\ThetaT + \iota)^{2}}{2\sigmaB^{2}}\right)
+I_\mathrm{max} & = I_{0} \exp\left(-\frac{(\Theta - \iota)^{2}}{2\sigmaB^{2}}\right) \\
+I_\mathrm{min} & = I_{0} \exp\left(-\frac{(\Theta + \iota)^{2}}{2\sigmaB^{2}}\right)
 \end{align}
 Substituting and rearranging for $\sigmaB$ we find that
 \begin{equation}
-\sigmaB^{2} < \frac{2\ThetaT\iota}{\log(100/P)}
+\sigmaB^{2} < \frac{2\Theta\iota}{\log(100/P)}
 \end{equation}
 
 \biblio

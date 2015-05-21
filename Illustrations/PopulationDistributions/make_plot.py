@@ -57,7 +57,7 @@ if "F2" in sys.argv or len(sys.argv) == 1:
     plt.savefig("F2_distribution.pdf")
     plt.show()
 
-if "W10" in sys.argv or len(sys.argv) == 1:
+if "log10W10" in sys.argv or len(sys.argv) == 1:
     fig = plt.figure(figsize=(6, 8))
     ax = fig.add_subplot(111)
     log10W10 = np.log10(df.W10[np.isfinite(df.W10)])
@@ -67,4 +67,16 @@ if "W10" in sys.argv or len(sys.argv) == 1:
     ax.set_ylabel("Normalised count")
     fig.tight_layout()
     plt.savefig("W10_distribution.pdf")
+    plt.show()
+
+if "lnW10" in sys.argv or len(sys.argv) == 1:
+    fig = plt.figure(figsize=(6, 8))
+    ax = fig.add_subplot(111)
+    lnW10 = np.log(df.W10[np.isfinite(df.W10)])
+    ax.hist(lnW10, bins=50, normed=True)
+    ax = AddNormal(ax, lnW10)
+    ax.set_xlabel("$\ln(W_{10})$")
+    ax.set_ylabel("Normalised count")
+    fig.tight_layout()
+    plt.savefig("lnW10_distribution.pdf")
     plt.show()

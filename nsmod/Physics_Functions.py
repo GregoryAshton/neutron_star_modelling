@@ -347,5 +347,5 @@ def Wp(Phi_dot, Theta, ThetaO, sigmaB, p=10):
     B = np.sin(Theta) * np.sin(ThetaO)
     C = np.cos(Theta) * np.cos(ThetaO)
     D = (A-C)/B
-    w = P * (1 - np.arccos(D)/np.pi)
+    w = P * np.arccos(D)/np.pi
     return w

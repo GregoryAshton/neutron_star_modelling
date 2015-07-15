@@ -2,7 +2,7 @@
 DOWNLOADED = psrcat_pkg.tar
 ATNF_DATABASE = psrcat_tar
 DATA_FILE = ATNF_data_file.txt
-PSRCAT_FILE_PATH = /home/greg/Neutron_star_modelling/Illustrations/Period_PeriodDot_plot/psrcat_tar/psrcat.db
+PSRCAT_FILE_PATH = /home/greg/Neutron_star_modelling/Illustrations/PopulationDistributions/psrcat_tar/psrcat.db
 SAVE_FIG = lnW10_distribution.pdf
 
 all:  $(ATNF_DATABASE) $(DATA_FILE) $(SAVE_FIG)

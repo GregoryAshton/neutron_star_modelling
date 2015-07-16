@@ -22,5 +22,11 @@ $(DATA_FILE):
 $(SAVE_FIG):make_plot.py
 	python make_plot.py
 
-clean:
+clear:
 	rm -f ${DOWNLOADED}
+
+clean:
+	rm -f ${DOWNLOADED} 
+	rm -fr ${ATNF_DATABASE} 
+	rm -f ${DATA_FILE} 
+	rm -f *pdf 

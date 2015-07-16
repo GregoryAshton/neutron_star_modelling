@@ -12,7 +12,7 @@ F1 = np.genfromtxt(data[:, 2])
 F2 = np.genfromtxt(data[:, 3])
 Binary = data[:, 4]  # If not "*" then it is a binary
 Type = data[:, 5]
-W10 = data[:, 6]
+W10_ms = data[:, 6]
 
 df = pd.DataFrame({'name': name,
                    'F0': F0,
@@ -20,7 +20,7 @@ df = pd.DataFrame({'name': name,
                    'F2': F2,
                    'Binary': Binary,
                    'Type': Type,
-                   'W10': W10
+                   'W10_ms': W10_ms
                    })
 
 # Clean data
@@ -29,4 +29,6 @@ df = df[df.Type == "*"]  # only look at ordinary pulsars
 df = df[df.F0 < 5e1]  # lazy cut of MSPs TBI
 
 df = df.replace("*", np.nan)
-df['W10'] = df['W10'].astype(float)
+df['W10_ms'] = df['W10_ms'].astype(float)
+df['W10'] = df['W10_ms'] * 1e-3
+

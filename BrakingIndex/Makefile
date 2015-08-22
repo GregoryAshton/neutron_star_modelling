@@ -16,7 +16,7 @@ $(ATNF_DATABASE):
 
 $(DATA_FILE):
 	export PSRCAT_FILE=${PSRCAT_FILE_PATH}; \
-		./psrcat_tar/psrcat -c "name F0 F1 F2 BINARY Type Age" -nonumber -o short > ${DATA_FILE}
+		./psrcat_tar/psrcat -c "name F0 F1 F2 P0 P1 BINARY Type Age" -nonumber -o short_error > ${DATA_FILE}
 
 clean:
 	rm -f ${DOWNLOADED}

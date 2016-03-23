@@ -19,11 +19,11 @@ def Save_Figure(file_path, type_of_plot, dest_dir="img", format_type=".pdf"):
 
     file_name = file_path.split("/")[-1]
     plot_file_name = "./{0}/{1}_{2}{3}".format(
-                                        dest_dir, type_of_plot, 
+                                        dest_dir, type_of_plot,
                                         RemoveFileSuffix(file_name),
                                         format_type)
- 
-    plt.tight_layout()                  
+
+    plt.tight_layout()
     plt.savefig(plot_file_name)
     print "Saving figure as %s" % plot_file_name
 
@@ -35,7 +35,7 @@ def Parameter_Dictionary(user_input):
     Function to produce a dictionary with all the values, this reduces the
     amount of code required on the other end. Input can either be a string
     such as the default filenames used in nsmod, or a partial dictionary
-    having at least epsI,epsA and omega0 to produce the other values
+    having at least epsI1, epsI3,epsA and omega0 to produce the other values
 
     """
 
@@ -46,7 +46,7 @@ def Parameter_Dictionary(user_input):
         # Remove the file descriptor and the path directory
         f = RemoveFileSuffix(user_input)
         f = f.split("/")[-1]
-                
+
         # Import the rest of the parameters
         f = f.split("_")
         p_d['source_script'] = f[0]
@@ -71,14 +71,14 @@ def Parameter_Dictionary(user_input):
 
     P = 2*np.pi / omega0
     p_d['P'] = P
-    
+
     # tauP doesn't make sense with epsI1 != 0 so set it to zero
     if epsI1==0:
         tauP = 2 * pi * pow(omega0 * abs(epsI3), -1)
     else:
         tauP = 2 * pi * pow(omega0 * max(abs(epsI3), abs(epsI1)), -1)
         print "Warning: calculating tauP not defined for triaxial body"
- 
+
     p_d["tauP"] = tauP
 
     delta_omega_dot0_FP = epsI3**2 * a0 * np.cos(chi0) * omega0**2 / (
@@ -97,14 +97,14 @@ def Parameter_Dictionary(user_input):
 
         tauS =  3 * c / (2 * R * epsA * omega0**2)
         p_d["tauS"] = str(tauS)
-        
+
 
         Bs = (2 * np.sqrt(epsA * I0 * pow(c, 2) / pow(R, 5)))
-        p_d["Bs"] = str(Bs)
+        p_d["Bs"] = Bs
 
         omega_dot0 = -2 * R /(3. * c) * omega0**3 * np.sin(alpha)**2 * epsA
         p_d['omega_dot0'] = omega_dot0
-        nu_dot0 = -1/(3 * np.pi) * (R/c) * omega0**3 * np.sin(alpha)**2 * epsA 
+        nu_dot0 = -1/(3 * np.pi) * (R/c) * omega0**3 * np.sin(alpha)**2 * epsA
         p_d['nu_dot0'] = nu_dot0
 
         tauE = abs(omega0/omega_dot0)
@@ -115,7 +115,7 @@ def Parameter_Dictionary(user_input):
 
     if epsA != 0:
         beta = Physics_Functions.Beta_Function(epsI3, epsA, chi0, warning=False)
-        wobble_angle_spindown = (P / tauS) * (1 + 1.0/epsI3) 
+        wobble_angle_spindown = (P / tauS) * (1 + 1.0/epsI3)
     else:
         beta = 0
         wobble_angle_spindown = 0
@@ -150,9 +150,9 @@ def Parameter_Dictionary(user_input):
         p_d['delta_omega_dot0_EM'] = pow(tauS * P, -1)
 
     # Need to import the beta function
-    #from Physics_Functions import Beta_Function
-    #p_d["beta30"] = str(Beta_Function(epsI, epsA, 30 * pi / 180) * 180 / pi)
-    #p_d["beta75"] = str(Beta_Function(epsI, epsA, 75 * pi / 180) * 180 / pi)
+    from Physics_Functions import Beta_Function
+    p_d["beta30"] = Beta_Function(epsI3, epsA, 30 * pi / 180) * 180 / pi
+    p_d["beta75"] = Beta_Function(epsI3, epsA, 75 * pi / 180) * 180 / pi
 
     return p_d
 
@@ -162,7 +162,7 @@ def PrintParameterDictionary(file_name):
     for key, val in sorted(pd.iteritems()):
         try:
             formatted_val = "{:1.10e}".format(float(val))
-            print key, ":", formatted_val 
+            print key, ":", formatted_val
         except ValueError:
             print key, ":", val
 
@@ -196,7 +196,7 @@ def Two_Component_Import(file_name):
 
     return (time, w1, w2, w3, o1, o2, o3)
 
-def PropertiesTable(file_name, table_name, 
+def PropertiesTable(file_name, table_name,
                     include=['omega0', 'B', 'chi', 'a0', 'Aem', 'wobble_angle']):
     """ Print a latex table of the NS properties used in a simulation
 
@@ -221,8 +221,8 @@ def PropertiesTable(file_name, table_name,
     if 'omega0' in include:
         lines.append(r"$\omega_0$  &=& {} rad/s\\".format(PD['omega0']))
     if 'B' in include:
-        try: 
-            Bs = Useful_Tools.Texify_Float(PD['Bs'],3)
+        try:
+            Bs = Useful_Tools.Texify_Float(PD['Bs'], 3)
         except KeyError:
             Bs = 0
         lines.append(r"$B_0$  &=& ${}$ G \\".format(Bs))
@@ -270,6 +270,7 @@ def Read_File(file_name):
     To access values >>>f['key'].value
 
     """
+    print file_name
 
     # Check the file name is well formed
     file_type = file_name.split(".")[-1]
@@ -298,16 +299,16 @@ def vprint(verbose, *args):
 
 
 def Euler_Angles_Import(file_name, time_offset=None, nmax=None):
-    """ Returns tuple of "(time, w1, w2, w3, theta, phi, psi) 
-    
+    """ Returns tuple of "(time, w1, w2, w3, theta, phi, psi)
+
     Parameters
     ----------
     file_name : str
         String containing file to import from
     time_offset : float [0, 1]
         Removes the first fraction of data
-    
-    """    
+
+    """
 
     with Read_File(file_name) as f:
         time = np.array(f['time'].value)
@@ -317,7 +318,7 @@ def Euler_Angles_Import(file_name, time_offset=None, nmax=None):
         theta = np.array(f['theta'].value)
         phi = np.array(f['phi'].value)
         psi = np.array(f['psi'].value)
-    
+
     if time_offset:
         idx = np.argmin(np.abs(time-time_offset))
         time = time[idx:]
@@ -327,7 +328,7 @@ def Euler_Angles_Import(file_name, time_offset=None, nmax=None):
         theta =theta[idx:]
         phi = phi[idx:]
         psi = psi[idx:]
-    
+
     return (time[:nmax], w1[:nmax], w2[:nmax], w3[:nmax],
             theta[:nmax], phi[:nmax], psi[:nmax])
 
@@ -345,7 +346,7 @@ def Clean_Data(directory, ask_user=True):
 
     if answer in['yes', 'y', 'alright']:
         file_type = 'hdf5'
-        data_files = [dfile for dfile in os.listdir(directory) 
+        data_files = [dfile for dfile in os.listdir(directory)
                                             if file_type in dfile]
         for dfile in data_files:
             os.remove(dfile)
@@ -355,9 +356,9 @@ def Clean_Data(directory, ask_user=True):
         return
 
 def FormatValue(key, val):
-    """ Formats value to give sensible file name 
-    
-    Note: None is returned if the key is not used in the filename, e.g 
+    """ Formats value to give sensible file name
+
+    Note: None is returned if the key is not used in the filename, e.g
           the error.
     """
     if key in ["epsI1", "epsI3", "epsA", "omega0", "T", "SwitchTime"]:
@@ -372,7 +373,7 @@ def FormatValue(key, val):
         if val:
             formatted_val = "{:.0f}".format(val)
         else:
-            formatted_val = None  
+            formatted_val = None
     elif key in ["error", "cleanup"]:
         formatted_val = None
     else:

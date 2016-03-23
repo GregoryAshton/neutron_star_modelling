@@ -110,6 +110,7 @@ def main (epsI1=0.0, epsI3=1.0e-6, epsA=1.0e-8 , omega0=1.0e1, chi0=30.0,
                           epsI1=epsI1, epsI3=epsI3, epsA=epsA,
                           omega0=omega0, chi0=chi0, a0=a0, T=T, AnomTorque=AnomTorque,
                           n=n, error=error, cleanup=cleanup, eta=eta, n=n)
+
     if not run_sim or DryRun:
         return file_name
 

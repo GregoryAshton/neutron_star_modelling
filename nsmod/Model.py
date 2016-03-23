@@ -8,11 +8,12 @@ import nsmod_two_component_model2
 import nsmod_one_component_model_with_Euler
 import pynotify
 from File_Functions import vprint
+import File_Functions
 
 
 def Run(AnomTorque=True, chi0=None, epsI1=0.0, epsI3=None, epsA=None,
-        omega0=None, t1=1e12, error=1e-12, n=1000, eta=0.0, verbose=True,
-        a_int=50.0, phi0=None):
+        omega0=None, T=1e12, error=1e-12, n=1000, eta=0.0, verbose=True,
+        a0=50.0):
     """
 
     Run a simulation of the one component model
@@ -38,104 +39,18 @@ def Run(AnomTorque=True, chi0=None, epsI1=0.0, epsI3=None, epsA=None,
     :returns: file name of a .hdf5 file containing the saved data
     """
 
-    file_name_list = []
-
-    if AnomTorque is False:
-        file_name_list .append("no_anom_")
-
-    if type(chi0) in [float, int, np.float32, np.float64]:
-        file_name_list.append("chi0_{:.1f}".format(chi0))
-    elif type(chi0) is str:
-        file_name_list.append("chi0_{}".format(chi0))
-        chi0 = float(chi0)
-    else:
-        print (" ERROR: You need to specify chi0 in degrees")
-        return
-
-    if type(epsI1) in [float, int, np.float32, np.float64]:
-        file_name_list.append("_epsI1_{:.2e}".format(epsI1))
-    elif type(epsI1) is str:
-        file_name_list.append("_epsI1_{}".format(epsI1))
-        epsI1 = float(epsI1)
-    else:
-        print (" ERROR: You need to specify epsI1")
-        return
-
-    if type(epsI3) in [float, int, np.float32, np.float64]:
-        file_name_list.append("_epsI3_{:.2e}".format(epsI3))
-    elif type(epsI3) is str:
-        file_name_list.append("_epsI3_{}".format(epsI3))
-        epsI3 = float(epsI3)
-    else:
-        print (" ERROR: You need to specify epsI3")
-        return
-
-    if type(epsA) in [float, int, np.float32, np.float64]:
-        file_name_list.append("_epsA_{:.2e}".format(epsA))
-    elif type(epsA) is str:
-        file_name_list.append("_epsA_{}".format(epsA))
-        epsA = float(epsA)
-    else:
-        print (" ERROR: You need to specify epsA")
-        return
-
-    if type(omega0) in [float, int, np.float32, np.float64]:
-        file_name_list.append("_omega0_{:.2f}".format(omega0))
-    elif type(omega0) is str:
-        file_name_list.append("_omega0_{}".format(omega0))
-        omega0 = float(omega0)
-    else:
-        print (" ERROR: You need to specify omega0")
-        return
-
-    if a_int != 50.0:
-        file_name_list.append("_aint_{}".format(a_int))
-        a_int = float(a_int)
-
-    if phi0:
-        file_name_list.append("_phi0_{}".format(phi0))
-        phi0 = float(phi0)
-    else:
-        phi0 = 0.0
-
-    if eta != 0.0:
-        file_name_list.append("_eta_{}".format(eta))
-        n = None  # Save at discrete timesteps turned off by eta
-        vprint(verbose, "Using eta turns of saving at discrete time steps")
-
-    if type(t1) in [float, int, np.float32, np.float64]:
-        file_name_list.append("_t1_{:.2e}".format(t1))
-    elif type(t1) is str:
-        file_name_list.append("_t1_{}".format(t1))
-        t1 = float(t1)
-    else:
-        print (" ERROR: t1 must be a float, int or string")
-        return
-
-    # Create file name
-    file_name_list.append(".hdf5")
-    file_name = "".join(file_name_list)
-
-    # Check if file already exists
-    if file_name in os.listdir("."):
-        #vprint(True, "File already exists, remove and rerun if is corrupted")
-        #return file_name
-        os.remove(file_name)
-
-    one_component_model.main(
-                      chi0=np.radians(chi0),
-                      #file_name=file_name,
-                      n=int(n),
+    file_name = one_component_model.main(
+                      chi0=chi0,
+                      n=n,
                       epsA=epsA,
                       epsI1=epsI1,
                       epsI3=epsI3,
                       omega0=omega0,
-                      T=t1,
+                      T=T,
                       eta=eta,
                       AnomTorque=AnomTorque,
-                      a0=np.radians(a_int),
+                      a0=a0,
                       error=float(error),
-                      #phi0=np.radians(phi0),
                       )
 
     return file_name

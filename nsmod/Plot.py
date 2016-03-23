@@ -14,7 +14,7 @@ import Physics_Functions
 import Useful_Tools
 from Physics_Functions import Beta_Function
 from nsmod.Pulse_width_fitting import W50
-
+from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import rc_file, ticker
 rc_file("/home/greg/Neutron_star_modelling/matplotlibrc")
 
@@ -63,7 +63,7 @@ def simple_plot(file_name, tmax=None, tmin=None, axes=None, *args, **kwargs):
     return (ax1, ax2, ax3)
 
 def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
-                   end_val=False, save_fig=False, **kwargs):
+                   end_val=False, save_fig=True, **kwargs):
     """
 
     Plot the input data after transforming to spherical polar coordinates
@@ -87,7 +87,6 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
     fig : matplotlib figure instance
 
     """
-
     if axes:
         (ax1, ax2, ax3) = axes
     else:
@@ -108,7 +107,6 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
     # Transform to spherical polar coordinates
     (omega, a, varphi) = Physics_Functions.Cartesian_2_Spherical(
                         omega_x, omega_y, omega_z, fix_varphi=True)
-
 
     # Plot omega(t)
     ax1.set_xticklabels([])
@@ -216,112 +214,112 @@ def Alpha_Plot(file_name, Option_Dictionary={}):
         py.show()
 
 # HACK DUE TO WEIRD IMPORT ERROR
-#def ThreeD_Plot_Cartesian(file_name, Option_Dictionary={}):
-#    """
-#
-#    Plots the components of input file in 3D Option_Dictionary, takes:
-#    # Integers to retrict the number of plotted points
-#    start = int
-#    stop = int
-#
-#    # Colouring commands
-#    power = float
-#    """
-#
-#    # Import the data in components x,y,z we use generic names incase the
-#    # effective body frame (EBF) axis is used
-#
-#    f = File_Functions.Read_File(file_name)
-#    time = f['time'].value
-#    x = f['w1'].value
-#    y = f['w2'].value
-#    z = f['w3'].value
-#
-#    # Set the defaults and then overide if they exist in Option_Dictionary
-#    start = 0
-#    stop = -1
-#    if "start" in Option_Dictionary:
-#        start = int(Option_Dictionary["start"])
-#    if "stop" in Option_Dictionary:
-#        stop = int(Option_Dictionary["stop"])
-#
-#    # Reduce the number of points
-#    time = time[start:stop]
-#    x = x[start:stop]
-#    y = y[start:stop]
-#    z = z[start:stop]
-#
-#    # Check if we should use the Effective body frame axis
-#    if 'EBF' in Option_Dictionary:
-#        if Option_Dictionary.get('verbose'):
-#            print " Using the effective body frame axis in this plot "
-#
-#        Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
-#        epsI = float(Parameter_Dictionary["epsI"])
-#        epsA = float(Parameter_Dictionary["epsA"])
-#        chi0 = float(Parameter_Dictionary["chi0"]) * pi / 180
-#        beta = Beta_Function(epsI, epsA, chi0)
-#        (x, y, z) = Physics_Functions.Cartesian_2_EBF(x, y, z, beta)
-#
-#    # Create subplot and define view angle, this is fixed
-#    ax = py.subplot(111, projection='3d')
-#    elev = 15.0
-#    azim = -134.0
-#    ax.view_init(elev, azim)
-#
-#    # Create and label the primed axis
-##    ax.plot(py.zeros(100),py.zeros(100),py.linspace(-max(z),max(z),100),
-##                color="k")
-##    ax.text(0,0,max(z)*1.1,"$z'$")
-##    ax.plot(py.zeros(100),py.linspace(max(y),min(y),100),py.zeros(100),
-##                color="k")
-##    ax.text(0,max(y)*1.1,0,"$y'$")
-##    ax.plot(py.linspace(max(x),min(x),100),py.zeros(100),py.zeros(100),
-#                 #color="k")
-##    ax.text(max(x)*1.1,0,0,"$x'$")
-#
-#    # Compute same variables used for colouring and plot the x',y' and z'
-#    # transforming the colour as time changes
-#    if 'power' in Option_Dictionary:
-#        power = float(Option_Dictionary['power'])
-##        n=len(x)
-##        d = int(Useful_Tools.Round_To_n(n,0))/100
-##        s=n/d
-##        for i in range(1,d-1):
-##            ax.plot(x[s*i:s*i+s],y[s*i:s*i+s],z[s*i:s*i+s],
-##            color=(0.0,1-float(pow(i,power)*1.0/pow(d,power)),0.8),alpha=0.5)
-#
-#        n = len(time)
-#        for i in range(0, n - 10, 10):
-#            color = (0.0,
-#                     1 - float(pow(i, power) * 1.0 / pow(n, power)),
-#                     float(pow(i, power) * 1.0 / pow(n, power))
-#                    )
-#            ax.plot(x[i:i + 11], y[i:i + 11], z[i:i + 11],
-#                                color=color, alpha=1.0)
-#    else:
-#        ax.plot(x, y, z)
-#
-#    if 'EBF' in Option_Dictionary:
-#        ax.set_xlabel(r"$e_{1}$")
-#        ax.set_ylabel(r"$e_{2}$")
-#        ax.set_zlabel(r"$e_{3}$")
-#        # These axis labels may prove to be wrong in the case of epsI<0
-#    else:
-#        ax.set_xlabel(r"$\hat{\omega_{x}}$")
-#        ax.set_ylabel(r"$\hat{\omega_{y}}$")
-#        ax.set_zlabel(r"$\hat{\omega_{z}}$")
-#    ax.grid(False)
-#
-#    # Remove ticks since we do not need them
-#    ax.set_xticklabels([])
-#    ax.set_yticklabels([])
-#    ax.set_zticklabels([])
-#
-#    if 'save_fig' in Option_Dictionary and Option_Dictionary['save_fig']:
-#        File_FUnctions.Save_Figure(file_name, "ThreeD_Plot_Cartesian")
-#    else:
-#        py.show()
+def ThreeD_Plot_Cartesian(file_name, Option_Dictionary={}):
+    """
+
+    Plots the components of input file in 3D Option_Dictionary, takes:
+    # Integers to retrict the number of plotted points
+    start = int
+    stop = int
+
+    # Colouring commands
+    power = float
+    """
+
+    # Import the data in components x,y,z we use generic names incase the
+    # effective body frame (EBF) axis is used
+
+    f = File_Functions.Read_File(file_name)
+    time = f['time'].value
+    x = f['w1'].value
+    y = f['w2'].value
+    z = f['w3'].value
+
+    # Set the defaults and then overide if they exist in Option_Dictionary
+    start = 0
+    stop = -1
+    if "start" in Option_Dictionary:
+        start = int(Option_Dictionary["start"])
+    if "stop" in Option_Dictionary:
+        stop = int(Option_Dictionary["stop"])
+
+    # Reduce the number of points
+    time = time[start:stop]
+    x = x[start:stop]
+    y = y[start:stop]
+    z = z[start:stop]
+
+    # Check if we should use the Effective body frame axis
+    if 'EBF' in Option_Dictionary:
+        if Option_Dictionary.get('verbose'):
+            print " Using the effective body frame axis in this plot "
+
+        Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
+        epsI = float(Parameter_Dictionary["epsI3"])
+        epsA = float(Parameter_Dictionary["epsA"])
+        chi0 = float(Parameter_Dictionary["chi0"]) * pi / 180
+        beta = Beta_Function(epsI, epsA, chi0)
+        (x, y, z) = Physics_Functions.Cartesian_2_EBF(x, y, z, beta)
+
+    # Create subplot and define view angle, this is fixed
+    ax = py.subplot(111, projection='3d')
+    elev = 15.0
+    azim = -134.0
+    ax.view_init(elev, azim)
+
+    # Create and label the primed axis
+#    ax.plot(py.zeros(100),py.zeros(100),py.linspace(-max(z),max(z),100),
+#                color="k")
+#    ax.text(0,0,max(z)*1.1,"$z'$")
+#    ax.plot(py.zeros(100),py.linspace(max(y),min(y),100),py.zeros(100),
+#                color="k")
+#    ax.text(0,max(y)*1.1,0,"$y'$")
+#    ax.plot(py.linspace(max(x),min(x),100),py.zeros(100),py.zeros(100),
+                 #color="k")
+#    ax.text(max(x)*1.1,0,0,"$x'$")
+
+    # Compute same variables used for colouring and plot the x',y' and z'
+    # transforming the colour as time changes
+    if 'power' in Option_Dictionary:
+        power = float(Option_Dictionary['power'])
+#        n=len(x)
+#        d = int(Useful_Tools.Round_To_n(n,0))/100
+#        s=n/d
+#        for i in range(1,d-1):
+#            ax.plot(x[s*i:s*i+s],y[s*i:s*i+s],z[s*i:s*i+s],
+#            color=(0.0,1-float(pow(i,power)*1.0/pow(d,power)),0.8),alpha=0.5)
+
+        n = len(time)
+        for i in range(0, n - 10, 10):
+            color = (0.0,
+                     1 - float(pow(i, power) * 1.0 / pow(n, power)),
+                     float(pow(i, power) * 1.0 / pow(n, power))
+                    )
+            ax.plot(x[i:i + 11], y[i:i + 11], z[i:i + 11],
+                                color=color, alpha=1.0)
+    else:
+        ax.plot(x, y, z)
+
+    if 'EBF' in Option_Dictionary:
+        ax.set_xlabel(r"$e_{1}$")
+        ax.set_ylabel(r"$e_{2}$")
+        ax.set_zlabel(r"$e_{3}$")
+        # These axis labels may prove to be wrong in the case of epsI<0
+    else:
+        ax.set_xlabel(r"$\hat{\omega_{x}}$")
+        ax.set_ylabel(r"$\hat{\omega_{y}}$")
+        ax.set_zlabel(r"$\hat{\omega_{z}}$")
+    ax.grid(False)
+
+    # Remove ticks since we do not need them
+    ax.set_xticklabels([])
+    ax.set_yticklabels([])
+    ax.set_zticklabels([])
+
+    if 'save_fig' in Option_Dictionary and Option_Dictionary['save_fig']:
+        File_Functions.Save_Figure(file_name, "ThreeD_Plot_Cartesian")
+    else:
+        py.show()
 
 
 def Angle_Space_Plot(file_name, Option_Dictionary={}):
@@ -356,7 +354,7 @@ def Angle_Space_Plot(file_name, Option_Dictionary={}):
             print " Using the effective body frame axis in this plot "
 
         Parameter_Dictionary = File_Functions.Parameter_Dictionary(file_name)
-        epsI = float(Parameter_Dictionary["epsI"])
+        epsI = float(Parameter_Dictionary["epsI3"])
         epsA = float(Parameter_Dictionary["epsA"])
         chi0 = float(Parameter_Dictionary["chi0"]) * pi / 180
         beta = Beta_Function(epsI, epsA, chi0)

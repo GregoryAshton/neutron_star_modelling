@@ -9,20 +9,47 @@ from math import floor
 def Texify_Float(f, n=1, power=True):
     """
 
-    Takes a float and returns a string that looks nice in Latex, takes arguments
+    Takes a float and returns a string that looks nice in Latex, takes args
 
     n=int ~ Number of sig.fig
     power = Bool ~ Whether to produce a *10^{x} or just a regular number"""
-
     f = float(f)
-    f_power = int(py.log10(Round_To_n(f, 0)))
-
-    if power and f_power not in  [-1, 0, 1, 2]:
+    if f == 0:
+        return "0"
+    sign = [r"\text{-}", "", ""][1+int(np.sign(f))]
+    f = abs(f)
+    f = float(f)
+    s = "{:1.2e}".format(f)
+    f_nodecimal = float(s[:2] + "e" + s.split("e")[1])
+    f_power = int(np.floor(np.log10(f_nodecimal)))
+    if power and f_power not in [-1, 0, 1, 2]:
         f_SF = Round_To_n(f, n) * pow(10, -f_power)
-        return r" %s\times 10^{%s} " % (f_SF, f_power)
+        if f_SF < 1:
+            f_SF = Round_To_n(f, n) * pow(10, -f_power + 1)
+        if n == 0:
+            f_SF = int(f_SF)
+        return r"{{{}{}}}\times 10^{{{}}}".format(sign, f_SF, f_power)
     else:
         f_SF = Round_To_n(f, n)
-        return  str(f_SF)
+        return sign + str(f_SF)
+
+#def Texify_Float(f, n=1, power=True):
+#    """
+#
+#    Takes a float and returns a string that looks nice in Latex, takes arguments
+#
+#    n=int ~ Number of sig.fig
+#    power = Bool ~ Whether to produce a *10^{x} or just a regular number"""
+#
+#    f = float(f)
+#    f_power = int(py.log10(Round_To_n(f, 0)))
+#
+#    if power and f_power not in  [-1, 0, 1, 2]:
+#        f_SF = Round_To_n(f, n) * pow(10, -f_power)
+#        return r" %s\times 10^{%s} " % (f_SF, f_power)
+#    else:
+#        f_SF = Round_To_n(f, n)
+#        return  str(f_SF)
 
 # This is not working at the moment, need to think some more....
 def rescale_axis(ax, axis='x', label="time"):

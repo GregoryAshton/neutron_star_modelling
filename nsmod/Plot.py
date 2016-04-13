@@ -63,7 +63,7 @@ def simple_plot(file_name, tmax=None, tmin=None, axes=None, *args, **kwargs):
     return (ax1, ax2, ax3)
 
 def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
-                   end_val=False, save_fig=True, **kwargs):
+                   end_val=False, save_fig=True, figsize=None, **kwargs):
     """
 
     Plot the input data after transforming to spherical polar coordinates
@@ -90,7 +90,7 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
     if axes:
         (ax1, ax2, ax3) = axes
     else:
-        fig, (ax1, ax2, ax3) = plt.subplots(nrows=3)
+        fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, figsize=figsize)
 
     # Default settings
     labelx = -0.1  # x position of the yaxis labels
@@ -799,13 +799,13 @@ def Observables_Plot(file_name):
 
 
 def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
-                 *args, **kwargs):
+                 figsize=None, *args, **kwargs):
     """ Plot the Euler angles in three subplots """
 
     if axes != None:
         (ax1, ax2, ax3)= axes
     else:
-        fig, (ax1, ax2, ax3) = plt.subplots(nrows=3)
+        fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, figsize=figsize)
 
     labelx = -0.1  # x position of the yaxis labels
 
@@ -830,45 +830,45 @@ def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
         epsI3 = parameter_dictionary['epsI3']
 
         COLOR = "r"
-        lw = 3
+        lw = 2
 
         thetadot = 0
         theta = time * thetadot + a0
-        ax1.plot(time, theta, ls="--", color=COLOR, lw=lw)
+        ax1.plot(time, theta, "--", color=COLOR, lw=lw, zorder=10)
 
         phidot = omega0
         phi = np.degrees(phidot * time)
-        ax2.plot(time, phi, ls="--", color=COLOR, lw=lw)
+        ax2.plot(time, phi, "--", color=COLOR, lw=lw, zorder=10)
 
         psidot = -1 * epsI3 * phidot
         psi = np.degrees(psidot * time) + 90.0
-        ax3.plot(time, psi, ls="--", color=COLOR, lw=lw)
+        ax3.plot(time, psi, "--", color=COLOR, lw=lw, zorder=10)
 
     # Plotting
-    ax1.plot(time, theta, *args, **kwargs)
+    ax1.plot(time, theta, "-k", *args, **kwargs)
     ax1.set_ylabel(r"$\theta$ [deg]")
     ax1.set_xticklabels([])
     ax1.yaxis.set_label_coords(labelx, 0.5)
-    ax1.yaxis.set_major_locator(MultipleLocator(0.5))
+    #ax1.yaxis.set_major_locator(MultipleLocator(0.5))
+    ax1.yaxis.set_major_locator(ticker.MaxNLocator(7))
     #ax1.set_yticks(ax1.get_yticks()[1:])
     #ax1.ticklabel_format(useOffset=False, axis='y')
 
     if abs(phi[-1])>10000:
-        ax2.plot(time, phi, *args, **kwargs)
+        ax2.plot(time, phi, "-k", *args, **kwargs)
         ax2.set_ylabel(r"$\phi$ [deg]")
     else:
-        ax2.plot(time, phi, *args, **kwargs)
+        ax2.plot(time, phi, "-k", *args, **kwargs)
         ax2.set_ylabel(r"$\phi$", rotation="horizontal")
     ax2.set_xticklabels([])
     ax2.yaxis.set_label_coords(labelx, 0.5)
     ax2.set_yticks(ax2.get_yticks()[1:])
 
-
     if abs(psi[-1])>10000:
-        ax3.plot(time, psi, *args, **kwargs)
+        ax3.plot(time, psi, "-k", *args, **kwargs)
         ax3.set_ylabel(r"$\psi$ [deg]")
     else:
-        ax3.plot(time, psi, *args, **kwargs)
+        ax3.plot(time, psi, "-k", *args, **kwargs)
         ax3.set_ylabel(r"$\psi$ [deg]")
     ax3.set_xlabel(r"time  [s]")
     ax3.yaxis.set_label_coords(labelx, 0.5)
@@ -1027,7 +1027,7 @@ def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="",
     return ax
 
 def SpindownRate(file_name, ax=None, normalise=False, divisor=10, analytic="",
-                 nmax=None, method='Lyne', *args, **kwargs):
+                 nmax=None, method='Lyne', figsize=None, *args, **kwargs):
     """
 
     Plot the spindown rate from numeric simulation
@@ -1070,7 +1070,7 @@ def SpindownRate(file_name, ax=None, normalise=False, divisor=10, analytic="",
                                                         phi, chi0)
 
     if not ax:
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=figsize)
 
     if normalise:
         nu_dot = nu_dot / sum(nu_dot**2)**0.5
@@ -1080,7 +1080,7 @@ def SpindownRate(file_name, ax=None, normalise=False, divisor=10, analytic="",
     ax.plot(time, nu_dot, *args, **kwargs)
 
     ax.set_xlabel(r"time [s]")
-    ax.set_ylabel(r"$\dot{\nu}$", rotation="horizontal", size=26)
+    ax.set_ylabel(r"$\dot{\nu}$", rotation="horizontal")
     #ax.set_ylim(ax.get_ylim()[0], max(ax.get_ylim()[1], 0))
     #ax.axhline(0, ls="--", color="k", zorder=-100)
 
@@ -1091,7 +1091,7 @@ def SpindownRate(file_name, ax=None, normalise=False, divisor=10, analytic="",
         nu_dot0 = 0
 
     if "EM" in analytic:
-        ax.axhline(nu_dot0, label=r"$\dot{\nu}_{0}$",
+        ax.axhline(nu_dot0, label=r"$\langle\dot{\nu}\rangle$",
                    color="r")
 
     if "FP" in analytic:

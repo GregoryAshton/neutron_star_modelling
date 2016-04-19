@@ -998,21 +998,23 @@ def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="",
     if not ax:
         fig, ax = plt.subplots()
 
-    ax.plot(time, Cycles, *args, **kwargs)
+    ax.plot(time, Cycles, ls="-", color="k", label="Numerical", *args, **kwargs)
     ax.set_ylabel(r"Phase residual [cycles]", rotation='vertical')
     ax.set_xlabel(r"time  [s]")
     ax.axhline(0, ls="-", color="k", zorder=-100)
 
+    epsI3 = PD['epsI3']
+    omega = np.sqrt(w1**2 + w2**2 + w3**2)
+    phidot = omega / np.sqrt(1+epsI3**2-2*epsI3*np.cos(theta))
+    psidot = epsI3 * phidot
     if "49" in analytic:
         DeltaPhi_49 = PD['DeltaPhi_49']
-        ax.axhline(DeltaPhi_49/(2*np.pi), ls="--", color="k", zorder=-100,
-                   label="$|\Delta\Phi^{49}|$")
-        ax.axhline(-DeltaPhi_49/(2*np.pi), ls="--", color="k", zorder=-100)
+        ax.plot(time, DeltaPhi_49/(2*np.pi)*np.cos(psidot*time + np.pi/2),
+                linestyle="-", color="r", label="$\Delta\Phi_{49}$")
     if "63" in analytic:
         DeltaPhi_63 = PD['DeltaPhi_63']
-        ax.axhline(DeltaPhi_63/(2*np.pi), ls="--", color="r", zorder=-100,
-                   label="$|\Delta\Phi^{63}|$")
-        ax.axhline(-DeltaPhi_63/(2*np.pi), ls="--", color="r", zorder=-100)
+        ax.plot(time, DeltaPhi_63/(2*np.pi)*np.cos(psidot*time + np.pi/2),
+                linestyle="--", color="r", label="$\Delta\Phi_{63}$")
     if "75" in analytic:
         DeltaPhi_75 = PD['DeltaPhi_75']
         ax.axhline(DeltaPhi_75/(2*np.pi), ls="--", color="b", zorder=-100,

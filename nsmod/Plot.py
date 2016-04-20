@@ -109,6 +109,7 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
                         omega_x, omega_y, omega_z, fix_varphi=True)
 
     # Plot omega(t)
+    ax1 = xaxis_precession_periods(ax1, file_name)
     ax1.set_xticklabels([])
     ax1.plot(time, omega, **kwargs)
     ax1.set_xlim(tmin, tmax)
@@ -119,6 +120,7 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
     ax1.yaxis.set_label_coords(labelx, 0.5)
 
     # Plot a(t)
+    ax2 = xaxis_precession_periods(ax2, file_name)
     ax2.set_xticklabels([])
     ax2.plot(time, a, **kwargs)
     #py.axhline(90,ls="--",color="k")
@@ -139,7 +141,8 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
     ax3.set_yticks(ax3.get_yticks()[0:-1])
     ax3.set_ylabel(r"$\varphi$ [deg]", rotation="vertical")
     ax3.yaxis.set_label_coords(labelx, 0.5)
-    ax3.set_xlabel(r"time [s]")
+    ax3.set_xlabel(r"time")
+    ax3 = xaxis_precession_periods(ax3, file_name)
     #ax3.xaxis.set_major_formatter(SCI_FORMATTER)
     ax3.set_xlim(tmin, tmax)
     if end_val:
@@ -155,7 +158,6 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
             .format(py.average(varphi_end), max(varphi_end) - min(varphi_end)))
 
     py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12, hspace=0.0)
-
     if save_fig:
         File_Functions.Save_Figure(file_name, 'Spherical_Plot')
 
@@ -847,6 +849,7 @@ def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
     # Plotting
     ax1.plot(time, theta, "-k", *args, **kwargs)
     ax1.set_ylabel(r"$\theta$ [deg]")
+    ax1 = xaxis_precession_periods(ax1, file_name)
     ax1.set_xticklabels([])
     ax1.yaxis.set_label_coords(labelx, 0.5)
     #ax1.yaxis.set_major_locator(MultipleLocator(0.5))
@@ -860,6 +863,7 @@ def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
     else:
         ax2.plot(time, phi, "-k", *args, **kwargs)
         ax2.set_ylabel(r"$\phi$", rotation="horizontal")
+    ax2 = xaxis_precession_periods(ax2, file_name)
     ax2.set_xticklabels([])
     ax2.yaxis.set_label_coords(labelx, 0.5)
     ax2.set_yticks(ax2.get_yticks()[1:])
@@ -872,6 +876,7 @@ def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
         ax3.set_ylabel(r"$\psi$ [deg]")
     ax3.set_xlabel(r"time  [s]")
     ax3.yaxis.set_label_coords(labelx, 0.5)
+    ax3 = xaxis_precession_periods(ax3, file_name)
 
     py.subplots_adjust(hspace=0.0)
 
@@ -900,13 +905,15 @@ def big_phi_dot(file_name, ax=None, save_fig=False, *args, **kwargs):
 
     time, w1, w2, w3, theta, phi, psi = File_Functions.Euler_Angles_Import(file_name)
     chi0 = float(File_Functions.Parameter_Dictionary(file_name)['chi0'])
-    (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
+    #(t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
 
     Phi_dot_list = Physics_Functions.Phi_dot(np.array([w1, w2, w3]), theta, phi, psi, np.radians(chi0))
-    ax.plot(t_scaled, Phi_dot_list, *args, **kwargs)
-    ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+    ax.plot(time, Phi_dot_list, *args, **kwargs)
+    #ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+    ax.set_xlabel(r"time")
     ax.set_ylabel(r"$\dot{\Phi}$", rotation="horizontal", size=26)
 
+    ax = xaxis_precession_periods(ax, file_name)
     return ax
 
 
@@ -937,6 +944,7 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
     ax.set_xlabel(r"time")
     ax.set_ylabel(r"$\Theta$", rotation="horizontal", size=26)
 
+    ax = xaxis_precession_periods(ax, file_name)
     return ax
 
 
@@ -1000,7 +1008,7 @@ def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="",
 
     ax.plot(time, Cycles, ls="-", color="k", label="Numerical", *args, **kwargs)
     ax.set_ylabel(r"Phase residual [cycles]", rotation='vertical')
-    ax.set_xlabel(r"time  [s]")
+    ax.set_xlabel(r"time")
     ax.axhline(0, ls="-", color="k", zorder=-100)
 
     epsI3 = PD['epsI3']
@@ -1026,6 +1034,7 @@ def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="",
                    zorder=-100, label="$|\Delta\Phi^{49}|$")
         ax.axhline(-DeltaPhi_49_SpindownTorque/(2*np.pi), ls="--", color="k",
                    zorder=-100)
+    ax = xaxis_precession_periods(ax, file_name)
     return ax
 
 def SpindownRate(file_name, ax=None, normalise=False, divisor=10, analytic="",
@@ -1081,7 +1090,7 @@ def SpindownRate(file_name, ax=None, normalise=False, divisor=10, analytic="",
 
     ax.plot(time, nu_dot, *args, **kwargs)
 
-    ax.set_xlabel(r"time [s]")
+    ax.set_xlabel(r"time")
     ax.set_ylabel(r"$\dot{\nu}$", rotation="horizontal")
     #ax.set_ylim(ax.get_ylim()[0], max(ax.get_ylim()[1], 0))
     #ax.axhline(0, ls="--", color="k", zorder=-100)
@@ -1117,6 +1126,7 @@ def SpindownRate(file_name, ax=None, normalise=False, divisor=10, analytic="",
 
     ax.set_xlim(time[0], time[-1])
 
+    ax = xaxis_precession_periods(ax, file_name)
     return ax
 
 
@@ -1216,4 +1226,22 @@ def PulseWidth(file_name, Theta0, sigmaB, p=50, ax=None, *args, **kwargs):
     ax.set_xlabel('time')
     ax.set_ylabel('$W_{{{}}}$'.format(p), rotation='vertical')
 
+    return ax
+
+
+def xaxis_precession_periods(ax, file_name):
+    PD = File_Functions.Parameter_Dictionary(file_name)
+    tauP = np.abs(PD['tauP'])
+    def label_format(x, pos):
+        multiple = x / tauP
+        if multiple == 0:
+            return "0"
+        elif multiple == 1:
+            return r"$\tau_\mathrm{{p}}$"
+        if int(multiple) - multiple < 1e-10:
+            return r"{:1.0f}$\tau_\mathrm{{p}}$".format(multiple)
+        else:
+            return r"{}$\tau_\mathrm{{p}}$".format(multiple)
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(tauP))
+    ax.xaxis.set_major_formatter(ticker.FuncFormatter(label_format))
     return ax

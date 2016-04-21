@@ -175,8 +175,8 @@ def Theta(theta, psi, chi):
     """ See equation (52) of Jones 2001 """
     return np.arccos(sin(theta) * sin(psi) * sin(chi) + cos(theta) * cos(chi))
 
-def PhaseResidual(time, w1, w2, w3, theta, phi, psi, chi, order=3,
-                    full=False):
+def PhaseResidual(time, w1, w2, w3, theta, phi, psi, chi, order=3, noise=None,
+                  full=False):
     """
 
     Calculate the phase residuals in the inertial frame using Phi_dot the
@@ -211,6 +211,8 @@ def PhaseResidual(time, w1, w2, w3, theta, phi, psi, chi, order=3,
     #Phi_list = cumtrapz(y=Phi_dot_list, x=time, initial=0)
 
     Phi_list = Phi(theta, phi, psi, chi, fix=True)
+    if noise:
+        Phi_list += np.random.normal(0, noise, len(Phi_list))
 
     # Fit polynomial to Phi or order order
     coefs, V = np.polyfit(time, Phi_list, order, cov=True)
@@ -341,11 +343,13 @@ def Wp(Phi_dot, Theta, ThetaO, sigmaB, p=10):
     -------
     Beam width at p
     """
-
-    P = 1/Phi_dot
-    A = np.cos(np.sqrt((Theta - ThetaO)**2 - 2 * sigmaB**2 * np.log(p/100.)))
+    
+    f = p/100.
+    Amax = np.exp(-(Theta-ThetaO)**2/(2*sigmaB)**2)
+    arg = -np.sqrt(-2*sigmaB**2*np.log(Amax*f))
     B = np.sin(Theta) * np.sin(ThetaO)
     C = np.cos(Theta) * np.cos(ThetaO)
-    D = (A-C)/B
-    w = P * np.arccos(D)/np.pi
+
+    A = (np.cos(arg) - B) / C
+    w = 1/Phi_dot * (1 - np.arccos(A)/np.pi)
     return w

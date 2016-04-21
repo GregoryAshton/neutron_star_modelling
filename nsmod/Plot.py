@@ -16,7 +16,6 @@ from Physics_Functions import Beta_Function
 from nsmod.Pulse_width_fitting import W50
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import rc_file, ticker
-rc_file("/home/greg/Neutron_star_modelling/matplotlibrc")
 
 SCI_FORMATTER = ticker.ScalarFormatter(useOffset=False,
                                        useMathText=True)
@@ -949,7 +948,7 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
 
 
 def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="",
-                    tstart=None, tend=None, *args, **kwargs):
+                  noise=None, tstart=None, tend=None, *args, **kwargs):
     """
     Plot the phase residuals for the data given in file_name.
 
@@ -1000,13 +999,14 @@ def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="",
         pass
 
     Pres = Physics_Functions.PhaseResidual(time, w1, w2, w3,
-                                             theta, phi, psi, chi0,
-                                             order=order)
+                                           theta, phi, psi, chi0,
+                                           noise=noise,
+                                           order=order)
     Cycles = Pres / (2*np.pi)
     if not ax:
         fig, ax = plt.subplots()
 
-    ax.plot(time, Cycles, ls="-", color="k", label="Numerical", *args, **kwargs)
+    ax.plot(time, Cycles, ls="-", label="Numerical", *args, **kwargs)
     ax.set_ylabel(r"Phase residual [cycles]", rotation='vertical')
     ax.set_xlabel(r"time")
     ax.axhline(0, ls="-", color="k", zorder=-100)
@@ -1108,7 +1108,7 @@ def SpindownRate(file_name, ax=None, normalise=False, divisor=10, analytic="",
     if "FP" in analytic:
         Delta_nu0 = PD['delta_omega_dot0_FP'] / (2*np.pi)
         ax.axhline(nu_dot0 + Delta_nu0,
-                   label=r"$|\Delta\dot{\nu}|_{\mathrm{p}}$")
+                   label=r"$|\Delta\dot{\nu}_{\mathrm{p}}|$")
         ax.axhline(nu_dot0 - Delta_nu0)
         #ax.fill_between(time, nu_dot0-Delta_nu0,
         #                 nu_dot0 + Delta_nu0, color="b",
@@ -1169,12 +1169,12 @@ def Intensity(file_name, PhiO, ThetaO, sigmaB,
 
     Intensity = Physics_Functions.Intensity(Phi, Theta, PhiO, ThetaO,
                                             sigmaB, I0=1)
-    ax.plot(time, Intensity, *args, **kwargs)
+    ax.plot(time, Intensity, label="observered intensity", *args, **kwargs)
 
     IMax = Physics_Functions.IntensityMax(Theta, ThetaO, sigmaB, I0=1)
-    ax.plot(time, IMax, "-b")
+    ax.plot(time, IMax, "-b", label="maximum intensity")
 
-    ax.set_xlabel("time [s]")
+    ax.set_xlabel("time")
     ax.set_ylabel("Normalised Intensity")
 
     return ax
@@ -1229,19 +1229,19 @@ def PulseWidth(file_name, Theta0, sigmaB, p=50, ax=None, *args, **kwargs):
     return ax
 
 
-def xaxis_precession_periods(ax, file_name):
+def xaxis_precession_periods(ax, file_name, fracs=1):
     PD = File_Functions.Parameter_Dictionary(file_name)
     tauP = np.abs(PD['tauP'])
     def label_format(x, pos):
-        multiple = x / tauP
+        multiple = x / float(tauP)
         if multiple == 0:
             return "0"
         elif multiple == 1:
             return r"$\tau_\mathrm{{p}}$"
-        if int(multiple) - multiple < 1e-10:
+        if abs(round(multiple, 0) - multiple) < 0.1:
             return r"{:1.0f}$\tau_\mathrm{{p}}$".format(multiple)
         else:
             return r"{}$\tau_\mathrm{{p}}$".format(multiple)
-    ax.xaxis.set_major_locator(ticker.MultipleLocator(tauP))
+    ax.xaxis.set_major_locator(ticker.MultipleLocator(fracs*tauP))
     ax.xaxis.set_major_formatter(ticker.FuncFormatter(label_format))
     return ax

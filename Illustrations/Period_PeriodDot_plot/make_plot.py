@@ -1,10 +1,9 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib import rc_file
 import pandas as pd
 import sys
 
-rc_file("/home/greg/Neutron_star_modelling/matplotlibrc")
+plt.style.use('thesis')
 
 DATA_FILE = sys.argv[1] #"name_p0_p1_AGE_BSURF_PB.txt"
 
@@ -100,8 +99,8 @@ for tau_year in tau_years:
     power = np.log10(tau_year)
     if power != int(power):
         print "pow = {} is not an int".format(power)
-    ax.text(text_X, 3.9*Pdot(text_X, tau),
-            r"$\tau_c=$" + "$10^{{{}}}$ yrs".format(int(power)),
+    ax.text(text_X, 5.8*Pdot(text_X, tau),
+            r"$\tau_\textrm{age}=$" + "$10^{{{}}}$ yrs".format(int(power)),
             rotation=rotation, size=10,
             bbox=dict(facecolor='w', alpha=1.0, edgecolor="w", pad=0)
             )

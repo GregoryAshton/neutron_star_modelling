@@ -13,6 +13,9 @@ F2 = np.genfromtxt(data[:, 3])
 Binary = data[:, 4]  # If not "*" then it is a binary
 Type = data[:, 5]
 W10_ms = data[:, 6]
+tauAge = data[:, 7]
+tauAge[tauAge == "*"] = np.nan
+tauAge = np.array(tauAge)
 
 df = pd.DataFrame({'name': name,
                    'F0': F0,
@@ -20,7 +23,8 @@ df = pd.DataFrame({'name': name,
                    'F2': F2,
                    'Binary': Binary,
                    'Type': Type,
-                   'W10_ms': W10_ms
+                   'W10_ms': W10_ms,
+                   'tauAge': tauAge
                    })
 
 # Clean data

@@ -41,13 +41,13 @@ if "F1" in sys.argv or len(sys.argv) == 1:
     fig = plt.figure(figsize=(6, 8))
     ax = fig.add_subplot(111)
     F1 = np.abs(df.F1[np.isfinite(df.F1.values)]).values
-    logF1 = np.log10(F1[F1 > 0])
+    logF1 = np.log(F1[F1 > 0])
     ax = setup_hist(logF1, ax, 100)
     ax = AddNormal(ax, logF1)
-    ax.set_xlabel("$\log_{10}(\dot{f})$")
+    ax.set_xlabel("$\log(\dot{f})$")
     ax.set_ylabel("Normalised count")
     fig.tight_layout()
-    plt.savefig("F1_distribution.pdf")
+    plt.savefig("logF1_distribution.pdf")
 
 if "F2" in sys.argv or len(sys.argv) == 1:
     fig = plt.figure(figsize=(6, 8))
@@ -81,3 +81,17 @@ if "lnW10" in sys.argv or len(sys.argv) == 1:
     ax.set_ylabel("Normalised count")
     fig.tight_layout()
     plt.savefig("lnW10_distribution.pdf")
+
+if "tauAge" in sys.argv:
+    fig = plt.figure(figsize=(6, 8))
+    ax = fig.add_subplot(111)
+    tauAge = df.tauAge.values.astype(np.float64)
+    tauAge = tauAge[~np.isnan(tauAge)] * 365.25 * 86400  # Convert to secs
+    log10tauAge = np.log10(tauAge)
+    ax = setup_hist(log10tauAge, ax, 30)
+    ax = AddNormal(ax, log10tauAge)
+    ax.set_xlabel(r"$\ln(\tau_{\textrm{age})$")
+    ax.set_ylabel("Normalised count")
+    fig.tight_layout()
+    plt.savefig("log10tauAge_distribution.pdf")
+

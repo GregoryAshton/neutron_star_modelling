@@ -846,7 +846,7 @@ def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
         ax3.plot(time, psi, "--", color=COLOR, lw=lw, zorder=10)
 
     # Plotting
-    ax1.plot(time, theta, "-k", *args, **kwargs)
+    ax1.plot(time, theta, "-", *args, **kwargs)
     ax1.set_ylabel(r"$\theta$ [deg]")
     ax1 = xaxis_precession_periods(ax1, file_name)
     ax1.set_xticklabels([])
@@ -857,10 +857,10 @@ def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
     #ax1.ticklabel_format(useOffset=False, axis='y')
 
     if abs(phi[-1])>10000:
-        ax2.plot(time, phi, "-k", *args, **kwargs)
+        ax2.plot(time, phi, "-", *args, **kwargs)
         ax2.set_ylabel(r"$\phi$ [deg]")
     else:
-        ax2.plot(time, phi, "-k", *args, **kwargs)
+        ax2.plot(time, phi, "-", *args, **kwargs)
         ax2.set_ylabel(r"$\phi$", rotation="horizontal")
     ax2 = xaxis_precession_periods(ax2, file_name)
     ax2.set_xticklabels([])
@@ -868,10 +868,10 @@ def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
     ax2.set_yticks(ax2.get_yticks()[1:])
 
     if abs(psi[-1])>10000:
-        ax3.plot(time, psi, "-k", *args, **kwargs)
+        ax3.plot(time, psi, "-", *args, **kwargs)
         ax3.set_ylabel(r"$\psi$ [deg]")
     else:
-        ax3.plot(time, psi, "-k", *args, **kwargs)
+        ax3.plot(time, psi, "-", *args, **kwargs)
         ax3.set_ylabel(r"$\psi$ [deg]")
     ax3.set_xlabel(r"time  [s]")
     ax3.yaxis.set_label_coords(labelx, 0.5)

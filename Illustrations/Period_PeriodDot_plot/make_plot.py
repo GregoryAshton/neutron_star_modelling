@@ -66,7 +66,7 @@ ax.scatter(binary_MSP_df.p0.values, binary_MSP_df.p1.values,
 # AXP
 magnetar_df = df[["AXP" in t for t in df.Type]]
 ax.scatter(magnetar_df.p0.values, magnetar_df.p1.values,
-           s = 40, c='r', marker="v", label="AXP")
+           s = 40, c='r', marker="v", label="Magnetars")
 
 P_range = np.logspace(-4, 4, 100)
 ## Add lines of constant magnetic field

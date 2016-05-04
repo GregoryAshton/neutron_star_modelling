@@ -1136,7 +1136,7 @@ def SpindownRate(file_name, ax=None, normalise=False, divisor=10, analytic="",
     ax.plot(time, nu_dot, *args, **kwargs)
 
     ax.set_xlabel(r"time")
-    ax.set_ylabel(r"$\dot{\nu}$", rotation="horizontal")
+    ax.set_ylabel(r"Spin-down rate $\dot{\nu}$")
     #ax.set_ylim(ax.get_ylim()[0], max(ax.get_ylim()[1], 0))
     #ax.axhline(0, ls="--", color="k", zorder=-100)
 

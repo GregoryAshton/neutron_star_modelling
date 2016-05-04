@@ -62,7 +62,8 @@ def simple_plot(file_name, tmax=None, tmin=None, axes=None, *args, **kwargs):
     return (ax1, ax2, ax3)
 
 def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
-                   end_val=False, save_fig=True, figsize=None, **kwargs):
+                   end_val=False, save_fig=True, figsize=None,
+                   analytic=False, ax1ylim=True, **kwargs):
     """
 
     Plot the input data after transforming to spherical polar coordinates
@@ -113,7 +114,8 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
     ax1.plot(time, omega, **kwargs)
     ax1.set_xlim(tmin, tmax)
 
-    ax1.set_ylim(0, 1.1 * max(omega))
+    if ax1ylim:
+        ax1.set_ylim(0, 1.1 * max(omega))
     #py.yticks(fig1.get_yticks()[1:-1])
     ax1.set_ylabel(r"$\omega$  [rad/s] ", rotation="vertical")
     ax1.yaxis.set_label_coords(labelx, 0.5)
@@ -156,9 +158,29 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
         print (" Average of varphi: {0} s^-1 \n Range of varphi : {1}"
             .format(py.average(varphi_end), max(varphi_end) - min(varphi_end)))
 
-    py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12, hspace=0.0)
+    if analytic:
+        parameter_dictionary = File_Functions.Parameter_Dictionary(file_name)
+        a0 = parameter_dictionary['a0']
+        omega0 = parameter_dictionary['omega0']
+        epsI3 = parameter_dictionary['epsI3']
+
+        COLOR = "r"
+        lw = 2
+
+        omega = np.zeros(len(time)) + omega0
+        ax1.plot(time, omega, "--", color=COLOR, lw=lw, zorder=10)
+
+        a = np.zeros(len(time)) + a0
+        ax2.plot(time, a, "--", color=COLOR, lw=lw, zorder=10)
+
+        varphi = np.degrees(epsI3 * omega0 * np.cos(np.radians(a0)) * time)
+        ax3.plot(time, varphi, "--", color=COLOR, lw=lw, zorder=10)
+
+
+    plt.tight_layout()
+    py.subplots_adjust(hspace=0.3)
     if save_fig:
-        File_Functions.Save_Figure(file_name, 'Spherical_Plot')
+        File_Functions.Save_Figure(file_name, 'Spherical_Plot', tight=False)
 
     return (ax1, ax2, ax3)
 
@@ -800,13 +822,16 @@ def Observables_Plot(file_name):
 
 
 def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
-                 figsize=None, *args, **kwargs):
+                 derivs=False, figsize=None, *args, **kwargs):
     """ Plot the Euler angles in three subplots """
 
     if axes != None:
         (ax1, ax2, ax3)= axes
     else:
-        fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, figsize=figsize)
+        if derivs:
+            fig, (ax1, ax2, ax2T, ax3, ax3T) = plt.subplots(nrows=5, figsize=figsize)
+        else:
+            fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, figsize=figsize)
 
     labelx = -0.1  # x position of the yaxis labels
 
@@ -852,7 +877,7 @@ def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
     ax1.set_xticklabels([])
     ax1.yaxis.set_label_coords(labelx, 0.5)
     #ax1.yaxis.set_major_locator(MultipleLocator(0.5))
-    ax1.yaxis.set_major_locator(ticker.MaxNLocator(7))
+    ax1.yaxis.set_major_locator(ticker.MaxNLocator(6))
     #ax1.set_yticks(ax1.get_yticks()[1:])
     #ax1.ticklabel_format(useOffset=False, axis='y')
 
@@ -865,6 +890,7 @@ def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
     ax2 = xaxis_precession_periods(ax2, file_name)
     ax2.set_xticklabels([])
     ax2.yaxis.set_label_coords(labelx, 0.5)
+    ax2.yaxis.set_major_locator(ticker.MaxNLocator(6))
     ax2.set_yticks(ax2.get_yticks()[1:])
 
     if abs(psi[-1])>10000:
@@ -873,14 +899,33 @@ def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
     else:
         ax3.plot(time, psi, "-", *args, **kwargs)
         ax3.set_ylabel(r"$\psi$ [deg]")
-    ax3.set_xlabel(r"time  [s]")
+    ax3.set_xlabel(r"time")
     ax3.yaxis.set_label_coords(labelx, 0.5)
     ax3 = xaxis_precession_periods(ax3, file_name)
+    ax3.yaxis.set_major_locator(ticker.MaxNLocator(6))
 
-    py.subplots_adjust(hspace=0.0)
+    if derivs:
+        phidot = np.gradient(phi)
+        ax2T.plot(time, phidot)
+        ax2T.set_ylabel("$\dot{\phi}$ [deg/s]")
+        ax2T = xaxis_precession_periods(ax2T, file_name)
+        ax2T.set_xticklabels([])
+        ax2T.yaxis.set_major_locator(ticker.MaxNLocator(6))
+
+        psidot = np.gradient(psi)
+        ax3T.plot(time, psidot)
+        ax3T = xaxis_precession_periods(ax3T, file_name)
+        ax3T.set_ylabel("$\dot{\psi}$ [deg/s]")
+        ax3T.yaxis.set_major_locator(ticker.MaxNLocator(6))
+        ax3T.set_xlabel("time")
+        ax3.set_xlabel("")
+        ax3.set_xticklabels([])
+
+    plt.tight_layout()
+    py.subplots_adjust(hspace=0.3)
 
     if save_fig:
-        File_Functions.Save_Figure(file_name, 'Euler_Angles')
+        File_Functions.Save_Figure(file_name, 'Euler_Angles', tight=False)
 
 
     return (ax1, ax2, ax3)
@@ -1021,8 +1066,8 @@ def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="",
                 linestyle="-", color="r", label="$\Delta\Phi_{49}$")
     if "63" in analytic:
         DeltaPhi_63 = PD['DeltaPhi_63']
-        ax.plot(time, DeltaPhi_63/(2*np.pi)*np.cos(psidot*time + np.pi/2),
-                linestyle="--", color="r", label="$\Delta\Phi_{63}$")
+        ax.plot(time, -DeltaPhi_63/(2*np.pi)*np.sin(psidot*time + np.pi/2),
+                dashes=(2, 2), color="r", label="$\Delta\Phi_{63}$")
     if "75" in analytic:
         DeltaPhi_75 = PD['DeltaPhi_75']
         ax.axhline(DeltaPhi_75/(2*np.pi), ls="--", color="b", zorder=-100,

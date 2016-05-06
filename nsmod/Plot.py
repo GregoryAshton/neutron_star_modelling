@@ -44,17 +44,17 @@ def simple_plot(file_name, tmax=None, tmin=None, axes=None, *args, **kwargs):
         fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, sharex=True)
 
     ax1.plot(time, wx, *args, **kwargs)
-    ax1.set_ylabel(r"$\omega_{x}$", rotation="horizontal")
+    ax1.set_ylabel(r"$\Omega_{x}$", rotation="horizontal")
     ax1.set_yticks(ax1.get_yticks()[1:-1])
     ax1.set_xlim(tmin, tmax)
 
     ax2.plot(time, wy, *args, **kwargs)
-    ax2.set_ylabel(r"$\omega_{y}$", rotation="horizontal")
+    ax2.set_ylabel(r"$\Omega_{y}$", rotation="horizontal")
     ax2.set_yticks(ax2.get_yticks()[1:-1])
     ax2.set_xlim(tmin, tmax)
 
     ax3.plot(time, wz, *args, **kwargs)
-    ax3.set_ylabel(r"$\omega_{z} $", rotation="horizontal")
+    ax3.set_ylabel(r"$\Omega_{z} $", rotation="horizontal")
     ax3.set_xlim(tmin, tmax)
 
     ax3.set_xlabel(r"$t$")
@@ -63,7 +63,8 @@ def simple_plot(file_name, tmax=None, tmin=None, axes=None, *args, **kwargs):
 
 def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
                    end_val=False, save_fig=True, figsize=None,
-                   analytic=False, ax1ylim=True, **kwargs):
+                   precession_periods=True, analytic=False, ax1ylim=True,
+                   **kwargs):
     """
 
     Plot the input data after transforming to spherical polar coordinates
@@ -93,7 +94,7 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
         fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, figsize=figsize)
 
     # Default settings
-    labelx = -0.1  # x position of the yaxis labels
+    labelx = -0.2  # x position of the yaxis labels
 
     # Handle any additional options which are in the dictionary
 
@@ -109,7 +110,6 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
                         omega_x, omega_y, omega_z, fix_varphi=True)
 
     # Plot omega(t)
-    ax1 = xaxis_precession_periods(ax1, file_name)
     ax1.set_xticklabels([])
     ax1.plot(time, omega, **kwargs)
     ax1.set_xlim(tmin, tmax)
@@ -117,11 +117,10 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
     if ax1ylim:
         ax1.set_ylim(0, 1.1 * max(omega))
     #py.yticks(fig1.get_yticks()[1:-1])
-    ax1.set_ylabel(r"$\omega$  [rad/s] ", rotation="vertical")
+    ax1.set_ylabel(r"$\Omega$  [rad/s] ", rotation="vertical")
     ax1.yaxis.set_label_coords(labelx, 0.5)
 
     # Plot a(t)
-    ax2 = xaxis_precession_periods(ax2, file_name)
     ax2.set_xticklabels([])
     ax2.plot(time, a, **kwargs)
     #py.axhline(90,ls="--",color="k")
@@ -143,7 +142,10 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
     ax3.set_ylabel(r"$\varphi$ [deg]", rotation="vertical")
     ax3.yaxis.set_label_coords(labelx, 0.5)
     ax3.set_xlabel(r"time")
-    ax3 = xaxis_precession_periods(ax3, file_name)
+    if precession_periods:
+        ax1 = xaxis_precession_periods(ax1, file_name)
+        ax2 = xaxis_precession_periods(ax2, file_name)
+        ax3 = xaxis_precession_periods(ax3, file_name)
     #ax3.xaxis.set_major_formatter(SCI_FORMATTER)
     ax3.set_xlim(tmin, tmax)
     if end_val:
@@ -176,7 +178,8 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
         varphi = np.degrees(epsI3 * omega0 * np.cos(np.radians(a0)) * time)
         ax3.plot(time, varphi, "--", color=COLOR, lw=lw, zorder=10)
 
-
+    for ax in (ax1, ax2, ax3):
+        ax.yaxis.set_major_locator(ticker.MaxNLocator(4))
     plt.tight_layout()
     py.subplots_adjust(hspace=0.3)
     if save_fig:
@@ -329,9 +332,9 @@ def ThreeD_Plot_Cartesian(file_name, Option_Dictionary={}):
         ax.set_zlabel(r"$e_{3}$")
         # These axis labels may prove to be wrong in the case of epsI<0
     else:
-        ax.set_xlabel(r"$\hat{\omega_{x}}$")
-        ax.set_ylabel(r"$\hat{\omega_{y}}$")
-        ax.set_zlabel(r"$\hat{\omega_{z}}$")
+        ax.set_xlabel(r"$\hat{\Omega_{x}}$")
+        ax.set_ylabel(r"$\hat{\Omega_{y}}$")
+        ax.set_zlabel(r"$\hat{\Omega_{z}}$")
     ax.grid(False)
 
     # Remove ticks since we do not need them
@@ -521,9 +524,9 @@ def Angle_Space_Plot(file_name, Option_Dictionary={}):
             ax.set_zlabel(r"$e_{3}$", rotation="horizontal")
             # These axis labels may prove to be wrong in the case of epsI<0
         else:
-            ax.set_xlabel(r"$\hat{\omega_{x}}$")
-            ax.set_ylabel(r"$\hat{\omega_{y}}$")
-            ax.set_zlabel(r"$\hat{\omega_{z}}$")
+            ax.set_xlabel(r"$\hat{\Omega_{x}}$")
+            ax.set_ylabel(r"$\hat{\Omega_{y}}$")
+            ax.set_zlabel(r"$\hat{\Omega_{z}}$")
 
         # Remove the ticks as these are not required
         ax.set_xticklabels([])
@@ -567,17 +570,17 @@ def Simple_Plot_Transform(file_name, Option_Dictionary={}):
 
     fig1 = py.subplot(3, 1, 1)
     fig1.plot(time, w1_prime)
-    py.ylabel(r"$\omega_{x}' $", fontsize=20, rotation="horizontal")
+    py.ylabel(r"$\Omega_{x}' $", fontsize=20, rotation="horizontal")
 
     fig2 = py.subplot(312)
     fig2.plot(time, w2_prime)
     py.yticks()
-    py.ylabel(r"$\omega_{y}' $", fontsize=20, rotation="horizontal")
+    py.ylabel(r"$\Omega_{y}' $", fontsize=20, rotation="horizontal")
 
     fig2 = py.subplot(313)
     fig2.plot(time, w3_prime)
     py.xlabel(r"$t$", fontsize=20)
-    py.ylabel(r"$\omega_{z}' $", fontsize=20, rotation="horizontal")
+    py.ylabel(r"$\Omega_{z}' $", fontsize=20, rotation="horizontal")
     py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12, hspace=0.0)
 
     py.show()
@@ -707,7 +710,7 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
 
         # py.yticks(fig1.get_yticks()[1:-1])
 
-        ax1.set_ylabel(r"$\omega'$ [Hz]", rotation='vertical')
+        ax1.set_ylabel(r"$\Omega'$ [Hz]", rotation='vertical')
         ax1.yaxis.set_label_coords(labelx, 0.5)
 
         # Plot a_prime(t)

@@ -76,12 +76,10 @@ def Parameter_Dictionary(user_input):
     P = 2*np.pi / omega0
     p_d['P'] = P
 
-    # tauP doesn't make sense with epsI1 != 0 so set it to zero
-    if epsI1==0:
-        tauP = 2 * pi * pow(omega0 * abs(epsI3), -1) / np.cos(theta0)
+    if epsI1 == 0 and epsI3 == 0:
+        tauP = np.nan
     else:
-        tauP = 2 * pi * pow(omega0 * max(abs(epsI3), abs(epsI1)), -1)
-        print "Warning: calculating tauP not defined for triaxial body"
+        tauP = 2 * pi * pow(omega0 * abs(epsI3), -1) / np.cos(theta0)
 
     p_d["tauP"] = tauP
 
@@ -117,7 +115,7 @@ def Parameter_Dictionary(user_input):
 
     # Wobble angle calculation
 
-    if epsA != 0:
+    if epsA != 0 and epsI3 != 0:
         beta = Physics_Functions.Beta_Function(epsI3, epsA, chi0, warning=False)
         wobble_angle_spindown = (P / tauS) * (1 + 1.0/epsI3)
     else:

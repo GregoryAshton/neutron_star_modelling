@@ -989,7 +989,7 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
     ax.plot(time, Theta_list, *args, **kwargs)
     #ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
     ax.set_xlabel(r"time")
-    ax.set_ylabel(r"$\Theta$", rotation="horizontal", size=26)
+    ax.set_ylabel(r"Polar angle of the" + "\n" + "magnetic dipole\n" + "$\Theta$ [degs]")
 
     ax = xaxis_precession_periods(ax, file_name)
     return ax

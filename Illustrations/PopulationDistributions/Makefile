@@ -17,7 +17,7 @@ $(ATNF_DATABASE):
 
 $(DATA_FILE):
 	export PSRCAT_FILE=${PSRCAT_FILE_PATH}; \
-		./psrcat_tar/psrcat -c "name F0 F1 F2 BINARY TYPE W10" -nonumber -o short > ${DATA_FILE}
+		./psrcat_tar/psrcat -c "name F0 F1 F2 BINARY TYPE W10 Age" -nonumber -o short > ${DATA_FILE}
 
 $(SAVE_FIG):make_plot.py
 	python make_plot.py

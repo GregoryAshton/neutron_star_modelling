@@ -958,13 +958,13 @@ def big_phi_dot(file_name, ax=None, save_fig=False, *args, **kwargs):
     ax.plot(time, Phi_dot_list, *args, **kwargs)
     #ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
     ax.set_xlabel(r"time")
-    ax.set_ylabel(r"$\dot{\Phi}$", rotation="horizontal", size=26)
+    ax.set_ylabel(r"Instantaneous electromagnetic" + "\n" + "frequency $\dot{\Phi}$")
 
     ax = xaxis_precession_periods(ax, file_name)
     return ax
 
 
-def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
+def big_theta(file_name, ax=None, save_fig=False, degs=True, *args, **kwargs):
     """
 
     Plot Phi_dot for data given in file_name
@@ -989,7 +989,10 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
     ax.plot(time, Theta_list, *args, **kwargs)
     #ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
     ax.set_xlabel(r"time")
-    ax.set_ylabel(r"Polar angle of the" + "\n" + "magnetic dipole\n" + "$\Theta$ [degs]")
+    label = r"Polar angle of the"+"\n"+"magnetic dipole $\Theta$"
+    if degs:
+        label += "\n[degs]"
+    ax.set_ylabel(label)
 
     ax = xaxis_precession_periods(ax, file_name)
     return ax

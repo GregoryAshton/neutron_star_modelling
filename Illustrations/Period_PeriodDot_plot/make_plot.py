@@ -1,19 +1,21 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
-import sys
 
 plt.style.use('thesis')
 
-DATA_FILE = sys.argv[1] #"name_p0_p1_AGE_BSURF_PB.txt"
+plt.rcParams['xtick.labelsize'] = 11
+plt.rcParams['ytick.labelsize'] = 11
+
+DATA_FILE = "ATNF_data_file.txt"
 
 data = np.genfromtxt(DATA_FILE, skip_header=4, skip_footer=1, dtype=None)
 name = data[:, 0]
 p0 = np.genfromtxt(data[:, 1])
 p1 = np.genfromtxt(data[:, 2])
-Binary = data[:, 3] # If not "*" then it is a binary
-Type = data[:, 4]
-Age = np.genfromtxt(data[:, 5])
+Binary = data[:, 4] # If not "*" then it is a binary
+Type = data[:, 5]
+Age = np.genfromtxt(data[:, 6])
 
 # Convert null "*" to NaN
 
@@ -23,8 +25,8 @@ df = pd.DataFrame({'name' : name,
                    'Binary' : Binary,
                    'Type' : Type,
                    'Age' : Age,
-                  })
-fig = plt.figure(figsize=(6,8))
+                   })
+fig = plt.figure(figsize=(5.5, 6.2))
 ax = fig.add_subplot(111)
 
 # Normal pulsars
@@ -32,7 +34,7 @@ normal_df = df[(df.p0 > 1e-1) & (df.p1 > 0) &
                (df.Binary == "*") & (df.Type=="*")
                & (df.Age > 1e5)]
 ax.scatter(normal_df.p0.values, normal_df.p1.values,
-           s=2, c='k', marker="o", label="Normal pulsars")
+           s=4, c='k', marker="o", label="Normal pulsars")
 
 # Young pulsars
 normal_df = df[(df.p0 > 1e-1) & (df.p1 > 0) &
@@ -80,9 +82,9 @@ for B0 in B0s:
     if power != int(power):
         print "pow = {} is not an int".format(power)
     if power > 9:
-        ax.text(text_X, 0.8*Pdot(text_X, B0),
+        ax.text(text_X, 0.9*Pdot(text_X, B0),
                 "$B_{{0}}=$" + "$10^{{{}}}$ G".format(int(power)),
-                rotation=-38., size=10,
+                rotation=-32., size=8,
                 bbox=dict(facecolor='w', alpha=1.0, edgecolor="w", pad=0)
                 )
     ax.plot(P_range, Pdot(P_range, B0), ls="--",
@@ -92,16 +94,16 @@ for B0 in B0s:
 def Pdot(P, tau):
     return 0.5 * P/tau
 tau_years = np.logspace(1, 9, 5)
-text_X = 2e-4
+text_X = 1.1e-4
 for tau_year in tau_years:
     tau = tau_year * (365. * 86400)
-    rotation=35
+    rotation = 30
     power = np.log10(tau_year)
     if power != int(power):
         print "pow = {} is not an int".format(power)
-    ax.text(text_X, 5.8*Pdot(text_X, tau),
+    ax.text(text_X, 7.8*Pdot(text_X, tau),
             r"$\tau_\textrm{age}=$" + "$10^{{{}}}$ yrs".format(int(power)),
-            rotation=rotation, size=10,
+            rotation=rotation, size=8,
             bbox=dict(facecolor='w', alpha=1.0, edgecolor="w", pad=0)
             )
     ax.plot(P_range, Pdot(P_range, tau), ls="--",
@@ -111,9 +113,9 @@ for tau_year in tau_years:
 #CONST = 1e-16
 #ax.plot(P_range, CONST * P_range, ls="-", color="r")
 
-ax.legend(loc=2, frameon=True, fontsize=14, numpoints=1)
-ax.set_xlabel("Period [s]")
-ax.set_ylabel("Period derivative [s/s]")
+ax.legend(loc=2, frameon=True, fontsize=11, numpoints=1)
+ax.set_xlabel("Period [s]", fontsize=14)
+ax.set_ylabel("Period derivative [s/s]", fontsize=14)
 
 
 xlims = (1e-4, 150)

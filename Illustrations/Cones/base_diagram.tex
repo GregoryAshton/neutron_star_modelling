@@ -1,14 +1,16 @@
+\LARGE
+
 % Define some colors
 \definecolor{deformation}{rgb}{0.0, 0, 0.8}
-\definecolor{dipole}{rgb}{1.0, 0.7, 0.0}
+\definecolor{dipole}{rgb}{1.0, 0.0, 0.1}
 
 % draw cones
-\draw[fill = deformation, opacity=0.5] 
+\draw[fill = deformation, opacity=0.3] 
             (0, 0)  -- ({sin(\thetaang)}, {cos(\thetaang)}) --   
            % ({sin(\thetaang)}, {cos(\thetaang)}) arc (90 - \thetaang: 90+\thetaang :1) --
             ({sin(-\thetaang)}, {cos(-\thetaang)}) --cycle;
 
-\draw[fill = dipole, opacity=0.4] 
+\draw[fill = dipole, opacity=0.3] 
             (0, 0)  -- ({sin(\thetaang + \chiang)}, {cos(\thetaang + \chiang)}) --  
            %({sin(\thetaang + \chiang)}, {cos( \thetaang + \chiang)}) arc (90 - (\thetaang + \chiang) : 90-(\thetaang - \chiang)  :1) --
             ({sin(\thetaang - \chiang)}, {cos(\thetaang - \chiang)}) --cycle;
@@ -22,7 +24,7 @@
 %draw lines
 \draw[very thick, black, ->] (0,0) -- (0, 1.0) node[above]{$\boldsymbol{J}$};
 \draw[very thick, deformation,, ->] (0,0) -- ({sin(\thetaang)}, {cos(\thetaang)}) node[above]{$\hat{\boldsymbol{n}}$};
-\draw[very thick, green!50!black, ->] (0,0) -- ({sin(\thetaanghat)}, {cos(\thetaanghat)}) node[above]{$\hat{\boldsymbol{\omega}}$};
+\draw[very thick, green!50!black, ->] (0,0) -- ({0.9*sin(\thetaanghat)}, {0.9*cos(\thetaanghat)}) node[above]{$\hat{\boldsymbol{\omega}}$};
 \draw[very thick, dipole, ->] (0,0) --  ({sin(\thetaang + \chiang)}, {cos(\thetaang + \chiang)}) node[anchor=west]{$\hat{\boldsymbol{m}}$};
 
 
@@ -31,14 +33,14 @@
 \node[deformation] at ({0.55 * sin(0.5 * \thetaang)}, { 0.55 * cos(0.5 * \thetaang)}){$\theta$} ;
 
 \draw[dipole] ({0.75 * sin(\chiang + \thetaang)}, {0.75 * cos(\chiang + \thetaang)})  arc (90 - (\thetaang + \chiang): 90 - \thetaang: 0.75);
-\node[dipole] at ({0.79 * sin(0.5 * \chiang + \thetaang)}, { 0.79 * cos(0.5 * \chiang + \thetaang)}){$\chi$} ;
+\node[dipole] at ({0.85 * sin(0.5 * \chiang + \thetaang)}, { 0.79 * cos(0.5 * \chiang + \thetaang)}){$\chi$} ;
 
 %\draw[purple] (0, 0.6)  arc (90: 116-(2*\thetaang - \chiang): 0.75);
 %\node[purple] at ({-0.79 * cos(2*\chiang-\thetaang)},{0.79 * sin(2*\chiang-\thetaang)}){$2\theta - \chi$} ;
 
 % Draw rotation
-\draw[color=black] (0.0,0.0) node at (0.,1.15) {\AxisRotator[rotate =-90]} ;
-\node[above] at (0, 1.17) {$\dot{\phi}$};
+\draw[color=black] (0.0,0.0) node at (0.,1.18) {\AxisRotator[rotate =-90]} ;
+\node[above] at (0, 1.16) {$\dot{\phi}$};
 
-\draw[color=deformation] (0.0,0.0) node at ({1.1*sin(\thetaang)}, {1.1*cos(\thetaang)}) {\AxisRotator[rotate =90 - \thetaang]} ;
-\node[above,  color=deformation] at ({1.15*sin(\thetaang)}, {1.15*cos(\thetaang)}) {$\dot{\psi}$};
+\draw[color=deformation] (0.0,0.0) node at ({1.15*sin(\thetaang)}, {1.15*cos(\thetaang)}) {\AxisRotator[rotate =90 - \thetaang]} ;
+\node[above,  color=deformation] at ({1.16*sin(\thetaang)}, {1.16*cos(\thetaang)}) {$\dot{\psi}$};

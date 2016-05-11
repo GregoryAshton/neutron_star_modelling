@@ -1,11 +1,13 @@
 import sys
 import os
-import matplotlib.pyplot as py
+import matplotlib.pyplot as plt
 import shutil
 from nsmod import Plot, Model, NLD_Functions
 from nsmod.File_Functions import Parameter_Dictionary
 from nsmod.Useful_Tools import Texify_Float
 
+plt.style.use('thesis')
+plt.rcParams['axes.formatter.limits'] = [-7, 7]
 
 def get_file_names():
     file_names = ["data/"+file_name for file_name in os.listdir("data") if
@@ -292,7 +294,7 @@ if "plot" in sys.argv:
 
         file_names = get_file_names()
 
-        Plot.Spherical_Plot(file_names[0], save_fig=True)
+        Plot.Spherical_Plot(file_names[0], save_fig=True, precession_periods=False)
 
     if "A_NA" in sys.argv:
         os.chdir(home)
@@ -300,11 +302,13 @@ if "plot" in sys.argv:
 
         file_low, file_high = get_low_high()
 
-        Plot.Spherical_Plot(file_low, tmax=1e9, save_fig=True)
-        Plot.Spherical_Plot(file_high, tmax=1e10, save_fig=True)
-        Plot.Angle_Space_Plot(file_low, {'save_fig': False, 'nmax': 1000,
-                                         "2D": True, 'delta': 0.4,
-                                         'arrows': "20/25/30/195"})
+        Plot.Spherical_Plot(file_low, tmax=1e9, save_fig=True,
+                            precession_periods=False)
+        Plot.Spherical_Plot(file_high, tmax=1e10, save_fig=True,
+                            precession_periods=False)
+        #Plot.Angle_Space_Plot(file_low, {'save_fig': False, 'nmax': 1000,
+        #                                 "2D": True, 'delta': 0.4,
+        #                                 'arrows': "20/25/30/195"})
 
     if "B_NA" in sys.argv:
         os.chdir(home)
@@ -359,5 +363,5 @@ if "plot" in sys.argv:
         Plot.Spherical_Plot_Transform(file_high, {'save_fig': True})
 
 if "copy" in sys.argv:
-    for dr in [dr_A, dr_B, dr_C, dr_A_NA, dr_B_NA, dr_C_NA]:
-        os.system("cp %s/*.png Images/" % dr)
+    for dr in [dr_S_NA, dr_A, dr_B, dr_C, dr_A_NA, dr_B_NA, dr_C_NA]:
+        os.system("cp {}/img/*.pdf ~/thesis/rotating_frame/img/".format(dr))

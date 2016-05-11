@@ -44,17 +44,17 @@ def simple_plot(file_name, tmax=None, tmin=None, axes=None, *args, **kwargs):
         fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, sharex=True)
 
     ax1.plot(time, wx, *args, **kwargs)
-    ax1.set_ylabel(r"$\omega_{x}$", rotation="horizontal")
+    ax1.set_ylabel(r"$\Omega_{x}$", rotation="horizontal")
     ax1.set_yticks(ax1.get_yticks()[1:-1])
     ax1.set_xlim(tmin, tmax)
 
     ax2.plot(time, wy, *args, **kwargs)
-    ax2.set_ylabel(r"$\omega_{y}$", rotation="horizontal")
+    ax2.set_ylabel(r"$\Omega_{y}$", rotation="horizontal")
     ax2.set_yticks(ax2.get_yticks()[1:-1])
     ax2.set_xlim(tmin, tmax)
 
     ax3.plot(time, wz, *args, **kwargs)
-    ax3.set_ylabel(r"$\omega_{z} $", rotation="horizontal")
+    ax3.set_ylabel(r"$\Omega_{z} $", rotation="horizontal")
     ax3.set_xlim(tmin, tmax)
 
     ax3.set_xlabel(r"$t$")
@@ -62,7 +62,9 @@ def simple_plot(file_name, tmax=None, tmin=None, axes=None, *args, **kwargs):
     return (ax1, ax2, ax3)
 
 def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
-                   end_val=False, save_fig=True, figsize=None, **kwargs):
+                   end_val=False, save_fig=True, figsize=None,
+                   precession_periods=True, analytic=False, ax1ylim=True,
+                   **kwargs):
     """
 
     Plot the input data after transforming to spherical polar coordinates
@@ -92,7 +94,7 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
         fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, figsize=figsize)
 
     # Default settings
-    labelx = -0.1  # x position of the yaxis labels
+    labelx = -0.2  # x position of the yaxis labels
 
     # Handle any additional options which are in the dictionary
 
@@ -108,18 +110,17 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
                         omega_x, omega_y, omega_z, fix_varphi=True)
 
     # Plot omega(t)
-    ax1 = xaxis_precession_periods(ax1, file_name)
     ax1.set_xticklabels([])
     ax1.plot(time, omega, **kwargs)
     ax1.set_xlim(tmin, tmax)
 
-    ax1.set_ylim(0, 1.1 * max(omega))
+    if ax1ylim:
+        ax1.set_ylim(0, 1.1 * max(omega))
     #py.yticks(fig1.get_yticks()[1:-1])
-    ax1.set_ylabel(r"$\omega$  [rad/s] ", rotation="vertical")
+    ax1.set_ylabel(r"$\Omega$  [rad/s] ", rotation="vertical")
     ax1.yaxis.set_label_coords(labelx, 0.5)
 
     # Plot a(t)
-    ax2 = xaxis_precession_periods(ax2, file_name)
     ax2.set_xticklabels([])
     ax2.plot(time, a, **kwargs)
     #py.axhline(90,ls="--",color="k")
@@ -141,7 +142,10 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
     ax3.set_ylabel(r"$\varphi$ [deg]", rotation="vertical")
     ax3.yaxis.set_label_coords(labelx, 0.5)
     ax3.set_xlabel(r"time")
-    ax3 = xaxis_precession_periods(ax3, file_name)
+    if precession_periods:
+        ax1 = xaxis_precession_periods(ax1, file_name)
+        ax2 = xaxis_precession_periods(ax2, file_name)
+        ax3 = xaxis_precession_periods(ax3, file_name)
     #ax3.xaxis.set_major_formatter(SCI_FORMATTER)
     ax3.set_xlim(tmin, tmax)
     if end_val:
@@ -156,9 +160,30 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
         print (" Average of varphi: {0} s^-1 \n Range of varphi : {1}"
             .format(py.average(varphi_end), max(varphi_end) - min(varphi_end)))
 
-    py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12, hspace=0.0)
+    if analytic:
+        parameter_dictionary = File_Functions.Parameter_Dictionary(file_name)
+        a0 = parameter_dictionary['a0']
+        omega0 = parameter_dictionary['omega0']
+        epsI3 = parameter_dictionary['epsI3']
+
+        COLOR = "r"
+        lw = 2
+
+        omega = np.zeros(len(time)) + omega0
+        ax1.plot(time, omega, "--", color=COLOR, lw=lw, zorder=10)
+
+        a = np.zeros(len(time)) + a0
+        ax2.plot(time, a, "--", color=COLOR, lw=lw, zorder=10)
+
+        varphi = np.degrees(epsI3 * omega0 * np.cos(np.radians(a0)) * time)
+        ax3.plot(time, varphi, "--", color=COLOR, lw=lw, zorder=10)
+
+    for ax in (ax1, ax2, ax3):
+        ax.yaxis.set_major_locator(ticker.MaxNLocator(4))
+    plt.tight_layout()
+    py.subplots_adjust(hspace=0.3)
     if save_fig:
-        File_Functions.Save_Figure(file_name, 'Spherical_Plot')
+        File_Functions.Save_Figure(file_name, 'Spherical_Plot', tight=False)
 
     return (ax1, ax2, ax3)
 
@@ -307,9 +332,9 @@ def ThreeD_Plot_Cartesian(file_name, Option_Dictionary={}):
         ax.set_zlabel(r"$e_{3}$")
         # These axis labels may prove to be wrong in the case of epsI<0
     else:
-        ax.set_xlabel(r"$\hat{\omega_{x}}$")
-        ax.set_ylabel(r"$\hat{\omega_{y}}$")
-        ax.set_zlabel(r"$\hat{\omega_{z}}$")
+        ax.set_xlabel(r"$\hat{\Omega_{x}}$")
+        ax.set_ylabel(r"$\hat{\Omega_{y}}$")
+        ax.set_zlabel(r"$\hat{\Omega_{z}}$")
     ax.grid(False)
 
     # Remove ticks since we do not need them
@@ -499,9 +524,9 @@ def Angle_Space_Plot(file_name, Option_Dictionary={}):
             ax.set_zlabel(r"$e_{3}$", rotation="horizontal")
             # These axis labels may prove to be wrong in the case of epsI<0
         else:
-            ax.set_xlabel(r"$\hat{\omega_{x}}$")
-            ax.set_ylabel(r"$\hat{\omega_{y}}$")
-            ax.set_zlabel(r"$\hat{\omega_{z}}$")
+            ax.set_xlabel(r"$\hat{\Omega_{x}}$")
+            ax.set_ylabel(r"$\hat{\Omega_{y}}$")
+            ax.set_zlabel(r"$\hat{\Omega_{z}}$")
 
         # Remove the ticks as these are not required
         ax.set_xticklabels([])
@@ -545,17 +570,17 @@ def Simple_Plot_Transform(file_name, Option_Dictionary={}):
 
     fig1 = py.subplot(3, 1, 1)
     fig1.plot(time, w1_prime)
-    py.ylabel(r"$\omega_{x}' $", fontsize=20, rotation="horizontal")
+    py.ylabel(r"$\Omega_{x}' $", fontsize=20, rotation="horizontal")
 
     fig2 = py.subplot(312)
     fig2.plot(time, w2_prime)
     py.yticks()
-    py.ylabel(r"$\omega_{y}' $", fontsize=20, rotation="horizontal")
+    py.ylabel(r"$\Omega_{y}' $", fontsize=20, rotation="horizontal")
 
     fig2 = py.subplot(313)
     fig2.plot(time, w3_prime)
     py.xlabel(r"$t$", fontsize=20)
-    py.ylabel(r"$\omega_{z}' $", fontsize=20, rotation="horizontal")
+    py.ylabel(r"$\Omega_{z}' $", fontsize=20, rotation="horizontal")
     py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12, hspace=0.0)
 
     py.show()
@@ -685,7 +710,7 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
 
         # py.yticks(fig1.get_yticks()[1:-1])
 
-        ax1.set_ylabel(r"$\omega'$ [Hz]", rotation='vertical')
+        ax1.set_ylabel(r"$\Omega'$ [Hz]", rotation='vertical')
         ax1.yaxis.set_label_coords(labelx, 0.5)
 
         # Plot a_prime(t)
@@ -800,13 +825,16 @@ def Observables_Plot(file_name):
 
 
 def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
-                 figsize=None, *args, **kwargs):
+                 derivs=False, figsize=None, *args, **kwargs):
     """ Plot the Euler angles in three subplots """
 
     if axes != None:
         (ax1, ax2, ax3)= axes
     else:
-        fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, figsize=figsize)
+        if derivs:
+            fig, (ax1, ax2, ax2T, ax3, ax3T) = plt.subplots(nrows=5, figsize=figsize)
+        else:
+            fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, figsize=figsize)
 
     labelx = -0.1  # x position of the yaxis labels
 
@@ -852,7 +880,7 @@ def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
     ax1.set_xticklabels([])
     ax1.yaxis.set_label_coords(labelx, 0.5)
     #ax1.yaxis.set_major_locator(MultipleLocator(0.5))
-    ax1.yaxis.set_major_locator(ticker.MaxNLocator(7))
+    ax1.yaxis.set_major_locator(ticker.MaxNLocator(6))
     #ax1.set_yticks(ax1.get_yticks()[1:])
     #ax1.ticklabel_format(useOffset=False, axis='y')
 
@@ -865,6 +893,7 @@ def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
     ax2 = xaxis_precession_periods(ax2, file_name)
     ax2.set_xticklabels([])
     ax2.yaxis.set_label_coords(labelx, 0.5)
+    ax2.yaxis.set_major_locator(ticker.MaxNLocator(6))
     ax2.set_yticks(ax2.get_yticks()[1:])
 
     if abs(psi[-1])>10000:
@@ -873,14 +902,33 @@ def Euler_Angles(file_name, axes=None, save_fig=False, analytic=False,
     else:
         ax3.plot(time, psi, "-", *args, **kwargs)
         ax3.set_ylabel(r"$\psi$ [deg]")
-    ax3.set_xlabel(r"time  [s]")
+    ax3.set_xlabel(r"time")
     ax3.yaxis.set_label_coords(labelx, 0.5)
     ax3 = xaxis_precession_periods(ax3, file_name)
+    ax3.yaxis.set_major_locator(ticker.MaxNLocator(6))
 
-    py.subplots_adjust(hspace=0.0)
+    if derivs:
+        phidot = np.gradient(phi)
+        ax2T.plot(time, phidot)
+        ax2T.set_ylabel("$\dot{\phi}$ [deg/s]")
+        ax2T = xaxis_precession_periods(ax2T, file_name)
+        ax2T.set_xticklabels([])
+        ax2T.yaxis.set_major_locator(ticker.MaxNLocator(6))
+
+        psidot = np.gradient(psi)
+        ax3T.plot(time, psidot)
+        ax3T = xaxis_precession_periods(ax3T, file_name)
+        ax3T.set_ylabel("$\dot{\psi}$ [deg/s]")
+        ax3T.yaxis.set_major_locator(ticker.MaxNLocator(6))
+        ax3T.set_xlabel("time")
+        ax3.set_xlabel("")
+        ax3.set_xticklabels([])
+
+    plt.tight_layout()
+    py.subplots_adjust(hspace=0.3)
 
     if save_fig:
-        File_Functions.Save_Figure(file_name, 'Euler_Angles')
+        File_Functions.Save_Figure(file_name, 'Euler_Angles', tight=False)
 
 
     return (ax1, ax2, ax3)
@@ -910,13 +958,13 @@ def big_phi_dot(file_name, ax=None, save_fig=False, *args, **kwargs):
     ax.plot(time, Phi_dot_list, *args, **kwargs)
     #ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
     ax.set_xlabel(r"time")
-    ax.set_ylabel(r"$\dot{\Phi}$", rotation="horizontal", size=26)
+    ax.set_ylabel(r"Instantaneous electromagnetic" + "\n" + "frequency $\dot{\Phi}$")
 
     ax = xaxis_precession_periods(ax, file_name)
     return ax
 
 
-def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
+def big_theta(file_name, ax=None, save_fig=False, degs=True, *args, **kwargs):
     """
 
     Plot Phi_dot for data given in file_name
@@ -941,7 +989,10 @@ def big_theta(file_name, ax=None, save_fig=False, *args, **kwargs):
     ax.plot(time, Theta_list, *args, **kwargs)
     #ax.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
     ax.set_xlabel(r"time")
-    ax.set_ylabel(r"$\Theta$", rotation="horizontal", size=26)
+    label = r"Polar angle of the"+"\n"+"magnetic dipole $\Theta$"
+    if degs:
+        label += "\n[degs]"
+    ax.set_ylabel(label)
 
     ax = xaxis_precession_periods(ax, file_name)
     return ax
@@ -1021,8 +1072,8 @@ def PhaseResidual(file_name, ax=None, save_fig=False, order=3, analytic="",
                 linestyle="-", color="r", label="$\Delta\Phi_{49}$")
     if "63" in analytic:
         DeltaPhi_63 = PD['DeltaPhi_63']
-        ax.plot(time, DeltaPhi_63/(2*np.pi)*np.cos(psidot*time + np.pi/2),
-                linestyle="--", color="r", label="$\Delta\Phi_{63}$")
+        ax.plot(time, -DeltaPhi_63/(2*np.pi)*np.sin(psidot*time + np.pi/2),
+                dashes=(2, 2), color="r", label="$\Delta\Phi_{63}$")
     if "75" in analytic:
         DeltaPhi_75 = PD['DeltaPhi_75']
         ax.axhline(DeltaPhi_75/(2*np.pi), ls="--", color="b", zorder=-100,
@@ -1091,7 +1142,7 @@ def SpindownRate(file_name, ax=None, normalise=False, divisor=10, analytic="",
     ax.plot(time, nu_dot, *args, **kwargs)
 
     ax.set_xlabel(r"time")
-    ax.set_ylabel(r"$\dot{\nu}$", rotation="horizontal")
+    ax.set_ylabel(r"Spin-down rate $\dot{\nu}$")
     #ax.set_ylim(ax.get_ylim()[0], max(ax.get_ylim()[1], 0))
     #ax.axhline(0, ls="--", color="k", zorder=-100)
 

@@ -12,7 +12,8 @@ def RemoveFileSuffix(file_name):
     if file_name.endswith(suffix):
         return file_name[:-5]
 
-def Save_Figure(file_path, type_of_plot, dest_dir="img", format_type=".pdf"):
+def Save_Figure(file_path, type_of_plot, dest_dir="img", format_type=".pdf",
+                tight=True):
     """ Saves the currently open figure with an appropriate name"""
     if not os.path.isdir(dest_dir):
         os.mkdir(dest_dir)
@@ -23,7 +24,8 @@ def Save_Figure(file_path, type_of_plot, dest_dir="img", format_type=".pdf"):
                                         RemoveFileSuffix(file_name),
                                         format_type)
 
-    plt.tight_layout()
+    if tight:
+        plt.tight_layout()
     plt.savefig(plot_file_name)
     print "Saving figure as %s" % plot_file_name
 
@@ -68,16 +70,16 @@ def Parameter_Dictionary(user_input):
     omega0 = float(p_d["omega0"])
     chi0 = np.radians(p_d['chi0'])
     a0 = np.radians(p_d['a0'])
+    theta0 = a0 / (1+epsI3)
+    p_d['theta0'] = theta0
 
     P = 2*np.pi / omega0
     p_d['P'] = P
 
-    # tauP doesn't make sense with epsI1 != 0 so set it to zero
-    if epsI1==0:
-        tauP = 2 * pi * pow(omega0 * abs(epsI3), -1)
+    if epsI1 == 0 and epsI3 == 0:
+        tauP = np.nan
     else:
-        tauP = 2 * pi * pow(omega0 * max(abs(epsI3), abs(epsI1)), -1)
-        print "Warning: calculating tauP not defined for triaxial body"
+        tauP = 2 * pi * pow(omega0 * abs(epsI3), -1) / np.cos(theta0)
 
     p_d["tauP"] = tauP
 
@@ -113,7 +115,7 @@ def Parameter_Dictionary(user_input):
 
     # Wobble angle calculation
 
-    if epsA != 0:
+    if epsA != 0 and epsI3 != 0:
         beta = Physics_Functions.Beta_Function(epsI3, epsA, chi0, warning=False)
         wobble_angle_spindown = (P / tauS) * (1 + 1.0/epsI3)
     else:
@@ -143,7 +145,8 @@ def Parameter_Dictionary(user_input):
         EMtorqueAmplificationfactor = (tauP / P) * (tauP / tauE)
         p_d['EMtorqueAmplificationfactor'] = EMtorqueAmplificationfactor
 
-        p_d['DeltaPhi_63'] = EMtorqueAmplificationfactor * DeltaPhi_49 / np.pi
+        #p_d['DeltaPhi_63'] = EMtorqueAmplificationfactor * DeltaPhi_49 / np.pi
+        p_d['DeltaPhi_63'] = wobble_angle * EMtorqueAmplificationfactor / np.tan(chi0) / np.pi
 
         p_d['delta_omega_dot0_FP_EM'] = delta_omega_dot0_FP * EMtorqueAmplificationfactor / np.pi
 

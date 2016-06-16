@@ -30,18 +30,21 @@ fig = plt.figure(figsize=(5.5, 6.2))
 ax = fig.add_subplot(111)
 
 # Normal pulsars
-normal_df = df[(df.p0 > 1e-1) & (df.p1 > 0) &
-               (df.Binary == "*") & (df.Type=="*")
+normal_df = df[(df.p1 > 0) &
+               (df.Binary == "*")
                & (df.Age > 1e5)]
+normal_df = normal_df[['AXP' not in t for t in normal_df.Type]]
 ax.scatter(normal_df.p0.values, normal_df.p1.values,
            s=4, c='k', marker="o", label="Normal pulsars")
 
 # Young pulsars
-normal_df = df[(df.p0 > 1e-1) & (df.p1 > 0) &
-               (df.Binary == "*") & (df.Type=="*")
-               & (df.Age < 1e5)]
-ax.scatter(normal_df.p0.values, normal_df.p1.values,
+young_df = df[(df.p1 > 0) &
+              (df.Binary == "*")
+              & (df.Age < 1e5)]
+young_df = young_df[['AXP' not in t for t in young_df.Type]]
+ax.scatter(young_df.p0.values, young_df.p1.values,
            s=22, c='cyan', marker="o", label="Young pulsars")
+crab = df[df.name == 'B0531+21']
 
 # Binary normal pulars
 binary_normal_df = df[(df.p0 > 1e-1) & (df.p1 > 0) &

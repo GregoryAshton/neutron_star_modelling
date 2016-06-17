@@ -86,7 +86,7 @@ for B0 in B0s:
         print "pow = {} is not an int".format(power)
     if power > 9:
         ax.text(text_X, 0.9*Pdot(text_X, B0),
-                "$B_{{0}}=$" + "$10^{{{}}}$ G".format(int(power)),
+                "$B_\mathrm{{s}}=$" + "$10^{{{}}}$ G".format(int(power)),
                 rotation=-32., size=8,
                 bbox=dict(facecolor='w', alpha=1.0, edgecolor="w", pad=0)
                 )

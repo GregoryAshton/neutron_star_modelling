@@ -345,11 +345,10 @@ def Wp(Phi_dot, Theta, ThetaO, sigmaB, p=10):
     """
     
     f = p/100.
-    Amax = np.exp(-(Theta-ThetaO)**2/(2*sigmaB)**2)
-    arg = -np.sqrt(-2*sigmaB**2*np.log(Amax*f))
+    Amax_over_A0 = np.exp(-(Theta-ThetaO)**2/(2*sigmaB)**2)
+    arg = -np.sqrt(-2*sigmaB**2*np.log(Amax_over_A0*f))
     B = np.sin(Theta) * np.sin(ThetaO)
     C = np.cos(Theta) * np.cos(ThetaO)
-
-    A = (np.cos(arg) - B) / C
-    w = 1/Phi_dot * (1 - np.arccos(A)/np.pi)
+    A = (np.cos(arg) - C) / B
+    w = 1/Phi_dot * (np.arccos(A)/np.pi)
     return w

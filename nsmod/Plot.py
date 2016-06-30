@@ -63,8 +63,8 @@ def simple_plot(file_name, tmax=None, tmin=None, axes=None, *args, **kwargs):
 
 def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
                    end_val=False, save_fig=True, figsize=None,
-                   precession_periods=True, analytic=False, ax1ylim=True,
-                   **kwargs):
+                   precession_periods=True, analytic=False, ax1ylim=None,
+                   phi_y_lim=None, labelx=-0.2, **kwargs):
     """
 
     Plot the input data after transforming to spherical polar coordinates
@@ -93,11 +93,6 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
     else:
         fig, (ax1, ax2, ax3) = plt.subplots(nrows=3, figsize=figsize)
 
-    # Default settings
-    labelx = -0.2  # x position of the yaxis labels
-
-    # Handle any additional options which are in the dictionary
-
     (time, omega_x, omega_y, omega_z) = \
             File_Functions.One_Component_Import(file_name)
 
@@ -115,9 +110,11 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
     ax1.set_xlim(tmin, tmax)
 
     if ax1ylim:
-        ax1.set_ylim(0, 1.1 * max(omega))
+        ax1.set_ylim(0, ax1ylim)
+    else:
+        ax1.set_ylim(0, 1.1*max(omega))
     #py.yticks(fig1.get_yticks()[1:-1])
-    ax1.set_ylabel(r"$\Omega$  [rad/s] ", rotation="vertical")
+    ax1.set_ylabel(r"$\omega$  [rad/s] ", rotation="vertical")
     ax1.yaxis.set_label_coords(labelx, 0.5)
 
     # Plot a(t)
@@ -136,12 +133,13 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
     ax3.plot(time, varphi, **kwargs)
 
     #Ploptions
-    #ax3.set_ylim(0,110)
+    if phi_y_lim:
+        ax3.set_ylim(0, phi_y_lim)
     #ax3.set_yticks(py.arange(0,105,15))
     ax3.set_yticks(ax3.get_yticks()[0:-1])
     ax3.set_ylabel(r"$\varphi$ [deg]", rotation="vertical")
     ax3.yaxis.set_label_coords(labelx, 0.5)
-    ax3.set_xlabel(r"time")
+    ax3.set_xlabel(r"time [s]")
     if precession_periods:
         ax1 = xaxis_precession_periods(ax1, file_name)
         ax2 = xaxis_precession_periods(ax2, file_name)
@@ -179,9 +177,10 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
         ax3.plot(time, varphi, "--", color=COLOR, lw=lw, zorder=10)
 
     for ax in (ax1, ax2, ax3):
-        ax.yaxis.set_major_locator(ticker.MaxNLocator(4))
+        ax.yaxis.set_major_locator(ticker.MaxNLocator(5))
+        ax.grid(True, linestyle='-', linewidth=0.1)
     plt.tight_layout()
-    py.subplots_adjust(hspace=0.3)
+    py.subplots_adjust(hspace=0.2)
     if save_fig:
         File_Functions.Save_Figure(file_name, 'Spherical_Plot', tight=False)
 
@@ -586,7 +585,8 @@ def Simple_Plot_Transform(file_name, Option_Dictionary={}):
     py.show()
 
 
-def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
+def Spherical_Plot_Transform(file_name, Option_Dictionary={}, tmax=None,
+                             labelx=-0.2, figsize=None):
     """
 
     Plot the input data after transforming to spherical polar coordinates in
@@ -600,8 +600,6 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
     """
 
     # Default settings
-
-    labelx = -0.1  # x position of the yaxis labels
 
     # Import the data in components x,y,z
 
@@ -695,29 +693,21 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
                   fontsize=16)
     else:
 
-        # Function to help scale the x-axis
-
-        (t_scaled, scale_val) = Useful_Tools.Sort_Out_Some_Axis(time)
-
         # Plot omega_prime(t)
 
-        fig = py.figure()
-        ax1 = fig.add_subplot(311)
-        ax1.set_xticklabels([])
-        ax1.plot(t_scaled, omega_prime)
+        fig, (ax1, ax2, ax3) = py.subplots(nrows=3, sharex=True, figsize=figsize)
+        ax1.plot(time, omega_prime)
 
         ax1.set_ylim(0, 1.1 * max(omega_prime))
 
         # py.yticks(fig1.get_yticks()[1:-1])
 
-        ax1.set_ylabel(r"$\Omega'$ [Hz]", rotation='vertical')
+        ax1.set_ylabel(r"$\omega '$ [rad/s]", rotation='vertical')
         ax1.yaxis.set_label_coords(labelx, 0.5)
 
         # Plot a_prime(t)
 
-        ax2 = fig.add_subplot(312)
-        ax2.set_xticklabels([])
-        ax2.plot(t_scaled, a_prime)
+        ax2.plot(time, a_prime)
 
         # py.axhline(90,ls="--",color="k")
 
@@ -732,8 +722,6 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
 
         # Plot varphi_prime(t)
 
-        ax3 = fig.add_subplot(313)
-
         # Check and fix rotations of 2pi in varphi
 
         varphi_prime = Physics_Functions.Fix_Varphi(varphi_prime)
@@ -742,22 +730,22 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
 
         if abs(varphi_prime[-1]) > 1000:
 
-            (varphi_prime_scaled, scale) = \
-                Useful_Tools.Sort_Out_Some_Axis(varphi_prime)
-            ax3.plot(t_scaled, varphi_prime_scaled)
-            ax3.set_ylabel(r"$\varphi' [\;1\times 10^{"
-                           + str(int(py.log10(scale))) + '} $deg]',
-                           rotation='vertical')
+            ax3.plot(time, varphi_prime)
+            ax3.set_ylabel(r"$\varphi'$ [deg]", rotation='vertical')
         else:
 
-            ax3.plot(t_scaled, varphi_prime)
+            ax3.plot(time, varphi_prime)
             ax3.set_ylabel(r"$\varphi'$  [deg]", rotation='vertical')
 
         # Ploptions
 
-        ax3.set_xlabel(r"time  [$1\times 10^{}$ s]".format(str(scale_val)))
+        ax3.set_xlabel(r"time  [s]")
         ax3.yaxis.set_label_coords(labelx, 0.5)
-        ax3.set_yticks(ax3.get_yticks()[0:-1])
+        if np.min(varphi_prime) == 0:
+            minv = 0
+        else:
+            minv = 1.05 * np.min(varphi_prime)
+        ax3.set_ylim(minv, 1.05*np.max(varphi_prime))
 
     if 'end_val' in Option_Dictionary:
         print ' Data on the end value of the spherical components of omega'
@@ -770,6 +758,16 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}):
         varphi_end = varphi_prime[-100:-1]
         print ' Average of varphi :  %s  degrees \n Range of varphi : %s' \
             % (py.average(varphi_end), max(varphi_end) - min(varphi_end))
+
+    if tmax:
+        ax3.set_xlim(0, tmax)
+    else:
+        ax3.set_xlim(0, time[-1])
+
+    for ax in (ax1, ax2, ax3):
+        ax.yaxis.set_major_locator(ticker.MaxNLocator(5))
+        ax.grid(True, linestyle='-', linewidth=0.1)
+
 
     py.subplots_adjust(left=0.13, right=0.9, top=0.9, bottom=0.12,
                        hspace=0.0)

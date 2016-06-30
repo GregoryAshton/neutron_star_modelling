@@ -28,7 +28,7 @@ def Texify_Float(f, n=1, power=True):
             f_SF = Round_To_n(f, n) * pow(10, -f_power + 1)
         if n == 0:
             f_SF = int(f_SF)
-        return r"{{{}{}}}\times 10^{{{}}}".format(sign, f_SF, f_power)
+        return r"{{{}{}}}{{\times}} 10^{{{}}}".format(sign, f_SF, f_power)
     else:
         f_SF = Round_To_n(f, n)
         return sign + str(f_SF)

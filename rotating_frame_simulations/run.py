@@ -7,7 +7,8 @@ from nsmod.File_Functions import Parameter_Dictionary
 from nsmod.Useful_Tools import Texify_Float
 
 plt.style.use('thesis')
-plt.rcParams['axes.formatter.limits'] = [-7, 7]
+plt.rcParams['axes.formatter.limits'] = [-6, 5]
+plt.rcParams['axes.prop_cycle'] = plt.cycler('color', ['k'])
 
 def get_file_names():
     file_names = ["data/"+file_name for file_name in os.listdir("data") if
@@ -84,14 +85,11 @@ if "table" in sys.argv:
 \begin{table}[h]
 \centering
 \begin{tabular}[h]{|l|c|c|c|c|c|}\hline
-&$\epsilon_{I}$ & $\epsilon_{A} $ & $B_{S} $[Gauss] & $\tau_{S}$ [s] & $ \tau_{P}$  [s] \\ \hline
+&$\epsilon_{\mathrm{I}}$ & $\epsilon_{\mathrm{A}} $ & $B_{0} $[Gauss] & $\tau_{\mathrm{S}}$ [s] & $ \tau_{\mathrm{P}}$  [s] \\ \hline
 Pulsar A & $ KEY_A_eI $ & $ KEY_A_eA $ & $ KEY_A_Bs $ & $ KEY_A_tauS $ & $ KEY_A_tauP $\\
 Pulsar B & $ KEY_B_eI $ & $ KEY_B_eA $ & $ KEY_B_Bs $ & $ KEY_B_tauS $ & $ KEY_B_tauP $\\
 Pulsar C & $ KEY_C_eI $ & $ KEY_C_eA $ & $ KEY_C_Bs $ & $ KEY_C_tauS $ & $ KEY_C_tauP $\\ \hline
 \end{tabular}
-\caption{Table of relevant values for the selected points. In calculating the Magnetic fields we have assumed canonical value of $R=1\times10^{6}$cm for the radius, and a value $\omega_{0} = 1\times10^{4}$ rads $s^{-1}$}
-\label{A B C params}
-\end{table}
 
 """
 
@@ -121,14 +119,11 @@ Pulsar C & $ KEY_C_eI $ & $ KEY_C_eA $ & $ KEY_C_Bs $ & $ KEY_C_tauS $ & $ KEY_C
 \begin{table}[h]
 \centering
 \begin{tabular}[h]{|l|c|c|c|c|c|c|c|c|}\hline
-$\epsilon_{I}$  & $\epsilon_{A} $ & $B_{S} $[Gauss] & $\tau_{S}$ [s] & $\tau_{A}$ [s] & $ \tau_{P}$  [s] & $\beta(\chi0=30^{\circ})$ & $\beta(\chi0=75^{\circ})$ \\ \hline
-Y_A_eI $ & $ KEY_A_eA $ & $ KEY_A_Bs $ & $ KEY_A_tauS $ & $ KEY_A_tauA $ & $ KEY_A_tauP $ & $ KEY_A_beta30 $& $ KEY_A_beta75 $ \\
-Y_B_eI $ & $ KEY_B_eA $ & $ KEY_B_Bs $ & $ KEY_B_tauS $ & $ KEY_B_tauA $ & $ KEY_B_tauP $ & $ KEY_B_beta30 $& $ KEY_B_beta75 $ \\
-Y_C_eI $ & $ KEY_C_eA $ & $ KEY_C_Bs $ & $ KEY_C_tauS $ & $ KEY_C_tauA $ & $ KEY_C_tauP $ & $ KEY_C_beta30 $& $ KEY_C_beta75 $ \\ \hline
+$\epsilon_{\mathrm{I}}$  & $\epsilon_{\mathrm{A}} $ & $B_{0} $[Gauss] & $\tau_{\mathrm{S}}$ [s] & $\tau_{\mathrm{A}}$ [s] & $ \tau_{\mathrm{P}}$  [s] & $\beta(\chi0=30^{\circ})$ & $\beta(\chi0=75^{\circ})$ \\ \hline
+A & $ KEY_A_eI $ & $ KEY_A_eA $ & $ KEY_A_Bs $ & $ KEY_A_tauS $ & $ KEY_A_tauA $ & $ KEY_A_tauP $ & $ KEY_A_beta30^{\circ} $& $ KEY_A_beta75^{\circ} $ \\
+B & $ KEY_B_eI $ & $ KEY_B_eA $ & $ KEY_B_Bs $ & $ KEY_B_tauS $ & $ KEY_B_tauA $ & $ KEY_B_tauP $ & $ KEY_B_beta30^{\circ} $& $ KEY_B_beta75^{\circ} $ \\
+C & $ KEY_C_eI $ & $ KEY_C_eA $ & $ KEY_C_Bs $ & $ KEY_C_tauS $ & $ KEY_C_tauA $ & $ KEY_C_tauP $ & $ KEY_C_beta30^{\circ} $& $ KEY_C_beta75^{\circ} $ \\ \hline
 \end{tabular}
-\caption{Table of relevant values for the selected points. In calculating the Magnetic fields we have assumeda canonical value of $R=1\times10^{6}$cm for the radius, and a value $\omega_{0} = 1\times10^{4}$ rads $s^{-1}$}
-\label{A B C params}
-\end{table}
 
 """
 
@@ -287,6 +282,7 @@ if "data" in sys.argv:
 
         os.chdir(home)
 
+figsize = (3, 3.5)
 if "plot" in sys.argv:
     if "spherical" in sys.argv:
         os.chdir(home)
@@ -294,7 +290,8 @@ if "plot" in sys.argv:
 
         file_names = get_file_names()
 
-        Plot.Spherical_Plot(file_names[0], save_fig=True, precession_periods=False)
+        Plot.Spherical_Plot(file_names[0], save_fig=True, figsize=figsize,
+                            tmax=0.4e8, precession_periods=False)
 
     if "A_NA" in sys.argv:
         os.chdir(home)
@@ -302,9 +299,10 @@ if "plot" in sys.argv:
 
         file_low, file_high = get_low_high()
 
-        Plot.Spherical_Plot(file_low, tmax=1e9, save_fig=True,
-                            precession_periods=False)
-        Plot.Spherical_Plot(file_high, tmax=1e10, save_fig=True,
+        Plot.Spherical_Plot(file_low, tmax=2e9, save_fig=True, figsize=figsize,
+                            precession_periods=False, phi_y_lim=200000,
+                            ax1ylim=10000, labelx=-0.25)
+        Plot.Spherical_Plot(file_high, tmax=2e9, save_fig=True, figsize=figsize,
                             precession_periods=False)
         #Plot.Angle_Space_Plot(file_low, {'save_fig': False, 'nmax': 1000,
         #                                 "2D": True, 'delta': 0.4,
@@ -325,17 +323,19 @@ if "plot" in sys.argv:
 
         file_low, file_high = get_low_high()
 
-        Plot.Spherical_Plot(file_low)
-        Plot.Spherical_Plot(file_high)
-        Plot.Alpha_Plot(file_low)
-        Plot.Alpha_Plot(file_high)
+        Plot.Spherical_Plot(file_low, tmax=1e8, figsize=figsize,
+                            precession_periods=False, labelx=-0.25)
+        Plot.Spherical_Plot(file_high, tmax=1e8, figsize=figsize,
+                            precession_periods=False, labelx=-0.25)
 
     if "A" in sys.argv:
         os.chdir(home)
         os.chdir(dr_A)
         file_low, file_high = get_low_high()
-        Plot.Spherical_Plot_Transform(file_low, {'save_fig': True})
-        Plot.Spherical_Plot_Transform(file_high, {'save_fig': True})
+        Plot.Spherical_Plot_Transform(file_low, {'save_fig': True},
+                                      tmax=2e9, figsize=figsize)
+        Plot.Spherical_Plot_Transform(file_high, {'save_fig': True},
+                                      tmax=2e9, figsize=figsize)
         Plot.Angle_Space_Plot(file_high, {"EBF": True, "3D": True,
                                           'split': '0/1000/4000/6000/9000/10000',
                                           'save_fig': True})
@@ -349,18 +349,24 @@ if "plot" in sys.argv:
         file_low, file_high = get_low_high()
 
         Plot.Spherical_Plot_Transform(file_low, {'nmax': 1000,
-                                                 'save_fig': True})
+                                                 'save_fig': True},
+                                      figsize=figsize, tmax=1e8)
         Plot.Spherical_Plot_Transform(file_high, {'nmax': 1000,
-                                                  'save_fig': True})
-        Plot.Spherical_Plot(file_low, save_fig=True)
-        Plot.Spherical_Plot(file_high, save_fig=True)
+                                                  'save_fig': True},
+                                      figsize=figsize, tmax=1e8)
+        Plot.Spherical_Plot(file_low, save_fig=True, precession_periods=False,
+                            figsize=figsize, tmax=1e8, ax1ylim=10000)
+        Plot.Spherical_Plot(file_high, save_fig=True, precession_periods=False,
+                            figsize=figsize, tmax=1e8, ax1ylim=10000)
 
     if "C" in sys.argv:
         os.chdir(home)
         os.chdir(dr_C)
         file_low, file_high = get_low_high()
-        Plot.Spherical_Plot_Transform(file_low, {'save_fig': True})
-        Plot.Spherical_Plot_Transform(file_high, {'save_fig': True})
+        Plot.Spherical_Plot_Transform(file_low, {'save_fig': True},
+                                      figsize=figsize, tmax=1e8)
+        Plot.Spherical_Plot_Transform(file_high, {'save_fig': True},
+                                      figsize=figsize, tmax=1e8)
 
 if "copy" in sys.argv:
     for dr in [dr_S_NA, dr_A, dr_B, dr_C, dr_A_NA, dr_B_NA, dr_C_NA]:

@@ -12,7 +12,7 @@ def RemoveFileSuffix(file_name):
     if file_name.endswith(suffix):
         return file_name[:-5]
 
-def Save_Figure(file_path, type_of_plot, dest_dir="img", format_type=".pdf",
+def Save_Figure(file_path, type_of_plot, dest_dir="img", format_type=".png",
                 tight=True):
     """ Saves the currently open figure with an appropriate name"""
     if not os.path.isdir(dest_dir):

@@ -92,7 +92,7 @@ ax.set_xlim(0.0, 2e9)
 
 fig.tight_layout()
 if '30' in sys.argv:
-    plt.savefig('Plot_a_averaged_and_exact_chi_30.png')
+    plt.savefig('Plot_a_averaged_and_exact_chi_30.png', dpi=500)
 else:
-    plt.savefig('Plot_a_averaged_and_exact_chi_75.png')
+    plt.savefig('Plot_a_averaged_and_exact_chi_75.png', dpi=500)
 

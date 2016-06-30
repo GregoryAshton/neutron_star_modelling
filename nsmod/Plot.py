@@ -64,7 +64,7 @@ def simple_plot(file_name, tmax=None, tmin=None, axes=None, *args, **kwargs):
 def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
                    end_val=False, save_fig=True, figsize=None,
                    precession_periods=True, analytic=False, ax1ylim=None,
-                   phi_y_lim=None, labelx=-0.2, **kwargs):
+                   ax2yupper=105, phi_y_lim=None, labelx=-0.2, **kwargs):
     """
 
     Plot the input data after transforming to spherical polar coordinates
@@ -122,9 +122,9 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
     ax2.plot(time, a, **kwargs)
     #py.axhline(90,ls="--",color="k")
 
-    ax2.set_ylim(0, 105)
+    ax2.set_ylim(0, ax2yupper)
     #py.yticks(fig2.get_yticks()[0:-2])
-    ax2.set_yticks(py.arange(0, 105, 15))
+    ax2.set_yticks(py.arange(0, 105, 30))
     ax2.set_ylabel(r"$a $ [deg]", rotation="vertical")
     ax2.yaxis.set_label_coords(labelx, 0.5)
     ax2.set_xlim(tmin, tmax)
@@ -176,9 +176,11 @@ def Spherical_Plot(file_name, axes=None, tmax=None, tmin=0.0,
         varphi = np.degrees(epsI3 * omega0 * np.cos(np.radians(a0)) * time)
         ax3.plot(time, varphi, "--", color=COLOR, lw=lw, zorder=10)
 
-    for ax in (ax1, ax2, ax3):
+    for ax in (ax1, ax3):
         ax.yaxis.set_major_locator(ticker.MaxNLocator(5))
+    for ax in (ax1, ax2, ax3):
         ax.grid(True, linestyle='-', linewidth=0.1)
+    #ax2.grid(True, which='minor', axis='both', linestyle='-', linewidth=0.05)
     plt.tight_layout()
     py.subplots_adjust(hspace=0.2)
     if save_fig:
@@ -586,7 +588,7 @@ def Simple_Plot_Transform(file_name, Option_Dictionary={}):
 
 
 def Spherical_Plot_Transform(file_name, Option_Dictionary={}, tmax=None,
-                             labelx=-0.2, figsize=None):
+                             ax2yupper=105, labelx=-0.2, figsize=None):
     """
 
     Plot the input data after transforming to spherical polar coordinates in
@@ -711,12 +713,12 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}, tmax=None,
 
         # py.axhline(90,ls="--",color="k")
 
-        y_max = 120
-        ax2.set_ylim(0, y_max)
+        y_max = 105
+        ax2.set_ylim(0, ax2yupper)
 
         # py.yticks(fig2.get_yticks()[0:-2])
 
-        ax2.set_yticks(py.arange(0, y_max, 15))
+        ax2.set_yticks(py.arange(0, y_max, 30))
         ax2.set_ylabel(r"$a'$ [deg]", rotation='vertical')
         ax2.yaxis.set_label_coords(labelx, 0.5)
 
@@ -764,8 +766,9 @@ def Spherical_Plot_Transform(file_name, Option_Dictionary={}, tmax=None,
     else:
         ax3.set_xlim(0, time[-1])
 
-    for ax in (ax1, ax2, ax3):
+    for ax in (ax1, ax3):
         ax.yaxis.set_major_locator(ticker.MaxNLocator(5))
+    for ax in (ax1, ax2, ax3):
         ax.grid(True, linestyle='-', linewidth=0.1)
 
 

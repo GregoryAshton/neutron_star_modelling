@@ -26,7 +26,7 @@ def Save_Figure(file_path, type_of_plot, dest_dir="img", format_type=".png",
 
     if tight:
         plt.tight_layout()
-    plt.savefig(plot_file_name)
+    plt.savefig(plot_file_name, dpi=500)
     print "Saving figure as %s" % plot_file_name
 
 

@@ -353,11 +353,13 @@ if "plot" in sys.argv:
                                       figsize=figsize, tmax=1e8)
         Plot.Spherical_Plot_Transform(file_high, {'nmax': 1000,
                                                   'save_fig': True},
-                                      figsize=figsize, tmax=1e8)
+                                      figsize=figsize, tmax=1e8,
+                                      ax2yupper=120)
         Plot.Spherical_Plot(file_low, save_fig=True, precession_periods=False,
                             figsize=figsize, tmax=1e8, ax1ylim=10000)
         Plot.Spherical_Plot(file_high, save_fig=True, precession_periods=False,
-                            figsize=figsize, tmax=1e8, ax1ylim=10000)
+                            figsize=figsize, tmax=1e8, ax1ylim=10000,
+                            ax2yupper=120)
 
     if "C" in sys.argv:
         os.chdir(home)
